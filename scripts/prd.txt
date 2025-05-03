@@ -1,0 +1,70 @@
+<context>
+# Overview
+Sitio web interno para un profesor de entrenamiento funcional, orientado a la gestión rápida y simple de asistencias y pagos de alumnos. No hay vistas públicas ni acceso de alumnos. El foco es la experiencia de usuario para una sola persona (el profesor), minimizando clics y tiempo de gestión.
+
+# Core Features
+- Registro de asistencias diarias por fecha, nombre y ubicación (Plaza Arenales o Plaza Terán).
+- Registro de pagos por alumno: fecha, monto, método de pago, período cubierto.
+- ABM de alumnos (crear, editar, eliminar).
+- Notas/informes personalizados por alumno (ausencias, vacaciones, lesiones, etc.).
+- Gestión de aumentos de precios y reflejo en reportes/balances.
+- Reportes mensuales y personalizados: asistencias, inasistencias prolongadas, pagos realizados/pendientes, balance mensual, promedios.
+- Alertas de inasistencias prolongadas y pagos atrasados.
+- Generación de reporte textual por alumno para enviar como factura/resumen.
+- Interfaz minimalista, clara, optimizada para desktop y móvil, con formularios simples y autocompletado.
+- Edición en lote (ej: marcar asistencia de varios alumnos a la vez).
+- Dashboards/resúmenes visuales del estado general del mes.
+- Sin secciones públicas ni acceso de alumnos.
+- Priorización de facilidad de uso, velocidad y reducción de errores.
+- Sugerencia de flujos de trabajo y pantallas para minimizar fricción y tiempo de gestión diaria.
+
+# User Experience
+- Usuario único: el profesor/editor.
+- Flujos principales: gestión diaria de asistencias y pagos, consulta rápida de balances y reportes, generación de resúmenes para alumnos.
+- UI minimalista, con autocompletado, edición en lote y dashboards visuales.
+- Optimización para uso rápido en desktop y móvil.
+</context>
+<PRD>
+# Technical Architecture
+- Next.js (ya implementado)
+- TypeScript (ya implementado)
+- Supabase para persistencia de datos (ya implementado)
+- Modelos de datos definidos: Alumno, Asistencia, Pago, Nota, HistorialPrecios
+- Estructura de carpetas: src/app/[alumnos|asistencias|pagos|reportes], src/components/[alumnos|asistencias|pagos|reportes|ui]
+- Servicios y hooks para lógica de negocio (ya implementados para alumnos, asistencias, pagos)
+- Faltan: lógica avanzada de reportes, alertas automáticas, edición en lote, dashboards visuales avanzados, flujos de UX optimizados
+
+# Development Roadmap
+## MVP (ya implementado parcialmente)
+- ABM de alumnos
+- Registro de asistencias y pagos
+- Listado y consulta básica de alumnos, asistencias y pagos
+- Reportes básicos
+
+## Mejoras y pendientes
+- Edición en lote de asistencias/pagos
+- Dashboards visuales y resúmenes mensuales
+- Alertas automáticas (inactividad, pagos atrasados)
+- Generación de reportes personalizados y exportables
+- Gestión de aumentos de precios y su reflejo en reportes
+- Optimización de UX/UI para minimizar clics y tiempo
+- Mejoras en autocompletado y formularios inteligentes
+- Flujos de trabajo sugeridos para el profesor
+
+# Logical Dependency Chain
+1. Completar y refinar modelos de datos según necesidades de reportes y alertas
+2. Implementar edición en lote y dashboards visuales
+3. Mejorar reportes personalizados y generación de resúmenes
+4. Añadir alertas automáticas y lógica de notificaciones
+5. Optimizar flujos de UX/UI y formularios inteligentes
+
+# Risks and Mitigations
+- Riesgo: Complejidad en reportes y alertas → Mitigación: desarrollo incremental, validación continua con el usuario (profesor)
+- Riesgo: UX no suficientemente ágil → Mitigación: prototipado rápido y feedback frecuente
+
+# Appendix
+- Tecnologías: Next.js, TypeScript, Supabase
+- Modelos de datos ya definidos en src/types/
+- Componentes y servicios ya implementados para alumnos, asistencias, pagos
+- Faltan: dashboards avanzados, edición en lote, alertas automáticas, reportes exportables
+</PRD> 

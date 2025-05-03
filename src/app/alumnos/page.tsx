@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import AlumnosList from '@/components/alumnos/AlumnosList'
 import AlumnosActions from '@/components/alumnos/AlumnosActions'
-import Loading from '@/components/Loading'
 
 export default function AlumnosPage() {
   const [key, setKey] = useState(0)

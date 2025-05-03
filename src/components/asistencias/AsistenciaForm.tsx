@@ -6,7 +6,7 @@ import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 import type { Alumno, Ubicacion } from '@/types'
 import { getAlumnos } from '@/services/alumnos'
-import { createAsistenciasBulk } from '@/services/asistencias'
+import { useAsistencias } from '@/hooks/useAsistencias'
 
 interface AsistenciaFormProps {
   onSuccess?: () => void
@@ -19,9 +19,12 @@ export default function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
   const [ubicacion, setUbicacion] = useState<Ubicacion>('Plaza Arenales')
   const [alumnosSeleccionados, setAlumnosSeleccionados] = useState<string[]>([])
   const [alumnos, setAlumnos] = useState<Alumno[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loadingAlumnos, setLoadingAlumnos] = useState(true)
+  const {
+    registrarAsistenciasBulk,
+    loading: loadingAsistencias
+  } = useAsistencias(ubicacion)
 
-  // Cargar alumnos al montar el componente
   useEffect(() => {
     cargarAlumnos()
   }, [])
@@ -33,7 +36,7 @@ export default function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
     } catch (error) {
       toast.error('Error al cargar los alumnos')
     } finally {
-      setLoading(false)
+      setLoadingAlumnos(false)
     }
   }
 
@@ -43,16 +46,8 @@ export default function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
       toast.error('Selecciona al menos un alumno')
       return
     }
-
     try {
-      const asistencias = alumnosSeleccionados.map(alumnoId => ({
-        alumnoId,
-        fecha: fecha.toISOString(),
-        ubicacion
-      }))
-
-      await createAsistenciasBulk(asistencias)
-      toast.success('Asistencias registradas')
+      await registrarAsistenciasBulk(alumnosSeleccionados, fecha.toISOString().split('T')[0])
       setAlumnosSeleccionados([])
       onSuccess?.()
     } catch (error) {
@@ -68,7 +63,7 @@ export default function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
     )
   }
 
-  if (loading) {
+  if (loadingAlumnos) {
     return (
       <div className="flex items-center justify-center h-32">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
@@ -140,10 +135,10 @@ export default function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
       <div className="flex justify-end">
         <button
           type="submit"
-          disabled={alumnosSeleccionados.length === 0}
+          disabled={alumnosSeleccionados.length === 0 || loadingAsistencias}
           className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Registrar Asistencias
+          {loadingAsistencias ? 'Registrando...' : 'Registrar Asistencias'}
         </button>
       </div>
     </form>

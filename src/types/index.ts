@@ -2,6 +2,8 @@ export type Ubicacion = 'Plaza Arenales' | 'Plaza Terán';
 
 export type MetodoPago = 'Efectivo' | 'Transferencia' | 'Mercado Pago';
 
+export type EstadoPago = 'al_dia' | 'pendiente' | 'atrasado';
+
 export interface Alumno {
   id: string;
   nombre: string;
@@ -11,6 +13,10 @@ export interface Alumno {
   activo: boolean;
   notas?: string;
   precioMensual: number;
+  alertasActivas?: boolean;
+  fechaUltimaAsistencia?: string;
+  diasConsecutivosAsistencia?: number;
+  estadoPago?: EstadoPago;
 }
 
 export interface Asistencia {
@@ -29,6 +35,7 @@ export interface Pago {
   periodoDesde: string;
   periodoHasta: string;
   notas?: string;
+  estado?: 'Pagado' | 'Pendiente';
 }
 
 export interface HistorialPrecios {
@@ -45,4 +52,5 @@ export interface Nota {
   fecha: string;
   contenido: string;
   tipo: 'Ausencia' | 'Lesión' | 'Vacaciones' | 'General';
+  visibleEnReporte?: boolean;
 } 

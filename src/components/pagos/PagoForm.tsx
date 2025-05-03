@@ -6,7 +6,7 @@ import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 import type { Alumno, MetodoPago } from '@/types'
 import { getAlumnos } from '@/services/alumnos'
-import { createPago } from '@/services/pagos'
+import { usePagos } from '@/hooks/usePagos'
 
 interface PagoFormProps {
   onSuccess?: () => void
@@ -26,7 +26,8 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
   })
 
   const [alumnos, setAlumnos] = useState<Alumno[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loadingAlumnos, setLoadingAlumnos] = useState(true)
+  const { registrarPago, loading: loadingPago } = usePagos()
 
   useEffect(() => {
     cargarAlumnos()
@@ -39,14 +40,14 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
     } catch (error) {
       toast.error('Error al cargar los alumnos')
     } finally {
-      setLoading(false)
+      setLoadingAlumnos(false)
     }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await createPago({
+      await registrarPago({
         alumnoId: formData.alumnoId,
         fecha: formData.fecha.toISOString(),
         monto: Number(formData.monto),
@@ -55,8 +56,6 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
         periodoHasta: formData.periodoHasta.toISOString().split('T')[0],
         notas: formData.notas,
       })
-      
-      toast.success('Pago registrado')
       setFormData({
         ...formData,
         alumnoId: '',
@@ -71,7 +70,7 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
 
   const alumnoSeleccionado = alumnos.find(a => a.id === formData.alumnoId)
 
-  if (loading) {
+  if (loadingAlumnos) {
     return (
       <div className="flex items-center justify-center h-32">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
@@ -206,8 +205,9 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
         <button
           type="submit"
           className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+          disabled={loadingPago}
         >
-          Registrar Pago
+          {loadingPago ? 'Registrando...' : 'Registrar Pago'}
         </button>
       </div>
     </form>

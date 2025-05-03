@@ -7,12 +7,8 @@ import { toast } from 'react-hot-toast'
 import type { Asistencia } from '@/types'
 import { getAsistencias } from '@/services/asistencias'
 
-interface AsistenciasListProps {
-  onSuccess?: () => void
-}
-
-export default function AsistenciasList({ onSuccess }: AsistenciasListProps) {
-  const [asistencias, setAsistencias] = useState<any[]>([])
+export default function AsistenciasList() {
+  const [asistencias, setAsistencias] = useState<Asistencia[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -54,16 +50,13 @@ export default function AsistenciasList({ onSuccess }: AsistenciasListProps) {
                   <div className="flex-shrink-0">
                     <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                       <span className="text-primary text-sm font-medium">
-                        {asistencia.alumnos.nombre
-                          .split(' ')
-                          .map((n: string) => n[0])
-                          .join('')}
+                        {asistencia.id.slice(0, 2).toUpperCase()}
                       </span>
                     </div>
                   </div>
                   <div className="ml-4">
                     <div className="text-sm font-medium text-gray-900">
-                      {asistencia.alumnos.nombre}
+                      {asistencia.alumnoId || 'Alumno'}
                     </div>
                     <div className="text-sm text-gray-500">
                       {format(new Date(asistencia.fecha), "EEEE d 'de' MMMM", {
