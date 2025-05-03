@@ -7,6 +7,8 @@ export type EstadoPago = 'al_dia' | 'pendiente' | 'atrasado';
 export interface Alumno {
   id: string;
   nombre: string;
+  apellido?: string;
+  sede: 'Plaza Arenales' | 'Plaza Terán';
   email?: string;
   telefono?: string;
   fechaAlta: string;
