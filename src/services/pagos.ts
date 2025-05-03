@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase'
 import type { Pago } from '@/types'
 
 // Mapeo entre los nombres del modelo y la base de datos
-function mapPagoFromDB(dbPago: Record<string, any>): Pago {
+function mapPagoFromDB(dbPago: Record<string, unknown>): Pago {
   return {
     id: dbPago.id,
     alumnoId: dbPago.alumno_id,
@@ -39,7 +39,7 @@ export async function getPagosPorAlumno(alumnoId: string) {
 
 export async function createPago(pago: Omit<Pago, 'id'>) {
   // Mapear los campos del modelo al formato de la base de datos
-  const dbPago: Record<string, any> = {
+  const dbPago: Record<string, unknown> = {
     alumno_id: pago.alumnoId,
     fecha_pago: pago.fecha,
     monto: pago.monto,
@@ -60,7 +60,7 @@ export async function createPago(pago: Omit<Pago, 'id'>) {
 }
 
 export async function updatePago(id: string, pago: Partial<Pago>) {
-  const dbPago: Record<string, any> = {
+  const dbPago: Record<string, unknown> = {
     alumno_id: pago.alumnoId,
     fecha_pago: pago.fecha,
     monto: pago.monto,
@@ -88,4 +88,4 @@ export async function deletePago(id: string) {
     .eq('id', id)
 
   if (error) throw error
-} 
+}

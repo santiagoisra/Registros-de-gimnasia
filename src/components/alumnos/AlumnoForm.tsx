@@ -49,7 +49,7 @@ export default function AlumnoForm({ alumno, onClose, onSuccess }: AlumnoFormPro
       }
       onSuccess()
       onClose()
-    } catch (error) {
+    } catch {
       toast.error('Error al guardar el alumno')
     }
   }
@@ -213,4 +213,4 @@ export default function AlumnoForm({ alumno, onClose, onSuccess }: AlumnoFormPro
       </div>
     </form>
   )
-} 
+}

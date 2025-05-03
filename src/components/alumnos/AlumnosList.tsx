@@ -20,7 +20,7 @@ export default function AlumnosList() {
     try {
       const data = await getAlumnos()
       setAlumnos(data)
-    } catch (error) {
+    } catch {
       toast.error('Error al cargar los alumnos')
     } finally {
       setLoading(false)
@@ -33,7 +33,7 @@ export default function AlumnosList() {
       await deleteAlumno(id)
       toast.success('Alumno eliminado')
       cargarAlumnos()
-    } catch (error) {
+    } catch {
       toast.error('Error al eliminar el alumno')
     }
   }
@@ -130,4 +130,4 @@ export default function AlumnosList() {
       )}
     </div>
   )
-} 
+}

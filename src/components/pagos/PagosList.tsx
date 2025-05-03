@@ -19,7 +19,7 @@ export default function PagosList() {
     try {
       const data = await getPagos()
       setPagos(data)
-    } catch (error) {
+    } catch {
       toast.error('Error al cargar los pagos')
     } finally {
       setLoading(false)
@@ -92,4 +92,4 @@ export default function PagosList() {
       </div>
     </div>
   )
-} 
+}

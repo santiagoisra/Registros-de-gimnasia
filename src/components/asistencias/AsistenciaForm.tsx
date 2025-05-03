@@ -33,7 +33,7 @@ export default function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
     try {
       const data = await getAlumnos()
       setAlumnos(data.filter(alumno => alumno.activo))
-    } catch (error) {
+    } catch {
       toast.error('Error al cargar los alumnos')
     } finally {
       setLoadingAlumnos(false)
@@ -50,7 +50,7 @@ export default function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
       await registrarAsistenciasBulk(alumnosSeleccionados, fecha.toISOString().split('T')[0])
       setAlumnosSeleccionados([])
       onSuccess?.()
-    } catch (error) {
+    } catch {
       toast.error('Error al registrar las asistencias')
     }
   }
@@ -143,4 +143,4 @@ export default function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
       </div>
     </form>
   )
-} 
+}
