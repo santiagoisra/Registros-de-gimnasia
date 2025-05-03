@@ -74,13 +74,11 @@ export default function ReportePagos() {
       y: {
         beginAtZero: true,
         ticks: {
-          callback: function(value) {
-            return `$${value}`
-          },
+          callback: (value: number | string) => `$${value}`
         },
       },
     },
-  }
+  } as const
 
   const totalPendiente = datos.pagosPendientes.reduce(
     (sum, pago) => sum + pago.monto,
@@ -130,4 +128,4 @@ export default function ReportePagos() {
       </div>
     </div>
   )
-} 
+}

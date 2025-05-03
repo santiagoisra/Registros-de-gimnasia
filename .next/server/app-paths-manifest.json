@@ -1,7 +1,8 @@
 {
-  "/alumnos/page": "app/alumnos/page.js",
-  "/asistencias/page": "app/asistencias/page.js",
-  "/pagos/page": "app/pagos/page.js",
+  "/_not-found": "app/_not-found.js",
   "/reportes/page": "app/reportes/page.js",
+  "/asistencias/page": "app/asistencias/page.js",
+  "/alumnos/page": "app/alumnos/page.js",
+  "/pagos/page": "app/pagos/page.js",
   "/page": "app/page.js"
 }

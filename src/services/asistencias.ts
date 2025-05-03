@@ -4,10 +4,10 @@ import type { Asistencia } from '@/types'
 // Mapeo entre los nombres del modelo y la base de datos
 function mapAsistenciaFromDB(dbAsistencia: Record<string, unknown>): Asistencia {
   return {
-    id: dbAsistencia.id,
-    alumnoId: dbAsistencia.alumno_id,
-    fecha: dbAsistencia.fecha,
-    ubicacion: dbAsistencia.sede,
+    id: dbAsistencia.id as string,
+    alumnoId: dbAsistencia.alumno_id as string,
+    fecha: dbAsistencia.fecha as string,
+    ubicacion: dbAsistencia.sede as Asistencia['ubicacion'],
   }
 }
 

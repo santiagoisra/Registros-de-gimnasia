@@ -3,11 +3,11 @@ import type { HistorialPrecios } from '@/types'
 
 function mapHistorialPrecioFromDB(db: Record<string, unknown>): HistorialPrecios {
   return {
-    id: db.id,
-    alumnoId: db.alumno_id,
-    precio: db.precio,
-    fechaDesde: db.fecha_desde,
-    fechaHasta: db.fecha_hasta,
+    id: db.id as string,
+    alumnoId: db.alumno_id as string,
+    precio: db.precio as number,
+    fechaDesde: db.fecha_desde as string,
+    fechaHasta: db.fecha_hasta as string | undefined,
   }
 }
 
