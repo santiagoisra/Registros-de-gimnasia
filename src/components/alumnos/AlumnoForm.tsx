@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
-import type { Alumno } from '@/types'
+import type { Alumno, EstadoPago } from '@/types'
 import { createAlumno, updateAlumno } from '@/services/alumnos'
 
 interface AlumnoFormProps {
@@ -10,6 +10,8 @@ interface AlumnoFormProps {
   onClose: () => void
   onSuccess: () => void
 }
+
+const ESTADOS_PAGO: EstadoPago[] = ['al_dia', 'pendiente', 'atrasado']
 
 export default function AlumnoForm({ alumno, onClose, onSuccess }: AlumnoFormProps) {
   const [formData, setFormData] = useState({
@@ -19,10 +21,24 @@ export default function AlumnoForm({ alumno, onClose, onSuccess }: AlumnoFormPro
     precioMensual: alumno?.precioMensual || 0,
     notas: alumno?.notas || '',
     activo: alumno?.activo ?? true,
+    alertasActivas: alumno?.alertasActivas ?? true,
+    estadoPago: alumno?.estadoPago || 'al_dia',
+    diasConsecutivosAsistencia: alumno?.diasConsecutivosAsistencia || 0,
+    fechaUltimaAsistencia: alumno?.fechaUltimaAsistencia || '',
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    // Validaciones
+    if (!formData.nombre.trim()) {
+      return
+    }
+    if (formData.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email)) {
+      return
+    }
+    if (formData.precioMensual <= 0) {
+      return
+    }
     try {
       if (alumno) {
         await updateAlumno(alumno.id, formData)
@@ -106,6 +122,64 @@ export default function AlumnoForm({ alumno, onClose, onSuccess }: AlumnoFormPro
           />
           <span className="ml-2 text-sm text-gray-700">Activo</span>
         </label>
+      </div>
+
+      <div>
+        <label htmlFor="alertasActivas" className="flex items-center">
+          <input
+            type="checkbox"
+            id="alertasActivas"
+            checked={formData.alertasActivas}
+            onChange={(e) => setFormData({ ...formData, alertasActivas: e.target.checked })}
+            className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
+          />
+          <span className="ml-2 text-sm text-gray-700">Recibir alertas</span>
+        </label>
+      </div>
+
+      <div>
+        <label htmlFor="estadoPago" className="block text-sm font-medium text-gray-700">
+          Estado de pago
+        </label>
+        <select
+          id="estadoPago"
+          value={formData.estadoPago}
+          onChange={(e) => setFormData({ ...formData, estadoPago: e.target.value as EstadoPago })}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+        >
+          {ESTADOS_PAGO.map((estado) => (
+            <option key={estado} value={estado}>
+              {estado === 'al_dia' ? 'Al día' : estado === 'pendiente' ? 'Pendiente' : 'Atrasado'}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="diasConsecutivosAsistencia" className="block text-sm font-medium text-gray-700">
+          Días consecutivos de asistencia
+        </label>
+        <input
+          type="number"
+          id="diasConsecutivosAsistencia"
+          value={formData.diasConsecutivosAsistencia}
+          onChange={(e) => setFormData({ ...formData, diasConsecutivosAsistencia: Number(e.target.value) })}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+          min="0"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="fechaUltimaAsistencia" className="block text-sm font-medium text-gray-700">
+          Fecha de última asistencia
+        </label>
+        <input
+          type="date"
+          id="fechaUltimaAsistencia"
+          value={formData.fechaUltimaAsistencia}
+          onChange={(e) => setFormData({ ...formData, fechaUltimaAsistencia: e.target.value })}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
+        />
       </div>
 
       <div>

@@ -7,6 +7,10 @@ export type Alumno = {
   telefono: string
   sede: 'Plaza Arenales' | 'Plaza Terán'
   activo: boolean
+  alertas_activas?: boolean
+  fecha_ultima_asistencia?: string
+  dias_consecutivos_asistencia?: number
+  estado_pago?: 'al_dia' | 'pendiente' | 'atrasado'
 }
 
 export type Asistencia = {
@@ -29,6 +33,23 @@ export type Pago = {
   estado: 'Pendiente' | 'Pagado'
 }
 
+export type HistorialPrecios = {
+  id: string
+  alumno_id: string
+  precio: number
+  fecha_desde: string
+  fecha_hasta?: string
+}
+
+export type Nota = {
+  id: string
+  alumno_id: string
+  fecha: string
+  contenido: string
+  tipo: 'Ausencia' | 'Lesión' | 'Vacaciones' | 'General'
+  visible_en_reporte?: boolean
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -46,6 +67,16 @@ export type Database = {
         Row: Pago
         Insert: Omit<Pago, 'id' | 'created_at'>
         Update: Partial<Omit<Pago, 'id' | 'created_at'>>
+      }
+      historial_precios: {
+        Row: HistorialPrecios
+        Insert: Omit<HistorialPrecios, 'id'>
+        Update: Partial<Omit<HistorialPrecios, 'id'>>
+      }
+      notas: {
+        Row: Nota
+        Insert: Omit<Nota, 'id'>
+        Update: Partial<Omit<Nota, 'id'>>
       }
     }
   }

@@ -72,7 +72,7 @@ export default function AlumnosList() {
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
-          {alumnos.map((alumno) => (
+          {alumnos.filter(a => a.activo).map((alumno) => (
             <tr key={alumno.id}>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="text-sm font-medium text-gray-900">{alumno.nombre}</div>

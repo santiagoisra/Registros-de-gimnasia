@@ -1,47 +1,36 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { supabase } from '../lib/supabase'
-import type { Asistencia } from '../types/supabase'
 import { toast } from 'react-hot-toast'
+import type { Asistencia } from '../types'
+import {
+  getAsistenciasPorFecha,
+  createAsistencia,
+  deleteAsistencia,
+  createAsistenciasBulk
+} from '@/services/asistencias'
 
-export const useAsistencias = (sede: 'Plaza Arenales' | 'Plaza Terán') => {
+export const useAsistencias = (ubicacion: 'Plaza Arenales' | 'Plaza Terán') => {
   const [loading, setLoading] = useState(false)
   const [asistencias, setAsistencias] = useState<Asistencia[]>([])
 
   const fetchAsistencias = useCallback(async (fecha: string) => {
     try {
       setLoading(true)
-      const { data, error } = await supabase
-        .from('asistencias')
-        .select('*')
-        .eq('sede', sede)
-        .eq('fecha', fecha)
-
-      if (error) throw error
-      setAsistencias(data || [])
+      const data = await getAsistenciasPorFecha(fecha)
+      setAsistencias(data.filter(a => a.ubicacion === ubicacion))
     } catch (error) {
       toast.error('Error al cargar las asistencias')
       console.error(error)
     } finally {
       setLoading(false)
     }
-  }, [sede])
+  }, [ubicacion])
 
   const registrarAsistencia = useCallback(async (alumnoId: string, fecha: string) => {
     try {
       setLoading(true)
-      const { error } = await supabase
-        .from('asistencias')
-        .insert([
-          {
-            alumno_id: alumnoId,
-            fecha,
-            sede
-          }
-        ])
-
-      if (error) throw error
+      await createAsistencia({ alumnoId, fecha, ubicacion })
       toast.success('Asistencia registrada')
       await fetchAsistencias(fecha)
     } catch (error) {
@@ -50,17 +39,26 @@ export const useAsistencias = (sede: 'Plaza Arenales' | 'Plaza Terán') => {
     } finally {
       setLoading(false)
     }
-  }, [sede, fetchAsistencias])
+  }, [ubicacion, fetchAsistencias])
+
+  const registrarAsistenciasBulk = useCallback(async (alumnosIds: string[], fecha: string) => {
+    try {
+      setLoading(true)
+      await createAsistenciasBulk(alumnosIds.map(alumnoId => ({ alumnoId, fecha, ubicacion })))
+      toast.success('Asistencias registradas')
+      await fetchAsistencias(fecha)
+    } catch (error) {
+      toast.error('Error al registrar asistencias en lote')
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }, [ubicacion, fetchAsistencias])
 
   const eliminarAsistencia = useCallback(async (id: string, fecha: string) => {
     try {
       setLoading(true)
-      const { error } = await supabase
-        .from('asistencias')
-        .delete()
-        .eq('id', id)
-
-      if (error) throw error
+      await deleteAsistencia(id)
       toast.success('Asistencia eliminada')
       await fetchAsistencias(fecha)
     } catch (error) {
@@ -76,6 +74,7 @@ export const useAsistencias = (sede: 'Plaza Arenales' | 'Plaza Terán') => {
     asistencias,
     fetchAsistencias,
     registrarAsistencia,
+    registrarAsistenciasBulk,
     eliminarAsistencia
   }
 } 
