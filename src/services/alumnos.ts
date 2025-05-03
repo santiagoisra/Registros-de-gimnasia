@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase'
 import type { Alumno } from '@/types'
 
 // Mapeo entre los nombres del modelo y la base de datos
-function mapAlumnoFromDB(dbAlumno: Record<string, any>): Alumno {
+function mapAlumnoFromDB(dbAlumno: Record<string, unknown>): Alumno {
   return {
     id: dbAlumno.id,
     nombre: dbAlumno.nombre,
@@ -43,7 +43,7 @@ export async function getAlumno(id: string) {
 
 export async function createAlumno(alumno: Omit<Alumno, 'id' | 'fechaAlta'>) {
   // Mapear los campos del modelo al formato de la base de datos
-  const dbAlumno: Record<string, any> = {
+  const dbAlumno: Record<string, unknown> = {
     nombre: alumno.nombre,
     email: alumno.email,
     telefono: alumno.telefono,
@@ -67,7 +67,7 @@ export async function createAlumno(alumno: Omit<Alumno, 'id' | 'fechaAlta'>) {
 }
 
 export async function updateAlumno(id: string, alumno: Partial<Alumno>) {
-  const dbAlumno: Record<string, any> = {
+  const dbAlumno: Record<string, unknown> = {
     nombre: alumno.nombre,
     email: alumno.email,
     telefono: alumno.telefono,
@@ -98,4 +98,4 @@ export async function deleteAlumno(id: string) {
     .eq('id', id)
 
   if (error) throw error
-} 
+}

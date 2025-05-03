@@ -112,7 +112,7 @@ export default function ReporteGeneral() {
         pagosPendientes: pagosPendientes || 0,
         asistenciasPorDia,
       })
-    } catch (error) {
+    } catch {
       toast.error('Error al cargar las estadísticas')
     } finally {
       setLoading(false)
@@ -214,4 +214,4 @@ export default function ReporteGeneral() {
       </div>
     </div>
   )
-} 
+}

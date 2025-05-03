@@ -37,7 +37,7 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
     try {
       const data = await getAlumnos()
       setAlumnos(data.filter(alumno => alumno.activo))
-    } catch (error) {
+    } catch {
       toast.error('Error al cargar los alumnos')
     } finally {
       setLoadingAlumnos(false)
@@ -63,7 +63,7 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
         notas: '',
       })
       onSuccess?.()
-    } catch (error) {
+    } catch {
       toast.error('Error al registrar el pago')
     }
   }
@@ -212,4 +212,4 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
       </div>
     </form>
   )
-} 
+}

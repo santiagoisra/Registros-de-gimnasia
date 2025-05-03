@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase'
 import type { Asistencia } from '@/types'
 
 // Mapeo entre los nombres del modelo y la base de datos
-function mapAsistenciaFromDB(dbAsistencia: Record<string, any>): Asistencia {
+function mapAsistenciaFromDB(dbAsistencia: Record<string, unknown>): Asistencia {
   return {
     id: dbAsistencia.id,
     alumnoId: dbAsistencia.alumno_id,
@@ -34,7 +34,7 @@ export async function getAsistenciasPorFecha(fecha: string) {
 
 export async function createAsistencia(asistencia: Omit<Asistencia, 'id'>) {
   // Mapear los campos del modelo al formato de la base de datos
-  const dbAsistencia: Record<string, any> = {
+  const dbAsistencia: Record<string, unknown> = {
     alumno_id: asistencia.alumnoId,
     fecha: asistencia.fecha,
     sede: asistencia.ubicacion,
@@ -71,4 +71,4 @@ export async function deleteAsistencia(id: string) {
     .eq('id', id)
 
   if (error) throw error
-} 
+}

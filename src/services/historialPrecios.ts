@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import type { HistorialPrecios } from '@/types'
 
-function mapHistorialPrecioFromDB(db: Record<string, any>): HistorialPrecios {
+function mapHistorialPrecioFromDB(db: Record<string, unknown>): HistorialPrecios {
   return {
     id: db.id,
     alumnoId: db.alumno_id,
@@ -23,7 +23,7 @@ export async function getHistorialPreciosPorAlumno(alumnoId: string) {
 }
 
 export async function createHistorialPrecio(historial: Omit<HistorialPrecios, 'id'>) {
-  const dbHistorial: Record<string, any> = {
+  const dbHistorial: Record<string, unknown> = {
     alumno_id: historial.alumnoId,
     precio: historial.precio,
     fecha_desde: historial.fechaDesde,
@@ -40,7 +40,7 @@ export async function createHistorialPrecio(historial: Omit<HistorialPrecios, 'i
 }
 
 export async function updateHistorialPrecio(id: string, historial: Partial<HistorialPrecios>) {
-  const dbHistorial: Record<string, any> = {
+  const dbHistorial: Record<string, unknown> = {
     precio: historial.precio,
     fecha_desde: historial.fechaDesde,
     fecha_hasta: historial.fechaHasta,
@@ -63,4 +63,4 @@ export async function deleteHistorialPrecio(id: string) {
     .eq('id', id)
 
   if (error) throw error
-} 
+}

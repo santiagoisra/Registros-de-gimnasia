@@ -19,7 +19,7 @@ export default function AsistenciasList() {
     try {
       const data = await getAsistencias()
       setAsistencias(data)
-    } catch (error) {
+    } catch {
       toast.error('Error al cargar las asistencias')
     } finally {
       setLoading(false)
@@ -73,4 +73,4 @@ export default function AsistenciasList() {
       </div>
     </div>
   )
-} 
+}
