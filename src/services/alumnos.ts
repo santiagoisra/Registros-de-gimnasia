@@ -4,18 +4,18 @@ import type { Alumno } from '@/types'
 // Mapeo entre los nombres del modelo y la base de datos
 function mapAlumnoFromDB(dbAlumno: Record<string, unknown>): Alumno {
   return {
-    id: dbAlumno.id,
-    nombre: dbAlumno.nombre,
-    email: dbAlumno.email,
-    telefono: dbAlumno.telefono,
-    fechaAlta: dbAlumno.created_at,
-    activo: dbAlumno.activo,
-    notas: dbAlumno.notas, // si existe
-    precioMensual: dbAlumno.precio_mensual, // si existe
-    alertasActivas: dbAlumno.alertas_activas,
-    fechaUltimaAsistencia: dbAlumno.fecha_ultima_asistencia,
-    diasConsecutivosAsistencia: dbAlumno.dias_consecutivos_asistencia,
-    estadoPago: dbAlumno.estado_pago,
+    id: dbAlumno.id as string,
+    nombre: dbAlumno.nombre as string,
+    email: dbAlumno.email as string | undefined,
+    telefono: dbAlumno.telefono as string | undefined,
+    fechaAlta: dbAlumno.created_at as string,
+    activo: dbAlumno.activo as boolean,
+    notas: dbAlumno.notas as string | undefined, // si existe
+    precioMensual: dbAlumno.precio_mensual as number, // si existe
+    alertasActivas: dbAlumno.alertas_activas as boolean | undefined,
+    fechaUltimaAsistencia: dbAlumno.fecha_ultima_asistencia as string | undefined,
+    diasConsecutivosAsistencia: dbAlumno.dias_consecutivos_asistencia as number | undefined,
+    estadoPago: dbAlumno.estado_pago as Alumno['estadoPago'],
     // sede: dbAlumno.sede // Descomentar si se agrega al modelo Alumno del frontend
   }
 }

@@ -4,15 +4,15 @@ import type { Pago } from '@/types'
 // Mapeo entre los nombres del modelo y la base de datos
 function mapPagoFromDB(dbPago: Record<string, unknown>): Pago {
   return {
-    id: dbPago.id,
-    alumnoId: dbPago.alumno_id,
-    fecha: dbPago.fecha_pago,
-    monto: dbPago.monto,
-    metodoPago: dbPago.metodo_pago,
-    periodoDesde: dbPago.periodo_desde || '', // si existe
-    periodoHasta: dbPago.periodo_hasta || '', // si existe
-    notas: dbPago.notas, // si existe
-    estado: dbPago.estado,
+    id: dbPago.id as string,
+    alumnoId: dbPago.alumno_id as string,
+    fecha: dbPago.fecha_pago as string,
+    monto: dbPago.monto as number,
+    metodoPago: dbPago.metodo_pago as Pago['metodoPago'],
+    periodoDesde: (dbPago.periodo_desde as string) || '', // si existe
+    periodoHasta: (dbPago.periodo_hasta as string) || '', // si existe
+    notas: dbPago.notas as string | undefined, // si existe
+    estado: dbPago.estado as Pago['estado'],
   }
 }
 

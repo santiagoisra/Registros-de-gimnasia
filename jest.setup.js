@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom'
+import '@testing-library/jest-dom/extend-expect'
 
 // Mock de next/navigation
 jest.mock('next/navigation', () => ({
@@ -32,4 +33,4 @@ jest.mock('@/lib/supabase', () => ({
       delete: jest.fn(),
     })),
   },
-})) 
+}))
