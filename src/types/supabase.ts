@@ -16,9 +16,13 @@ export type Alumno = {
 export type Asistencia = {
   id: string
   created_at: string
+  updated_at: string
   alumno_id: string
   fecha: string
   sede: 'Plaza Arenales' | 'Plaza Terán'
+  estado: 'presente' | 'ausente'
+  notas?: string
+  alumno?: Alumno
 }
 
 export type Pago = {

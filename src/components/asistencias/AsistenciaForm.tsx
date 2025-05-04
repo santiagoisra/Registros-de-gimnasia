@@ -1,144 +1,148 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { toast } from 'react-hot-toast'
-import DatePicker from 'react-datepicker'
-import "react-datepicker/dist/react-datepicker.css"
-import type { Alumno, Ubicacion } from '@/types'
-import { getAlumnos } from '@/services/alumnos'
+import { useState } from 'react'
 import { useAsistencias } from '@/hooks/useAsistencias'
+import { useAlumnos } from '@/hooks/useAlumnos'
+import { Alert } from '@/components/ui/Alert'
+import { Spinner } from '@/components/ui/Spinner'
+import type { Alumno } from '@/types'
 
 interface AsistenciaFormProps {
   onSuccess?: () => void
 }
 
-const ubicaciones: Ubicacion[] = ['Plaza Arenales', 'Plaza Terán']
+export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
+  const [alumno_id, setAlumnoId] = useState('')
+  const [fecha, setFecha] = useState(new Date().toISOString().split('T')[0])
+  const [estado, setEstado] = useState<'presente' | 'ausente'>('presente')
+  const [notas, setNotas] = useState('')
+  const [sede, setSede] = useState<'Plaza Arenales' | 'Plaza Terán'>('Plaza Arenales')
+  const [error, setError] = useState<string | null>(null)
 
-export default function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
-  const [fecha, setFecha] = useState<Date>(new Date())
-  const [ubicacion, setUbicacion] = useState<Ubicacion>('Plaza Arenales')
-  const [alumnosSeleccionados, setAlumnosSeleccionados] = useState<string[]>([])
-  const [alumnos, setAlumnos] = useState<Alumno[]>([])
-  const [loadingAlumnos, setLoadingAlumnos] = useState(true)
-  const {
-    registrarAsistenciasBulk,
-    loading: loadingAsistencias
-  } = useAsistencias(ubicacion)
-
-  useEffect(() => {
-    cargarAlumnos()
-  }, [])
-
-  const cargarAlumnos = async () => {
-    try {
-      const data = await getAlumnos()
-      setAlumnos(data.filter(alumno => alumno.activo))
-    } catch {
-      toast.error('Error al cargar los alumnos')
-    } finally {
-      setLoadingAlumnos(false)
-    }
-  }
+  const { crearAsistencia, loading } = useAsistencias()
+  const { alumnos } = useAlumnos()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (alumnosSeleccionados.length === 0) {
-      toast.error('Selecciona al menos un alumno')
-      return
-    }
+    setError(null)
+
     try {
-      await registrarAsistenciasBulk(alumnosSeleccionados, fecha.toISOString().split('T')[0])
-      setAlumnosSeleccionados([])
-      onSuccess?.()
-    } catch {
-      toast.error('Error al registrar las asistencias')
+      await crearAsistencia({
+        alumno_id,
+        fecha,
+        estado,
+        notas,
+        sede
+      })
+
+      setAlumnoId('')
+      setFecha(new Date().toISOString().split('T')[0])
+      setEstado('presente')
+      setNotas('')
+      setSede('Plaza Arenales')
+
+      if (onSuccess) {
+        onSuccess()
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al registrar la asistencia')
     }
   }
 
-  const toggleAlumno = (id: string) => {
-    setAlumnosSeleccionados(prev =>
-      prev.includes(id)
-        ? prev.filter(alumnoId => alumnoId !== id)
-        : [...prev, id]
-    )
-  }
-
-  if (loadingAlumnos) {
-    return (
-      <div className="flex items-center justify-center h-32">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-      </div>
-    )
+  if (loading) {
+    return <Spinner size="lg" className="mx-auto" />
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Fecha
-          </label>
-          <DatePicker
-            selected={fecha}
-            onChange={(date: Date) => setFecha(date)}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-            dateFormat="dd/MM/yyyy"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Ubicación
-          </label>
-          <select
-            value={ubicacion}
-            onChange={(e) => setUbicacion(e.target.value as Ubicacion)}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-          >
-            {ubicaciones.map((ubi) => (
-              <option key={ubi} value={ubi}>
-                {ubi}
-              </option>
-            ))}
-          </select>
-        </div>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && <Alert variant="error">{error}</Alert>}
+
+      <div>
+        <label htmlFor="alumno" className="block text-sm font-medium text-gray-700">
+          Alumno
+        </label>
+        <select
+          id="alumno"
+          value={alumno_id}
+          onChange={(e) => setAlumnoId(e.target.value)}
+          required
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+        >
+          <option value="">Seleccionar alumno</option>
+          {alumnos?.map((alumno: Alumno) => (
+            <option key={alumno.id} value={alumno.id}>
+              {alumno.apellido}, {alumno.nombre}
+            </option>
+          ))}
+        </select>
       </div>
 
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Alumnos Presentes
+      <div>
+        <label htmlFor="fecha" className="block text-sm font-medium text-gray-700">
+          Fecha
         </label>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {alumnos.map((alumno) => (
-            <div
-              key={alumno.id}
-              className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                alumnosSeleccionados.includes(alumno.id)
-                  ? 'bg-primary/10 border-primary'
-                  : 'border-gray-200 hover:border-primary'
-              }`}
-              onClick={() => toggleAlumno(alumno.id)}
-            >
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={alumnosSeleccionados.includes(alumno.id)}
-                  onChange={() => toggleAlumno(alumno.id)}
-                  className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                />
-                <span className="ml-3 text-sm">{alumno.nombre}</span>
-              </div>
-            </div>
-          ))}
-        </div>
+        <input
+          type="date"
+          id="fecha"
+          value={fecha}
+          onChange={(e) => setFecha(e.target.value)}
+          required
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="sede" className="block text-sm font-medium text-gray-700">
+          Sede
+        </label>
+        <select
+          id="sede"
+          value={sede}
+          onChange={(e) => setSede(e.target.value as 'Plaza Arenales' | 'Plaza Terán')}
+          required
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+        >
+          <option value="Plaza Arenales">Plaza Arenales</option>
+          <option value="Plaza Terán">Plaza Terán</option>
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="estado" className="block text-sm font-medium text-gray-700">
+          Estado
+        </label>
+        <select
+          id="estado"
+          value={estado}
+          onChange={(e) => setEstado(e.target.value as 'presente' | 'ausente')}
+          required
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+        >
+          <option value="presente">Presente</option>
+          <option value="ausente">Ausente</option>
+        </select>
+      </div>
+
+      <div>
+        <label htmlFor="notas" className="block text-sm font-medium text-gray-700">
+          Notas
+        </label>
+        <textarea
+          id="notas"
+          value={notas}
+          onChange={(e) => setNotas(e.target.value)}
+          rows={3}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+        />
       </div>
 
       <div className="flex justify-end">
         <button
           type="submit"
-          disabled={alumnosSeleccionados.length === 0 || loadingAsistencias}
-          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={loading}
+          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loadingAsistencias ? 'Registrando...' : 'Registrar Asistencias'}
+          {loading ? 'Guardando...' : 'Guardar'}
         </button>
       </div>
     </form>

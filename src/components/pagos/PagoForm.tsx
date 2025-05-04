@@ -23,6 +23,8 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
     periodoDesde: new Date(),
     periodoHasta: new Date(new Date().setMonth(new Date().getMonth() + 1)),
     notas: '',
+    mes: new Date().getMonth() + 1,
+    anio: new Date().getFullYear(),
   })
 
   const [alumnos, setAlumnos] = useState<Alumno[]>([])
@@ -32,6 +34,14 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
   useEffect(() => {
     cargarAlumnos()
   }, [])
+
+  useEffect(() => {
+    setFormData(prev => ({
+      ...prev,
+      mes: formData.fecha.getMonth() + 1,
+      anio: formData.fecha.getFullYear()
+    }))
+  }, [formData.fecha])
 
   const cargarAlumnos = async () => {
     try {
@@ -46,23 +56,37 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!formData.alumnoId || !formData.monto) {
+      toast.error('Por favor completa los campos requeridos')
+      return
+    }
+
     try {
       await registrarPago({
         alumnoId: formData.alumnoId,
         fecha: formData.fecha.toISOString(),
         monto: Number(formData.monto),
         metodoPago: formData.metodoPago,
-        periodoDesde: formData.periodoDesde.toISOString().split('T')[0],
-        periodoHasta: formData.periodoHasta.toISOString().split('T')[0],
-        notas: formData.notas,
+        periodoDesde: formData.periodoDesde.toISOString(),
+        periodoHasta: formData.periodoHasta.toISOString(),
+        notas: formData.notas || undefined,
+        estado: 'Pagado',
+        mes: formData.mes,
+        anio: formData.anio
       })
-      setFormData({
-        ...formData,
-        alumnoId: '',
-        monto: '',
-        notas: '',
-      })
+      toast.success('Pago registrado correctamente')
       onSuccess?.()
+      setFormData({
+        alumnoId: '',
+        fecha: new Date(),
+        monto: '',
+        metodoPago: 'Efectivo',
+        periodoDesde: new Date(),
+        periodoHasta: new Date(new Date().setMonth(new Date().getMonth() + 1)),
+        notas: '',
+        mes: new Date().getMonth() + 1,
+        anio: new Date().getFullYear()
+      })
     } catch {
       toast.error('Error al registrar el pago')
     }
@@ -79,135 +103,123 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Alumno
-          </label>
-          <select
-            value={formData.alumnoId}
-            onChange={(e) => {
-              const alumno = alumnos.find(a => a.id === e.target.value)
-              setFormData({
-                ...formData,
-                alumnoId: e.target.value,
-                monto: alumno ? alumno.precioMensual.toString() : '',
-              })
-            }}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-            required
-          >
-            <option value="">Seleccionar alumno</option>
-            {alumnos.map((alumno) => (
-              <option key={alumno.id} value={alumno.id}>
-                {alumno.nombre}
-              </option>
-            ))}
-          </select>
-        </div>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div>
+        <label htmlFor="alumno" className="block text-sm font-medium text-gray-700">
+          Alumno
+        </label>
+        <select
+          id="alumno"
+          value={formData.alumnoId}
+          onChange={(e) => setFormData({ ...formData, alumnoId: e.target.value })}
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
+        >
+          <option value="">Selecciona un alumno</option>
+          {alumnos.map((alumno) => (
+            <option key={alumno.id} value={alumno.id}>
+              {alumno.nombre} {alumno.apellido}
+            </option>
+          ))}
+        </select>
+      </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Fecha de Pago
-          </label>
-          <DatePicker
-            selected={formData.fecha}
-            onChange={(date: Date) => setFormData({ ...formData, fecha: date })}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-            dateFormat="dd/MM/yyyy"
-          />
-        </div>
+      <div>
+        <label htmlFor="fecha" className="block text-sm font-medium text-gray-700">
+          Fecha de Pago
+        </label>
+        <DatePicker
+          id="fecha"
+          selected={formData.fecha}
+          onChange={(date) => setFormData({ ...formData, fecha: date || new Date() })}
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
+          dateFormat="dd/MM/yyyy"
+        />
+      </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Monto
-          </label>
-          <div className="relative rounded-md shadow-sm">
-            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <span className="text-gray-500 sm:text-sm">$</span>
-            </div>
-            <input
-              type="number"
-              value={formData.monto}
-              onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
-              className="block w-full rounded-md border-gray-300 pl-7 focus:border-primary focus:ring-primary sm:text-sm"
-              placeholder="0.00"
-              required
-              min="0"
-            />
+      <div>
+        <label htmlFor="monto" className="block text-sm font-medium text-gray-700">
+          Monto
+        </label>
+        <div className="mt-1 relative rounded-md shadow-sm">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span className="text-gray-500 sm:text-sm">$</span>
           </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Método de Pago
-          </label>
-          <select
-            value={formData.metodoPago}
-            onChange={(e) => setFormData({ ...formData, metodoPago: e.target.value as MetodoPago })}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-            required
-          >
-            {metodosPago.map((metodo) => (
-              <option key={metodo} value={metodo}>
-                {metodo}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Período Desde
-          </label>
-          <DatePicker
-            selected={formData.periodoDesde}
-            onChange={(date: Date) => setFormData({ ...formData, periodoDesde: date })}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-            dateFormat="dd/MM/yyyy"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Período Hasta
-          </label>
-          <DatePicker
-            selected={formData.periodoHasta}
-            onChange={(date: Date) => setFormData({ ...formData, periodoHasta: date })}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
-            dateFormat="dd/MM/yyyy"
-            minDate={formData.periodoDesde}
-          />
-        </div>
-
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Notas
-          </label>
-          <textarea
-            value={formData.notas}
-            onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
-            rows={3}
-            className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-            placeholder="Notas adicionales..."
+          <input
+            type="number"
+            id="monto"
+            value={formData.monto}
+            onChange={(e) => setFormData({ ...formData, monto: e.target.value })}
+            className="mt-1 block w-full pl-7 pr-3 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
+            placeholder="0.00"
           />
         </div>
       </div>
 
-      <div className="mt-6 flex justify-between items-center">
-        {alumnoSeleccionado && (
-          <div className="text-sm text-gray-500">
-            Precio mensual actual: ${alumnoSeleccionado.precioMensual}
-          </div>
-        )}
+      <div>
+        <label htmlFor="metodoPago" className="block text-sm font-medium text-gray-700">
+          Método de Pago
+        </label>
+        <select
+          id="metodoPago"
+          value={formData.metodoPago}
+          onChange={(e) => setFormData({ ...formData, metodoPago: e.target.value as MetodoPago })}
+          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
+        >
+          {metodosPago.map((metodo) => (
+            <option key={metodo} value={metodo}>
+              {metodo}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div>
+          <label htmlFor="periodoDesde" className="block text-sm font-medium text-gray-700">
+            Período Desde
+          </label>
+          <DatePicker
+            id="periodoDesde"
+            selected={formData.periodoDesde}
+            onChange={(date) => setFormData({ ...formData, periodoDesde: date || new Date() })}
+            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
+            dateFormat="dd/MM/yyyy"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="periodoHasta" className="block text-sm font-medium text-gray-700">
+            Período Hasta
+          </label>
+          <DatePicker
+            id="periodoHasta"
+            selected={formData.periodoHasta}
+            onChange={(date) => setFormData({ ...formData, periodoHasta: date || new Date() })}
+            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
+            dateFormat="dd/MM/yyyy"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="notas" className="block text-sm font-medium text-gray-700">
+          Notas
+        </label>
+        <textarea
+          id="notas"
+          value={formData.notas}
+          onChange={(e) => setFormData({ ...formData, notas: e.target.value })}
+          rows={3}
+          className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary focus:border-primary sm:text-sm"
+        />
+      </div>
+
+      <div>
         <button
           type="submit"
-          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-          disabled={loadingPago}
+          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
         >
-          {loadingPago ? 'Registrando...' : 'Registrar Pago'}
+          Registrar Pago
         </button>
       </div>
     </form>

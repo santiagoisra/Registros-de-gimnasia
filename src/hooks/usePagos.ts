@@ -8,7 +8,8 @@ import {
   getPagosPorAlumno,
   createPago,
   updatePago,
-  deletePago
+  deletePago,
+  createPagosBulk
 } from '@/services/pagos'
 
 export const usePagos = () => {
@@ -18,8 +19,8 @@ export const usePagos = () => {
   const fetchPagos = useCallback(async () => {
     try {
       setLoading(true)
-      const data = await getPagos()
-      setPagos(data)
+      const response = await getPagos()
+      setPagos(response.pagos)
     } catch (error) {
       toast.error('Error al cargar los pagos')
       console.error(error)
@@ -49,6 +50,20 @@ export const usePagos = () => {
       await fetchPagos()
     } catch (error) {
       toast.error('Error al registrar el pago')
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }, [fetchPagos])
+
+  const registrarPagosBulk = useCallback(async (pagos: Omit<Pago, 'id'>[]) => {
+    try {
+      setLoading(true)
+      await createPagosBulk(pagos)
+      toast.success('Pagos registrados')
+      await fetchPagos()
+    } catch (error) {
+      toast.error('Error al registrar los pagos en lote')
       console.error(error)
     } finally {
       setLoading(false)
@@ -89,6 +104,7 @@ export const usePagos = () => {
     fetchPagos,
     fetchPagosPorAlumno,
     registrarPago,
+    registrarPagosBulk,
     modificarPago,
     eliminarPago
   }
