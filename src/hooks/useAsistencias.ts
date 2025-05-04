@@ -1,80 +1,115 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import { toast } from 'react-hot-toast'
-import type { Asistencia } from '../types'
-import {
-  getAsistenciasPorFecha,
+import { useCallback, useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useToast } from './useToast'
+import { handleDatabaseError } from '@/utils/errorHandling'
+import { 
+  getAsistencias, 
+  getAsistenciasPorPeriodo, 
+  getEstadisticasAsistencia,
   createAsistencia,
-  deleteAsistencia,
-  createAsistenciasBulk
+  updateAsistencia,
+  deleteAsistencia 
 } from '@/services/asistencias'
+import type { Asistencia, EstadisticasAsistencia } from '@/types/supabase'
 
-export const useAsistencias = (ubicacion: 'Plaza Arenales' | 'Plaza Terán') => {
+export const useAsistencias = (options?: { 
+  alumnoId?: string
+  page?: number 
+  pageSize?: number
+}) => {
+  const queryClient = useQueryClient()
+  const { showToast } = useToast()
   const [loading, setLoading] = useState(false)
-  const [asistencias, setAsistencias] = useState<Asistencia[]>([])
 
-  const fetchAsistencias = useCallback(async (fecha: string) => {
+  // Query para obtener asistencias
+  const { 
+    data: asistenciasData,
+    error: asistenciasError,
+    isLoading: asistenciasLoading 
+  } = useQuery({
+    queryKey: ['asistencias', options?.alumnoId, options?.page, options?.pageSize],
+    queryFn: () => getAsistencias(options),
+    enabled: !!options
+  })
+
+  // Query para estadísticas
+  const {
+    data: estadisticas,
+    error: estadisticasError,
+    isLoading: estadisticasLoading
+  } = useQuery({
+    queryKey: ['estadisticas', options?.alumnoId],
+    queryFn: () => getEstadisticasAsistencia(options?.alumnoId),
+    enabled: !!options?.alumnoId
+  })
+
+  // Mutation para crear asistencia
+  const { mutate: crearAsistencia } = useMutation({
+    mutationFn: createAsistencia,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['asistencias'])
+      showToast('Asistencia registrada correctamente', 'success')
+    },
+    onError: (error) => {
+      const err = handleDatabaseError(error, 'crear asistencia')
+      showToast(err.message, 'error')
+      console.error(err)
+    }
+  })
+
+  // Mutation para actualizar asistencia
+  const { mutate: actualizarAsistencia } = useMutation({
+    mutationFn: updateAsistencia,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['asistencias'])
+      showToast('Asistencia actualizada correctamente', 'success')
+    },
+    onError: (error) => {
+      const err = handleDatabaseError(error, 'actualizar asistencia')
+      showToast(err.message, 'error')
+      console.error(err)
+    }
+  })
+
+  // Mutation para eliminar asistencia
+  const { mutate: eliminarAsistencia } = useMutation({
+    mutationFn: deleteAsistencia,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['asistencias'])
+      showToast('Asistencia eliminada correctamente', 'success')
+    },
+    onError: (error) => {
+      const err = handleDatabaseError(error, 'eliminar asistencia')
+      showToast(err.message, 'error')
+      console.error(err)
+    }
+  })
+
+  const obtenerAsistenciasPorPeriodo = useCallback(async (periodo: { desde: string; hasta: string }) => {
     try {
       setLoading(true)
-      const data = await getAsistenciasPorFecha(fecha)
-      setAsistencias(data.filter(a => a.ubicacion === ubicacion))
+      const data = await getAsistenciasPorPeriodo(periodo)
+      return data
     } catch (error) {
-      toast.error('Error al cargar las asistencias')
+      showToast('Error al obtener las asistencias del periodo', 'error')
       console.error(error)
+      return []
     } finally {
       setLoading(false)
     }
-  }, [ubicacion])
-
-  const registrarAsistencia = useCallback(async (alumnoId: string, fecha: string) => {
-    try {
-      setLoading(true)
-      await createAsistencia({ alumnoId, fecha, ubicacion })
-      toast.success('Asistencia registrada')
-      await fetchAsistencias(fecha)
-    } catch (error) {
-      toast.error('Error al registrar la asistencia')
-      console.error(error)
-    } finally {
-      setLoading(false)
-    }
-  }, [ubicacion, fetchAsistencias])
-
-  const registrarAsistenciasBulk = useCallback(async (alumnosIds: string[], fecha: string) => {
-    try {
-      setLoading(true)
-      await createAsistenciasBulk(alumnosIds.map(alumnoId => ({ alumnoId, fecha, ubicacion })))
-      toast.success('Asistencias registradas')
-      await fetchAsistencias(fecha)
-    } catch (error) {
-      toast.error('Error al registrar asistencias en lote')
-      console.error(error)
-    } finally {
-      setLoading(false)
-    }
-  }, [ubicacion, fetchAsistencias])
-
-  const eliminarAsistencia = useCallback(async (id: string, fecha: string) => {
-    try {
-      setLoading(true)
-      await deleteAsistencia(id)
-      toast.success('Asistencia eliminada')
-      await fetchAsistencias(fecha)
-    } catch (error) {
-      toast.error('Error al eliminar la asistencia')
-      console.error(error)
-    } finally {
-      setLoading(false)
-    }
-  }, [fetchAsistencias])
+  }, [showToast])
 
   return {
-    loading,
-    asistencias,
-    fetchAsistencias,
-    registrarAsistencia,
-    registrarAsistenciasBulk,
-    eliminarAsistencia
+    asistencias: asistenciasData?.data || [],
+    totalPages: asistenciasData?.totalPages || 1,
+    estadisticas,
+    loading: loading || asistenciasLoading || estadisticasLoading,
+    error: asistenciasError || estadisticasError,
+    crearAsistencia,
+    actualizarAsistencia,
+    eliminarAsistencia,
+    obtenerAsistenciasPorPeriodo
   }
 } 
