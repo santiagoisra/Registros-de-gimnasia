@@ -1,4 +1,4 @@
-// File: D:\OneDrive\Documentos\GitHub\Registros-de-gimnasia\src\app\layout.tsx
+// File: /Users/santiago/Documents/GitHub/Registros-de-gimnasia/src/app/layout.tsx
 import * as entry from '../../../src/app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

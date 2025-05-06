@@ -1,3 +1,7 @@
 {
+  "/reportes/page": "app/reportes/page.js",
+  "/page": "app/page.js",
+  "/pagos/page": "app/pagos/page.js",
+  "/alumnos/page": "app/alumnos/page.js",
   "/asistencias/page": "app/asistencias/page.js"
 }
