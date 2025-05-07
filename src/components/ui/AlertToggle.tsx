@@ -61,7 +61,7 @@ export function AlertToggle({
       await onChange(newState)
       setEnabled(newState)
       toast.success(`Alertas ${newState ? 'activadas' : 'desactivadas'}`)
-    } catch (error) {
+    } catch {
       toast.error('Error al cambiar el estado de las alertas')
       setEnabled(!newState) // Revert on error
     } finally {

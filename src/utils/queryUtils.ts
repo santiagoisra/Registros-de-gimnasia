@@ -16,27 +16,27 @@ export interface DateRangeParams {
 }
 
 export function applyPagination<T>(
-  query: PostgrestFilterBuilder<T>,
+  query: PostgrestFilterBuilder<any, any, any, any, any>,
   { page = 1, pageSize = 10 }: PaginationParams
-): PostgrestFilterBuilder<T> {
+): PostgrestFilterBuilder<any, any, any, any, any> {
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
   return query.range(from, to)
 }
 
 export function applyOrder<T>(
-  query: PostgrestFilterBuilder<T>,
+  query: PostgrestFilterBuilder<any, any, any, any, any>,
   { orderBy, orderDirection = 'desc' }: OrderParams
-): PostgrestFilterBuilder<T> {
+): PostgrestFilterBuilder<any, any, any, any, any> {
   if (!orderBy) return query
   return query.order(orderBy, { ascending: orderDirection === 'asc' })
 }
 
 export function applyDateRange<T>(
-  query: PostgrestFilterBuilder<T>,
+  query: PostgrestFilterBuilder<any, any, any, any, any>,
   { fechaDesde, fechaHasta }: DateRangeParams,
   dateField = 'fecha'
-): PostgrestFilterBuilder<T> {
+): PostgrestFilterBuilder<any, any, any, any, any> {
   if (fechaDesde) {
     query = query.gte(dateField, fechaDesde)
   }
@@ -48,7 +48,7 @@ export function applyDateRange<T>(
 
 export function buildWhereClause(conditions: Record<string, unknown>): Record<string, unknown> {
   return Object.entries(conditions)
-    .filter(([_, value]) => value !== undefined && value !== null)
+    .filter(([, value]) => value !== undefined && value !== null)
     .reduce((acc, [key, value]) => ({ ...acc, [key]: value }), {})
 }
 

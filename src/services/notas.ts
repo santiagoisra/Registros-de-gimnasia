@@ -34,7 +34,7 @@ function mapNotaFromDB(dbNota: NotaDB): Nota {
     tipo: dbNota.tipo,
     visibleEnReporte: dbNota.visible_en_reporte,
     categoria: dbNota.categoria as Nota['categoria'],
-    calificacion: dbNota.calificacion,
+    calificacion: dbNota.calificacion ?? undefined,
     objetivos: dbNota.objetivos as string[],
     seguimiento: dbNota.seguimiento ? JSON.parse(dbNota.seguimiento) : undefined,
     adjuntos: dbNota.adjuntos ? JSON.parse(dbNota.adjuntos) : undefined,

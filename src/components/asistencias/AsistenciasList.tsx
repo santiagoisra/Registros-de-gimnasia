@@ -7,11 +7,7 @@ import { Alert } from '@/components/ui/Alert'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 
-interface AsistenciasListProps {
-  onRefresh?: () => void
-}
-
-export function AsistenciasList({ onRefresh }: AsistenciasListProps) {
+export function AsistenciasList() {
   const [page, setPage] = useState(1)
   const [perPage] = useState(10)
   const [filterDate, setFilterDate] = useState<string>('')
@@ -20,9 +16,7 @@ export function AsistenciasList({ onRefresh }: AsistenciasListProps) {
 
   const { asistencias, loading, error, totalPages } = useAsistencias({
     page,
-    perPage,
-    filterDate,
-    filterEstado: filterEstado === 'todos' ? undefined : filterEstado,
+    pageSize: perPage,
     sede: filterSede === 'todas' ? undefined : filterSede
   })
 

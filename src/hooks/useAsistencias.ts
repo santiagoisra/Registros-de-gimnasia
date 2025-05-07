@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useToast } from './useToast'
 import { handleDatabaseError } from '@/utils/errorHandling'
 import { asistenciasService } from '@/services/asistencias'
-import type { Asistencia, EstadisticasAsistencia } from '@/types/supabase'
+import type { Asistencia } from '@/types/supabase'
 
 export const useAsistencias = (options?: { 
   alumnoId?: string

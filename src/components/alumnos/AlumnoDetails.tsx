@@ -1,16 +1,13 @@
 'use client'
 
-import { useState } from 'react'
 import { useAlumnos } from '@/hooks/useAlumnos'
 import { PriceHistorySection } from '@/components/precios/PriceHistorySection'
 import { NotasSection } from '@/components/notas/NotasSection'
 import { PaymentStatusBadge } from '@/components/ui/PaymentStatusBadge'
 import { AlertToggle } from '@/components/ui/AlertToggle'
 import { AlertConfigPanel } from '@/components/ui/AlertConfigPanel'
-import { Button } from '@/components/ui/Button'
 import { PencilIcon } from '@heroicons/react/24/outline'
 import type { Alumno } from '@/types'
-import { formatCurrency } from '@/utils'
 
 interface AlumnoDetailsProps {
   alumnoId: string
@@ -57,14 +54,14 @@ export function AlumnoDetails({ alumnoId, onEdit }: AlumnoDetailsProps) {
             <p className="mt-1 text-sm text-gray-500">{alumno.email}</p>
           </div>
           {onEdit && (
-            <Button
-              variant="ghost"
+            <button
+              type="button"
               onClick={() => onEdit(alumno)}
-              className="text-gray-400 hover:text-gray-500"
+              className="text-gray-400 hover:text-gray-500 bg-transparent border-none p-0"
               title="Editar alumno"
             >
               <PencilIcon className="h-5 w-5" />
-            </Button>
+            </button>
           )}
         </div>
       </div>

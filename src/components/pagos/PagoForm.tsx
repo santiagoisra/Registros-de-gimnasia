@@ -29,7 +29,7 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
 
   const [alumnos, setAlumnos] = useState<Alumno[]>([])
   const [loadingAlumnos, setLoadingAlumnos] = useState(true)
-  const { registrarPago, loading: loadingPago } = usePagos()
+  const { createPago } = usePagos()
 
   useEffect(() => {
     cargarAlumnos()
@@ -62,7 +62,7 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
     }
 
     try {
-      await registrarPago({
+      await createPago({
         alumnoId: formData.alumnoId,
         fecha: formData.fecha.toISOString(),
         monto: Number(formData.monto),
@@ -91,8 +91,6 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
       toast.error('Error al registrar el pago')
     }
   }
-
-  const alumnoSeleccionado = alumnos.find(a => a.id === formData.alumnoId)
 
   if (loadingAlumnos) {
     return (

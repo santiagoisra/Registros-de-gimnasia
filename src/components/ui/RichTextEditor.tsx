@@ -9,6 +9,7 @@ import Link from '@tiptap/extension-link'
 import Underline from '@tiptap/extension-underline'
 import TextAlign from '@tiptap/extension-text-align'
 import Image from '@tiptap/extension-image'
+import type { Editor } from '@tiptap/react'
 
 interface RichTextEditorProps {
   content: string
@@ -19,7 +20,7 @@ interface RichTextEditorProps {
   autoFocus?: boolean
 }
 
-const MenuBar = ({ editor }: { editor: any }) => {
+const MenuBar = ({ editor }: { editor: Editor | null }) => {
   if (!editor) {
     return null
   }
@@ -196,7 +197,7 @@ export function RichTextEditor({
   className = '',
   autoFocus = false,
 }: RichTextEditorProps) {
-  const editor = useEditor({
+  const editor: Editor | null = useEditor({
     extensions: [
       StarterKit,
       Placeholder.configure({
