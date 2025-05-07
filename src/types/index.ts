@@ -4,42 +4,78 @@ export type MetodoPago = 'Efectivo' | 'Transferencia' | 'Mercado Pago';
 
 export type EstadoPago = 'al_dia' | 'pendiente' | 'atrasado';
 
+/**
+ * Modelo extendido de Alumno para frontend.
+ * Incluye todos los campos de la base (ver src/types/supabase.ts) y campos adicionales para UI/lógica.
+ * - Los campos con snake_case provienen de la base.
+ * - Los campos camelCase son agregados o mapeados para frontend.
+ */
 export interface Alumno {
+  /** ID único (base) */
   id: string;
+  /** Nombre (base) */
   nombre: string;
+  /** Apellido (base) */
   apellido: string;
+  /** Fecha de nacimiento (extendido/UI) */
   fechaNacimiento?: string;
+  /** Dirección (extendido/UI) */
   direccion?: string;
+  /** Teléfono (base) */
   telefono?: string;
+  /** Email (base) */
   email?: string;
+  /** Fecha de alta (base: created_at) */
   createdAt: string;
+  /** Fecha de última actualización (base: updated_at) */
   updatedAt: string;
+  /** Estado de actividad (base) */
+  activo?: boolean;
+  /** Alertas activas (base) */
+  alertasActivas?: boolean;
+  /** Fecha última asistencia (base) */
+  fechaUltimaAsistencia?: string;
+  /** Días consecutivos de asistencia (base) */
+  diasConsecutivosAsistencia?: number;
+  /** Estado de pago (base) */
+  estadoPago?: EstadoPago;
 }
 
+/**
+ * Modelo extendido de Asistencia para frontend.
+ * Incluye todos los campos de la base y relación con Alumno.
+ */
 export interface Asistencia {
   id: string;
   alumno_id: string;
   fecha: string;
-  sede: 'Plaza Arenales' | 'Plaza Terán';
+  sede: Ubicacion;
   estado: 'presente' | 'ausente';
   notas?: string;
   created_at: string;
   updated_at: string;
+  /** Relación: datos completos del alumno (extendido/UI) */
   alumno?: Alumno;
 }
 
+/**
+ * Modelo extendido de Pago para frontend.
+ * Incluye todos los campos de la base y campos adicionales para UI.
+ */
 export interface Pago {
   id: string;
-  alumnoId: string;
-  fecha: string;
+  alumnoId: string; // mapeo de alumno_id
+  fecha: string; // mapeo de fecha_pago
   monto: number;
-  metodoPago: MetodoPago;
+  metodoPago: MetodoPago; // mapeo de metodo_pago
   periodoDesde: string;
   periodoHasta: string;
   notas?: string;
   estado?: 'Pagado' | 'Pendiente';
   mes: number;
   anio: number;
+  createdAt?: string; // extendido/UI
+  updatedAt?: string; // extendido/UI
 }
 
 export interface HistorialPrecios {
@@ -50,58 +86,70 @@ export interface HistorialPrecios {
   fechaHasta?: string;
 }
 
+/**
+ * Modelo extendido de Nota para frontend.
+ * Incluye todos los campos de la base y campos adicionales para UI.
+ */
 export interface Nota {
   id: string;
-  alumnoId: string;
+  alumnoId: string; // mapeo de alumno_id
   fecha: string;
   contenido: string;
   tipo: 'Ausencia' | 'Lesión' | 'Vacaciones' | 'General' | 'Evaluación' | 'Progreso' | 'Competencia';
-  visibleEnReporte?: boolean;
-  categoria?: 'Técnica' | 'Física' | 'Actitudinal' | 'Competitiva';
-  calificacion?: number;
-  objetivos?: string[];
+  visibleEnReporte?: boolean; // mapeo de visible_en_reporte
+  categoria?: 'Técnica' | 'Física' | 'Actitudinal' | 'Competitiva'; // extendido/UI
+  calificacion?: number; // extendido/UI
+  objetivos?: string[]; // extendido/UI
   seguimiento?: {
     fechaRevision: string;
     estado: 'Pendiente' | 'En Progreso' | 'Completado';
     comentarios?: string;
-  }[];
+  }[]; // extendido/UI
   adjuntos?: {
     url: string;
     tipo: 'imagen' | 'video' | 'documento';
     descripcion?: string;
-  }[];
-  createdAt?: string;
-  updatedAt?: string;
+  }[]; // extendido/UI
+  createdAt: string; // mapeo de created_at
+  updatedAt: string; // mapeo de updated_at
 }
 
+/**
+ * Modelo extendido de HistorialPrecio para frontend.
+ * Incluye todos los campos de la base y campos adicionales para UI.
+ */
 export interface HistorialPrecio {
   id: string;
-  servicio: string;
+  alumnoId: string; // mapeo de alumno_id
   precio: number;
-  fechaInicio: string;
-  fechaFin: string | null;
-  notas?: string;
+  fechaDesde: string; // mapeo de fecha_desde
+  fechaHasta: string; // mapeo de fecha_hasta
+  servicio: 'Clases' | 'Competencia' | 'Equipamiento' | 'Otro';
+  tipoServicio: 'Individual' | 'Grupal' | 'Personalizado' | 'Evento' | 'Material' | 'Otro'; // mapeo de tipo_servicio
   activo: boolean;
-  moneda?: 'ARS' | 'USD';
-  tipoServicio: 'Mensual' | 'Por Clase' | 'Especial' | 'Competencia';
-  descuento?: {
-    porcentaje: number;
-    motivo: string;
-    validoHasta?: string;
+  moneda: 'ARS' | 'USD' | 'EUR';
+  descuento?: { // extendido/UI
+    tipo: 'Porcentaje' | 'Monto Fijo';
+    valor: number;
+    motivo?: string;
+    fechaExpiracion?: string;
   };
-  incrementoProgramado?: {
-    fecha: string;
-    porcentaje: number;
-    notificado: boolean;
-  }[];
-  historialCambios?: {
+  incrementoProgramado?: { // extendido/UI
+    tipo: 'Porcentaje' | 'Monto Fijo';
+    valor: number;
+    fechaEfectiva: string;
+    notificado?: boolean;
+  };
+  historialCambios?: { // extendido/UI
     fecha: string;
     precioAnterior: number;
     precioNuevo: number;
     motivo?: string;
+    usuario?: string;
   }[];
-  createdAt?: string;
-  updatedAt?: string;
+  notas?: string;
+  createdAt: string; // mapeo de created_at
+  updatedAt: string; // mapeo de updated_at
 }
 
 export interface EstadisticasPrecios {

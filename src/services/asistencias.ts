@@ -1,45 +1,57 @@
 import { supabase } from '@/lib/supabase'
+import type { Asistencia as AsistenciaDB, Alumno as AlumnoDB } from '@/types/supabase'
 import type { Asistencia, Alumno } from '@/types'
 import { handleDatabaseError } from '@/utils/errorHandling'
+import { PostgrestError } from '@supabase/supabase-js'
 
-// Mapeo entre los nombres del modelo y la base de datos
-function mapAsistenciaFromDB(dbAsistencia: Record<string, unknown>): Asistencia {
-  return {
-    id: dbAsistencia.id as string,
-    alumno_id: dbAsistencia.alumno_id as string,
-    fecha: dbAsistencia.fecha as string,
-    sede: dbAsistencia.sede as Asistencia['sede'],
-    estado: dbAsistencia.estado as Asistencia['estado'],
-    created_at: dbAsistencia.created_at as string,
-    updated_at: dbAsistencia.updated_at as string,
-    notas: dbAsistencia.notas as string | undefined,
-    alumno: dbAsistencia.alumnos as Alumno | undefined
-  }
-}
-
-// Mapeo del modelo a la base de datos
-function mapAsistenciaToDB(asistencia: Partial<Asistencia>): Record<string, unknown> {
-  return {
-    alumno_id: asistencia.alumno_id,
-    fecha: asistencia.fecha,
-    sede: asistencia.sede,
-    estado: asistencia.estado,
-    notas: asistencia.notas,
-  }
-}
-
+/**
+ * Opciones para filtrar y paginar la consulta de asistencias
+ */
 interface GetAsistenciasOptions {
   page?: number
   perPage?: number
-  orderBy?: keyof Asistencia
+  orderBy?: keyof AsistenciaDB
   orderDirection?: 'asc' | 'desc'
   alumnoId?: string
-  estado?: Asistencia['estado']
+  estado?: AsistenciaDB['estado']
   fecha?: string
-  sede?: Asistencia['sede']
+  sede?: AsistenciaDB['sede']
+}
+
+/**
+ * Mapea una asistencia desde la base de datos al modelo del frontend
+ */
+function mapAsistenciaFromDB(dbAsistencia: AsistenciaDB & { alumnos: AlumnoDB | null }): Asistencia {
+  return {
+    id: dbAsistencia.id,
+    alumno_id: dbAsistencia.alumno_id,
+    fecha: dbAsistencia.fecha,
+    estado: dbAsistencia.estado,
+    sede: dbAsistencia.sede,
+    notas: dbAsistencia.notas,
+    created_at: dbAsistencia.created_at,
+    updated_at: dbAsistencia.updated_at,
+    alumno: dbAsistencia.alumnos ? {
+      id: dbAsistencia.alumnos.id,
+      nombre: dbAsistencia.alumnos.nombre,
+      apellido: dbAsistencia.alumnos.apellido,
+      email: dbAsistencia.alumnos.email || undefined,
+      telefono: dbAsistencia.alumnos.telefono || undefined,
+      activo: dbAsistencia.alumnos.activo,
+      alertasActivas: dbAsistencia.alumnos.alertas_activas || undefined,
+      fechaUltimaAsistencia: dbAsistencia.alumnos.fecha_ultima_asistencia || undefined,
+      diasConsecutivosAsistencia: dbAsistencia.alumnos.dias_consecutivos_asistencia || undefined,
+      estadoPago: dbAsistencia.alumnos.estado_pago || undefined,
+      createdAt: dbAsistencia.alumnos.created_at,
+      updatedAt: dbAsistencia.alumnos.updated_at
+    } : undefined
+  }
 }
 
 export const asistenciasService = {
+  /**
+   * Obtiene un listado paginado de asistencias con filtros opcionales
+   */
   async getAsistencias(options: GetAsistenciasOptions = {}) {
     try {
       let query = supabase
@@ -75,29 +87,29 @@ export const asistenciasService = {
 
       const { data, error, count } = await query
 
-      if (error) throw error
+      if (error) {
+        if (error instanceof Error) {
+          throw handleDatabaseError(error, 'Error al obtener asistencias')
+        }
+        throw handleDatabaseError(error as PostgrestError, 'Error al obtener asistencias')
+      }
 
-      const asistencias = data.map(asistencia => ({
-        id: asistencia.id,
-        alumno_id: asistencia.alumno_id,
-        fecha: asistencia.fecha,
-        estado: asistencia.estado,
-        sede: asistencia.sede,
-        notas: asistencia.notas,
-        created_at: asistencia.created_at,
-        updated_at: asistencia.updated_at,
-        alumno: asistencia.alumnos
-      }))
-
+      const asistencias = data.map(mapAsistenciaFromDB)
       const totalPages = count ? Math.ceil(count / (options.perPage || 10)) : 1
 
       return { data: asistencias, totalPages }
     } catch (error) {
-      throw handleDatabaseError(error)
+      if (error instanceof Error) {
+        throw handleDatabaseError(error, 'Error al obtener asistencias')
+      }
+      throw handleDatabaseError(error as PostgrestError, 'Error al obtener asistencias')
     }
   },
 
-  async createAsistencia(data: Partial<Asistencia>) {
+  /**
+   * Crea una nueva asistencia
+   */
+  async createAsistencia(data: Partial<AsistenciaDB>) {
     try {
       const { data: newAsistencia, error } = await supabase
         .from('asistencias')
@@ -111,25 +123,26 @@ export const asistenciasService = {
         .select('*, alumnos(*)')
         .single()
 
-      if (error) throw error
-
-      return {
-        id: newAsistencia.id,
-        alumno_id: newAsistencia.alumno_id,
-        fecha: newAsistencia.fecha,
-        estado: newAsistencia.estado,
-        sede: newAsistencia.sede,
-        notas: newAsistencia.notas,
-        created_at: newAsistencia.created_at,
-        updated_at: newAsistencia.updated_at,
-        alumno: newAsistencia.alumnos
+      if (error) {
+        if (error instanceof Error) {
+          throw handleDatabaseError(error, 'Error al crear asistencia')
+        }
+        throw handleDatabaseError(error as PostgrestError, 'Error al crear asistencia')
       }
+
+      return mapAsistenciaFromDB(newAsistencia)
     } catch (error) {
-      throw handleDatabaseError(error)
+      if (error instanceof Error) {
+        throw handleDatabaseError(error, 'Error al crear asistencia')
+      }
+      throw handleDatabaseError(error as PostgrestError, 'Error al crear asistencia')
     }
   },
 
-  async updateAsistencia(id: string, data: Partial<Asistencia>) {
+  /**
+   * Actualiza una asistencia existente
+   */
+  async updateAsistencia(id: string, data: Partial<AsistenciaDB>) {
     try {
       const { data: updatedAsistencia, error } = await supabase
         .from('asistencias')
@@ -144,24 +157,25 @@ export const asistenciasService = {
         .select('*, alumnos(*)')
         .single()
 
-      if (error) throw error
-
-      return {
-        id: updatedAsistencia.id,
-        alumno_id: updatedAsistencia.alumno_id,
-        fecha: updatedAsistencia.fecha,
-        estado: updatedAsistencia.estado,
-        sede: updatedAsistencia.sede,
-        notas: updatedAsistencia.notas,
-        created_at: updatedAsistencia.created_at,
-        updated_at: updatedAsistencia.updated_at,
-        alumno: updatedAsistencia.alumnos
+      if (error) {
+        if (error instanceof Error) {
+          throw handleDatabaseError(error, 'Error al actualizar asistencia')
+        }
+        throw handleDatabaseError(error as PostgrestError, 'Error al actualizar asistencia')
       }
+
+      return mapAsistenciaFromDB(updatedAsistencia)
     } catch (error) {
-      throw handleDatabaseError(error)
+      if (error instanceof Error) {
+        throw handleDatabaseError(error, 'Error al actualizar asistencia')
+      }
+      throw handleDatabaseError(error as PostgrestError, 'Error al actualizar asistencia')
     }
   },
 
+  /**
+   * Elimina una asistencia
+   */
   async deleteAsistencia(id: string) {
     try {
       const { error } = await supabase
@@ -169,17 +183,28 @@ export const asistenciasService = {
         .delete()
         .eq('id', id)
 
-      if (error) throw error
+      if (error) {
+        if (error instanceof Error) {
+          throw handleDatabaseError(error, 'Error al eliminar asistencia')
+        }
+        throw handleDatabaseError(error as PostgrestError, 'Error al eliminar asistencia')
+      }
     } catch (error) {
-      throw handleDatabaseError(error)
+      if (error instanceof Error) {
+        throw handleDatabaseError(error, 'Error al eliminar asistencia')
+      }
+      throw handleDatabaseError(error as PostgrestError, 'Error al eliminar asistencia')
     }
   },
 
+  /**
+   * Obtiene estadísticas de asistencia para un alumno en un período opcional
+   */
   async getEstadisticasAsistencia(alumnoId: string, periodo?: { desde: string; hasta: string }) {
     try {
       let query = supabase
         .from('asistencias')
-        .select('*')
+        .select('*', { count: 'exact' })
         .eq('alumno_id', alumnoId)
 
       if (periodo?.desde) {
@@ -192,18 +217,14 @@ export const asistenciasService = {
 
       const { data, error } = await query
 
-      if (error) throw error
+      if (error) {
+        if (error instanceof Error) {
+          throw handleDatabaseError(error, 'Error al obtener estadísticas de asistencia')
+        }
+        throw handleDatabaseError(error as PostgrestError, 'Error al obtener estadísticas de asistencia')
+      }
 
-      const asistencias = data.map(asistencia => ({
-        id: asistencia.id,
-        alumno_id: asistencia.alumno_id,
-        fecha: asistencia.fecha,
-        estado: asistencia.estado,
-        sede: asistencia.sede,
-        notas: asistencia.notas,
-        created_at: asistencia.created_at,
-        updated_at: asistencia.updated_at
-      }))
+      const asistencias = data.map(asistencia => mapAsistenciaFromDB({ ...asistencia, alumnos: null }))
 
       const total = asistencias.length
       const presentes = asistencias.filter(a => a.estado === 'presente').length
@@ -238,7 +259,10 @@ export const asistenciasService = {
         tendencia
       }
     } catch (error) {
-      throw handleDatabaseError(error)
+      if (error instanceof Error) {
+        throw handleDatabaseError(error, 'Error al obtener estadísticas de asistencia')
+      }
+      throw handleDatabaseError(error as PostgrestError, 'Error al obtener estadísticas de asistencia')
     }
   }
 }

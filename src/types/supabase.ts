@@ -1,3 +1,12 @@
+/**
+ * Tipos generados para reflejar la estructura real de la base de datos en Supabase.
+ * No incluir campos extendidos de frontend ni lógica de UI.
+ * Usar estos tipos como fuente de verdad para los servicios y queries directos a la base.
+ */
+
+/**
+ * Modelo de Alumno según Supabase
+ */
 export type Alumno = {
   id: string
   created_at: string
@@ -13,6 +22,9 @@ export type Alumno = {
   estado_pago?: 'al_dia' | 'pendiente' | 'atrasado'
 }
 
+/**
+ * Modelo de Asistencia según Supabase
+ */
 export type Asistencia = {
   id: string
   created_at: string
@@ -22,9 +34,12 @@ export type Asistencia = {
   sede: 'Plaza Arenales' | 'Plaza Terán'
   estado: 'presente' | 'ausente'
   notas?: string
-  alumno?: Alumno
+  alumno?: Alumno // relación opcional (join)
 }
 
+/**
+ * Modelo de Pago según Supabase
+ */
 export type Pago = {
   id: string
   created_at: string
@@ -37,23 +52,66 @@ export type Pago = {
   estado: 'Pendiente' | 'Pagado'
 }
 
-export type HistorialPrecios = {
-  id: string
-  alumno_id: string
-  precio: number
-  fecha_desde: string
-  fecha_hasta?: string
+/**
+ * Modelo de HistorialPrecios en la base de datos.
+ * Refleja exactamente la estructura de la tabla historial_precios.
+ */
+export interface HistorialPrecios {
+  id: string;
+  alumno_id: string;
+  precio: number;
+  fecha_desde: string;
+  fecha_hasta: string;
+  servicio: 'Clases' | 'Competencia' | 'Equipamiento' | 'Otro';
+  tipo_servicio: 'Individual' | 'Grupal' | 'Personalizado' | 'Evento' | 'Material' | 'Otro';
+  activo: boolean;
+  moneda: 'ARS' | 'USD' | 'EUR';
+  descuento: string | null; // JSON string
+  incremento_programado: string | null; // JSON string
+  historial_cambios: string | null; // JSON string
+  notas: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
-export type Nota = {
-  id: string
-  alumno_id: string
-  fecha: string
-  contenido: string
-  tipo: 'Ausencia' | 'Lesión' | 'Vacaciones' | 'General'
-  visible_en_reporte?: boolean
+/**
+ * Modelo de Nota en la base de datos.
+ * Refleja exactamente la estructura de la tabla notas.
+ */
+export interface Nota {
+  id: string;
+  alumno_id: string;
+  fecha: string;
+  contenido: string;
+  tipo: 'Ausencia' | 'Lesión' | 'Vacaciones' | 'General' | 'Evaluación' | 'Progreso' | 'Competencia';
+  visible_en_reporte: boolean;
+  categoria: 'Técnica' | 'Física' | 'Actitudinal' | 'Competitiva' | null;
+  calificacion: number | null;
+  objetivos: string[] | null;
+  seguimiento: string | null; // JSON string
+  adjuntos: string | null; // JSON string
+  created_at: string;
+  updated_at: string;
 }
 
+/**
+ * Estadísticas de asistencia (usado en servicios)
+ */
+export type EstadisticasAsistencia = {
+  total: number
+  porMes: Record<number, number>
+  porcentajePresente: number
+  porcentajeAusente: number
+  porSede: {
+    'Plaza Arenales': number
+    'Plaza Terán': number
+  }
+  tendencia: Array<{ fecha: string; presentes: number; ausentes: number }>
+}
+
+/**
+ * Tipado de tablas para Supabase (usado por servicios generados)
+ */
 export type Database = {
   public: {
     Tables: {

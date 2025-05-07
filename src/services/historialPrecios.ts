@@ -1,359 +1,302 @@
 import { supabase } from '@/lib/supabase'
-import type { HistorialPrecio, EstadisticasPrecios } from '@/types'
+import type { HistorialPrecios as HistorialPreciosDB } from '@/types/supabase'
+import type { HistorialPrecio } from '@/types'
+import { handleDatabaseError } from '@/utils/errorHandling'
+import { PostgrestError } from '@supabase/supabase-js'
 
-// Mapeo entre los nombres del modelo y la base de datos
-function mapHistorialPrecioFromDB(dbPrecio: Record<string, unknown>): HistorialPrecio {
+/**
+ * Opciones para filtrar y paginar la consulta de historial de precios
+ */
+interface GetHistorialPreciosOptions {
+  page?: number
+  perPage?: number
+  orderBy?: keyof HistorialPreciosDB
+  orderDirection?: 'asc' | 'desc'
+  alumnoId?: string
+  fechaDesde?: string
+  fechaHasta?: string
+  servicio?: HistorialPreciosDB['servicio']
+  tipoServicio?: HistorialPreciosDB['tipo_servicio']
+  activo?: boolean
+  moneda?: HistorialPreciosDB['moneda']
+}
+
+/**
+ * Mapea un registro de historial de precios desde la base de datos al modelo del frontend
+ */
+function mapHistorialPrecioFromDB(dbHistorial: HistorialPreciosDB): HistorialPrecio {
   return {
-    id: dbPrecio.id as string,
-    servicio: dbPrecio.servicio as string,
-    precio: dbPrecio.precio as number,
-    fechaInicio: dbPrecio.fecha_inicio as string,
-    fechaFin: dbPrecio.fecha_fin as string | null,
-    notas: dbPrecio.notas as string | undefined,
-    activo: dbPrecio.activo as boolean,
-    moneda: dbPrecio.moneda as HistorialPrecio['moneda'],
-    tipoServicio: dbPrecio.tipo_servicio as HistorialPrecio['tipoServicio'],
-    descuento: dbPrecio.descuento as HistorialPrecio['descuento'],
-    incrementoProgramado: dbPrecio.incremento_programado as HistorialPrecio['incrementoProgramado'],
-    historialCambios: dbPrecio.historial_cambios as HistorialPrecio['historialCambios'],
-    createdAt: dbPrecio.created_at as string | undefined,
-    updatedAt: dbPrecio.updated_at as string | undefined,
+    id: dbHistorial.id,
+    alumnoId: dbHistorial.alumno_id,
+    precio: dbHistorial.precio,
+    fechaDesde: dbHistorial.fecha_desde,
+    fechaHasta: dbHistorial.fecha_hasta,
+    servicio: dbHistorial.servicio,
+    tipoServicio: dbHistorial.tipo_servicio,
+    activo: dbHistorial.activo,
+    moneda: dbHistorial.moneda,
+    descuento: dbHistorial.descuento ? JSON.parse(dbHistorial.descuento) : undefined,
+    incrementoProgramado: dbHistorial.incremento_programado ? JSON.parse(dbHistorial.incremento_programado) : undefined,
+    historialCambios: dbHistorial.historial_cambios ? JSON.parse(dbHistorial.historial_cambios) : undefined,
+    notas: dbHistorial.notas,
+    createdAt: dbHistorial.created_at,
+    updatedAt: dbHistorial.updated_at
   }
 }
 
-// Función para obtener todos los precios históricos
-export async function getHistorialPrecios(options?: {
-  servicio?: string;
-  fecha?: string;
-  soloActivos?: boolean;
-  tipoServicio?: HistorialPrecio['tipoServicio'];
-  moneda?: HistorialPrecio['moneda'];
-  conDescuento?: boolean;
-}) {
-  try {
-    let query = supabase.from('historial_precios').select('*')
-
-    if (options?.servicio) {
-      query = query.eq('servicio', options.servicio)
-    }
-
-    if (options?.fecha) {
-      query = query.lte('fecha_inicio', options.fecha)
-        .or(`fecha_fin.is.null,fecha_fin.gt.${options.fecha}`)
-    }
-
-    if (options?.soloActivos) {
-      query = query.eq('activo', true)
-    }
-
-    if (options?.tipoServicio) {
-      query = query.eq('tipo_servicio', options.tipoServicio)
-    }
-
-    if (options?.moneda) {
-      query = query.eq('moneda', options.moneda)
-    }
-
-    if (options?.conDescuento) {
-      query = query.not('descuento', 'is', null)
-    }
-
-    const { data, error } = await query.order('fecha_inicio', { ascending: false })
-
-    if (error) throw error
-
-    return data ? data.map(mapHistorialPrecioFromDB) : []
-  } catch (error) {
-    console.error('Error al obtener el historial de precios:', error)
-    throw error
+/**
+ * Mapea un registro de historial de precios del frontend al formato de la base de datos
+ */
+function mapHistorialPrecioToDB(historial: Partial<HistorialPrecio>): Partial<HistorialPreciosDB> {
+  return {
+    alumno_id: historial.alumnoId,
+    precio: historial.precio,
+    fecha_desde: historial.fechaDesde,
+    fecha_hasta: historial.fechaHasta,
+    servicio: historial.servicio,
+    tipo_servicio: historial.tipoServicio,
+    activo: historial.activo,
+    moneda: historial.moneda,
+    descuento: historial.descuento ? JSON.stringify(historial.descuento) : null,
+    incremento_programado: historial.incrementoProgramado ? JSON.stringify(historial.incrementoProgramado) : null,
+    historial_cambios: historial.historialCambios ? JSON.stringify(historial.historialCambios) : null,
+    notas: historial.notas
   }
 }
 
-// Función para obtener el precio vigente de un servicio en una fecha específica
-export async function getPrecioVigente(servicio: string, fecha: string = new Date().toISOString()) {
-  try {
-    const { data, error } = await supabase
-      .from('historial_precios')
-      .select('*')
-      .eq('servicio', servicio)
-      .eq('activo', true)
-      .lte('fecha_inicio', fecha)
-      .or(`fecha_fin.is.null,fecha_fin.gt.${fecha}`)
-      .order('fecha_inicio', { ascending: false })
-      .limit(1)
-      .single()
+export const historialPreciosService = {
+  /**
+   * Obtiene un listado paginado del historial de precios con filtros opcionales
+   */
+  async getHistorialPrecios(options: GetHistorialPreciosOptions = {}) {
+    try {
+      let query = supabase
+        .from('historial_precios')
+        .select('*', { count: 'exact' })
 
-    if (error) throw error
-
-    return data ? mapHistorialPrecioFromDB(data) : null
-  } catch (error) {
-    console.error('Error al obtener el precio vigente:', error)
-    throw error
-  }
-}
-
-// Función para crear un nuevo registro de precio
-export async function createHistorialPrecio(precio: Omit<HistorialPrecio, 'id'>) {
-  try {
-    // Si es un precio activo, desactivar los precios anteriores del mismo servicio
-    if (precio.activo) {
-      const precioAnterior = await getPrecioVigente(precio.servicio)
-      
-      if (precioAnterior) {
-        await supabase
-          .from('historial_precios')
-          .update({ 
-            activo: false, 
-            fecha_fin: precio.fechaInicio,
-            historial_cambios: [
-              ...(precioAnterior.historialCambios || []),
-              {
-                fecha: new Date().toISOString(),
-                precioAnterior: precioAnterior.precio,
-                precioNuevo: precio.precio,
-                motivo: precio.notas
-              }
-            ]
-          })
-          .eq('id', precioAnterior.id)
-      }
-    }
-
-    const { data, error } = await supabase
-      .from('historial_precios')
-      .insert({
-        servicio: precio.servicio,
-        precio: precio.precio,
-        fecha_inicio: precio.fechaInicio,
-        fecha_fin: precio.fechaFin,
-        notas: precio.notas,
-        activo: precio.activo,
-        moneda: precio.moneda,
-        tipo_servicio: precio.tipoServicio,
-        descuento: precio.descuento,
-        incremento_programado: precio.incrementoProgramado,
-        historial_cambios: precio.historialCambios || [],
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      })
-      .select()
-      .single()
-
-    if (error) throw error
-
-    return mapHistorialPrecioFromDB(data)
-  } catch (error) {
-    console.error('Error al crear el registro de precio:', error)
-    throw error
-  }
-}
-
-// Función para actualizar un registro de precio
-export async function updateHistorialPrecio(id: string, precio: Partial<Omit<HistorialPrecio, 'id'>>) {
-  try {
-    const precioActual = await supabase
-      .from('historial_precios')
-      .select('*')
-      .eq('id', id)
-      .single()
-      .then(({ data }) => data ? mapHistorialPrecioFromDB(data) : null)
-
-    if (!precioActual) throw new Error('Precio no encontrado')
-
-    const historialCambios = [...(precioActual.historialCambios || [])]
-    if (precio.precio && precio.precio !== precioActual.precio) {
-      historialCambios.push({
-        fecha: new Date().toISOString(),
-        precioAnterior: precioActual.precio,
-        precioNuevo: precio.precio,
-        motivo: precio.notas
-      })
-    }
-
-    const { data, error } = await supabase
-      .from('historial_precios')
-      .update({
-        servicio: precio.servicio,
-        precio: precio.precio,
-        fecha_inicio: precio.fechaInicio,
-        fecha_fin: precio.fechaFin,
-        notas: precio.notas,
-        activo: precio.activo,
-        moneda: precio.moneda,
-        tipo_servicio: precio.tipoServicio,
-        descuento: precio.descuento,
-        incremento_programado: precio.incrementoProgramado,
-        historial_cambios: historialCambios,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', id)
-      .select()
-      .single()
-
-    if (error) throw error
-
-    return mapHistorialPrecioFromDB(data)
-  } catch (error) {
-    console.error('Error al actualizar el registro de precio:', error)
-    throw error
-  }
-}
-
-// Función para eliminar un registro de precio
-export async function deleteHistorialPrecio(id: string) {
-  try {
-    const { error } = await supabase
-      .from('historial_precios')
-      .delete()
-      .eq('id', id)
-
-    if (error) throw error
-
-    return true
-  } catch (error) {
-    console.error('Error al eliminar el registro de precio:', error)
-    throw error
-  }
-}
-
-// Función para obtener análisis de tendencias de precios
-export async function getPreciosTendencia(
-  servicio: string, 
-  fechaInicio: string, 
-  fechaFin: string,
-  options?: {
-    tipoServicio?: HistorialPrecio['tipoServicio'];
-    moneda?: HistorialPrecio['moneda'];
-  }
-): Promise<{ precios: HistorialPrecio[]; estadisticas: EstadisticasPrecios }> {
-  try {
-    let query = supabase
-      .from('historial_precios')
-      .select('*')
-      .eq('servicio', servicio)
-      .gte('fecha_inicio', fechaInicio)
-      .lte('fecha_inicio', fechaFin)
-
-    if (options?.tipoServicio) {
-      query = query.eq('tipo_servicio', options.tipoServicio)
-    }
-
-    if (options?.moneda) {
-      query = query.eq('moneda', options.moneda)
-    }
-
-    const { data, error } = await query.order('fecha_inicio', { ascending: true })
-
-    if (error) throw error
-
-    const precios = data ? data.map(mapHistorialPrecioFromDB) : []
-    
-    // Calcular estadísticas
-    const stats: EstadisticasPrecios = {
-      promedio: 0,
-      minimo: 0,
-      maximo: 0,
-      variacionPorcentual: 0,
-      tendenciaMensual: [],
-      proyeccionProximoMes: undefined
-    }
-
-    if (precios.length > 0) {
-      // Estadísticas básicas
-      stats.promedio = precios.reduce((sum, p) => sum + p.precio, 0) / precios.length
-      stats.minimo = Math.min(...precios.map(p => p.precio))
-      stats.maximo = Math.max(...precios.map(p => p.precio))
-      
-      if (precios.length >= 2) {
-        const primerPrecio = precios[0].precio
-        const ultimoPrecio = precios[precios.length - 1].precio
-        stats.variacionPorcentual = ((ultimoPrecio - primerPrecio) / primerPrecio) * 100
+      if (options.alumnoId) {
+        query = query.eq('alumno_id', options.alumnoId)
       }
 
-      // Tendencia mensual
-      const preciosPorMes = precios.reduce((acc, precio) => {
-        const mes = precio.fechaInicio.substring(0, 7) // YYYY-MM
-        if (!acc[mes]) {
-          acc[mes] = { suma: 0, cantidad: 0, cambios: 0 }
+      if (options.fechaDesde) {
+        query = query.gte('fecha_desde', options.fechaDesde)
+      }
+
+      if (options.fechaHasta) {
+        query = query.lte('fecha_hasta', options.fechaHasta)
+      }
+
+      if (options.servicio) {
+        query = query.eq('servicio', options.servicio)
+      }
+
+      if (options.tipoServicio) {
+        query = query.eq('tipo_servicio', options.tipoServicio)
+      }
+
+      if (typeof options.activo === 'boolean') {
+        query = query.eq('activo', options.activo)
+      }
+
+      if (options.moneda) {
+        query = query.eq('moneda', options.moneda)
+      }
+
+      if (options.orderBy) {
+        const dbColumn = options.orderBy === 'alumno_id' ? 'alumno_id' : options.orderBy
+        query = query.order(dbColumn, { ascending: options.orderDirection !== 'desc' })
+      }
+
+      if (options.page && options.perPage) {
+        const from = (options.page - 1) * options.perPage
+        const to = from + options.perPage - 1
+        query = query.range(from, to)
+      }
+
+      const { data, error, count } = await query
+
+      if (error) {
+        if (error instanceof Error) {
+          throw handleDatabaseError(error, 'Error al obtener historial de precios')
         }
-        acc[mes].suma += precio.precio
-        acc[mes].cantidad++
-        if (precio.historialCambios?.length) {
-          acc[mes].cambios += precio.historialCambios.length
+        throw handleDatabaseError(error as PostgrestError, 'Error al obtener historial de precios')
+      }
+
+      const historial = data.map(mapHistorialPrecioFromDB)
+      const totalPages = count ? Math.ceil(count / (options.perPage || 10)) : 1
+
+      return { data: historial, totalPages }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw handleDatabaseError(error, 'Error al obtener historial de precios')
+      }
+      throw handleDatabaseError(error as PostgrestError, 'Error al obtener historial de precios')
+    }
+  },
+
+  /**
+   * Crea un nuevo registro en el historial de precios
+   */
+  async createHistorialPrecio(data: Partial<HistorialPrecio>) {
+    try {
+      const dbData = mapHistorialPrecioToDB(data)
+      const { data: newHistorial, error } = await supabase
+        .from('historial_precios')
+        .insert([dbData])
+        .select()
+        .single()
+
+      if (error) {
+        if (error instanceof Error) {
+          throw handleDatabaseError(error, 'Error al crear historial de precios')
+        }
+        throw handleDatabaseError(error as PostgrestError, 'Error al crear historial de precios')
+      }
+
+      return mapHistorialPrecioFromDB(newHistorial)
+    } catch (error) {
+      if (error instanceof Error) {
+        throw handleDatabaseError(error, 'Error al crear historial de precios')
+      }
+      throw handleDatabaseError(error as PostgrestError, 'Error al crear historial de precios')
+    }
+  },
+
+  /**
+   * Actualiza un registro del historial de precios
+   */
+  async updateHistorialPrecio(id: string, data: Partial<HistorialPrecio>) {
+    try {
+      const dbData = mapHistorialPrecioToDB(data)
+      const { data: updatedHistorial, error } = await supabase
+        .from('historial_precios')
+        .update(dbData)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) {
+        if (error instanceof Error) {
+          throw handleDatabaseError(error, 'Error al actualizar historial de precios')
+        }
+        throw handleDatabaseError(error as PostgrestError, 'Error al actualizar historial de precios')
+      }
+
+      return mapHistorialPrecioFromDB(updatedHistorial)
+    } catch (error) {
+      if (error instanceof Error) {
+        throw handleDatabaseError(error, 'Error al actualizar historial de precios')
+      }
+      throw handleDatabaseError(error as PostgrestError, 'Error al actualizar historial de precios')
+    }
+  },
+
+  /**
+   * Elimina un registro del historial de precios
+   */
+  async deleteHistorialPrecio(id: string) {
+    try {
+      const { error } = await supabase
+        .from('historial_precios')
+        .delete()
+        .eq('id', id)
+
+      if (error) {
+        if (error instanceof Error) {
+          throw handleDatabaseError(error, 'Error al eliminar historial de precios')
+        }
+        throw handleDatabaseError(error as PostgrestError, 'Error al eliminar historial de precios')
+      }
+    } catch (error) {
+      if (error instanceof Error) {
+        throw handleDatabaseError(error, 'Error al eliminar historial de precios')
+      }
+      throw handleDatabaseError(error as PostgrestError, 'Error al eliminar historial de precios')
+    }
+  },
+
+  /**
+   * Obtiene estadísticas del historial de precios
+   */
+  async getEstadisticasHistorialPrecios(options?: { fechaDesde?: string; fechaHasta?: string }) {
+    try {
+      let query = supabase
+        .from('historial_precios')
+        .select('*')
+
+      if (options?.fechaDesde) {
+        query = query.gte('fecha_desde', options.fechaDesde)
+      }
+
+      if (options?.fechaHasta) {
+        query = query.lte('fecha_hasta', options.fechaHasta)
+      }
+
+      const { data, error } = await query
+
+      if (error) {
+        if (error instanceof Error) {
+          throw handleDatabaseError(error, 'Error al obtener estadísticas de historial de precios')
+        }
+        throw handleDatabaseError(error as PostgrestError, 'Error al obtener estadísticas de historial de precios')
+      }
+
+      const historial = data.map(mapHistorialPrecioFromDB)
+
+      // Calcular estadísticas
+      const porServicio = historial.reduce((acc, h) => {
+        if (h.servicio) {
+          acc[h.servicio] = (acc[h.servicio] || 0) + 1
         }
         return acc
-      }, {} as Record<string, { suma: number; cantidad: number; cambios: number }>)
+      }, {} as Record<string, number>)
 
-      stats.tendenciaMensual = Object.entries(preciosPorMes)
-        .map(([mes, datos]) => ({
-          mes,
-          promedio: datos.suma / datos.cantidad,
-          cantidadCambios: datos.cambios
-        }))
-        .sort((a, b) => a.mes.localeCompare(b.mes))
+      const porTipoServicio = historial.reduce((acc, h) => {
+        if (h.tipoServicio) {
+          acc[h.tipoServicio] = (acc[h.tipoServicio] || 0) + 1
+        }
+        return acc
+      }, {} as Record<string, number>)
 
-      // Proyección para el próximo mes
-      if (stats.tendenciaMensual.length >= 3) {
-        const ultimosTresMeses = stats.tendenciaMensual.slice(-3)
-        const variacionPromedio = ultimosTresMeses.reduce((acc, curr, i, arr) => {
-          if (i === 0) return acc
-          return acc + ((curr.promedio - arr[i-1].promedio) / arr[i-1].promedio)
-        }, 0) / (ultimosTresMeses.length - 1)
+      const promediosPorServicio = historial.reduce((acc, h) => {
+        if (h.servicio && h.precio) {
+          if (!acc[h.servicio]) {
+            acc[h.servicio] = { sum: 0, count: 0 }
+          }
+          acc[h.servicio].sum += h.precio
+          acc[h.servicio].count++
+        }
+        return acc
+      }, {} as Record<string, { sum: number; count: number }>)
 
-        const ultimoPrecio = ultimosTresMeses[ultimosTresMeses.length - 1].promedio
-        stats.proyeccionProximoMes = ultimoPrecio * (1 + variacionPromedio)
+      const preciosPromedio = Object.entries(promediosPorServicio).reduce((acc, [servicio, stats]) => {
+        acc[servicio] = stats.sum / stats.count
+        return acc
+      }, {} as Record<string, number>)
+
+      const descuentosAplicados = historial.filter(h => h.descuento).length
+      const incrementosProgramados = historial.filter(h => h.incrementoProgramado).length
+
+      return {
+        total: historial.length,
+        porServicio,
+        porTipoServicio,
+        preciosPromedio,
+        descuentosAplicados,
+        incrementosProgramados,
+        activos: historial.filter(h => h.activo).length,
+        porMoneda: historial.reduce((acc, h) => {
+          if (h.moneda) {
+            acc[h.moneda] = (acc[h.moneda] || 0) + 1
+          }
+          return acc
+        }, {} as Record<string, number>)
       }
-    }
-
-    return {
-      precios,
-      estadisticas: stats
-    }
-  } catch (error) {
-    console.error('Error al obtener tendencias de precios:', error)
-    throw error
-  }
-}
-
-// Función para verificar y notificar incrementos programados
-export async function verificarIncrementosProgramados(): Promise<HistorialPrecio[]> {
-  try {
-    const fechaActual = new Date().toISOString()
-    
-    const { data, error } = await supabase
-      .from('historial_precios')
-      .select('*')
-      .eq('activo', true)
-      .contains('incremento_programado', [{ notificado: false }])
-
-    if (error) throw error
-
-    const preciosConIncrementos = data ? data.map(mapHistorialPrecioFromDB) : []
-    const preciosParaActualizar: HistorialPrecio[] = []
-
-    for (const precio of preciosConIncrementos) {
-      const incrementosPendientes = precio.incrementoProgramado?.filter(
-        inc => !inc.notificado && inc.fecha <= fechaActual
-      )
-
-      if (incrementosPendientes?.length) {
-        const incrementosActualizados = precio.incrementoProgramado?.map(inc => ({
-          ...inc,
-          notificado: inc.fecha <= fechaActual ? true : inc.notificado
-        }))
-
-        await supabase
-          .from('historial_precios')
-          .update({ incremento_programado: incrementosActualizados })
-          .eq('id', precio.id)
-
-        preciosParaActualizar.push(precio)
+    } catch (error) {
+      if (error instanceof Error) {
+        throw handleDatabaseError(error, 'Error al obtener estadísticas de historial de precios')
       }
+      throw handleDatabaseError(error as PostgrestError, 'Error al obtener estadísticas de historial de precios')
     }
-
-    return preciosParaActualizar
-  } catch (error) {
-    console.error('Error al verificar incrementos programados:', error)
-    throw error
   }
 }
