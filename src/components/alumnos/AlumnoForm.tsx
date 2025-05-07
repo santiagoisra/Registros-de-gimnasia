@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import type { Alumno, EstadoPago } from '@/types'
-import { createAlumno, updateAlumno } from '@/services/alumnos'
+import { alumnosService } from '@/services/alumnos'
 
 interface AlumnoFormProps {
   alumno?: Alumno
@@ -45,10 +45,10 @@ export default function AlumnoForm({ alumno, onClose, onSuccess }: AlumnoFormPro
     const payload = { ...formData, sede: formData.sede as 'Plaza Arenales' | 'Plaza Terán' };
     try {
       if (alumno) {
-        await updateAlumno(alumno.id, payload)
+        await alumnosService.updateAlumno(alumno.id, payload)
         toast.success('Alumno actualizado')
       } else {
-        await createAlumno(payload)
+        await alumnosService.createAlumno(payload)
         toast.success('Alumno creado')
       }
       onSuccess()

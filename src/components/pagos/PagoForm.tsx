@@ -5,7 +5,7 @@ import { toast } from 'react-hot-toast'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 import type { Alumno, MetodoPago } from '@/types'
-import { getAlumnos } from '@/services/alumnos'
+import { alumnosService } from '@/services/alumnos'
 import { usePagos } from '@/hooks/usePagos'
 
 interface PagoFormProps {
@@ -45,7 +45,7 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
 
   const cargarAlumnos = async () => {
     try {
-      const data = await getAlumnos()
+      const { data } = await alumnosService.getAlumnos()
       setAlumnos(data.filter(alumno => alumno.activo))
     } catch {
       toast.error('Error al cargar los alumnos')
@@ -130,9 +130,10 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
         <DatePicker
           id="fecha"
           selected={formData.fecha}
-          onChange={(date) => setFormData({ ...formData, fecha: date || new Date() })}
+          onChange={(date: Date | null) => setFormData({ ...formData, fecha: date || new Date() })}
           className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
           dateFormat="dd/MM/yyyy"
+          showPopperArrow={false}
         />
       </div>
 
@@ -181,9 +182,10 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
           <DatePicker
             id="periodoDesde"
             selected={formData.periodoDesde}
-            onChange={(date) => setFormData({ ...formData, periodoDesde: date || new Date() })}
+            onChange={(date: Date | null) => setFormData({ ...formData, periodoDesde: date || new Date() })}
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
             dateFormat="dd/MM/yyyy"
+            showPopperArrow={false}
           />
         </div>
 
@@ -194,9 +196,10 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
           <DatePicker
             id="periodoHasta"
             selected={formData.periodoHasta}
-            onChange={(date) => setFormData({ ...formData, periodoHasta: date || new Date() })}
+            onChange={(date: Date | null) => setFormData({ ...formData, periodoHasta: date || new Date() })}
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-primary focus:border-primary sm:text-sm rounded-md"
             dateFormat="dd/MM/yyyy"
+            showPopperArrow={false}
           />
         </div>
       </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getAlumnos } from '@/services/alumnos'
+import { alumnosService } from '@/services/alumnos'
 import type { Alumno } from '@/types'
 
 interface UseAlumnosOptions {
@@ -24,7 +24,7 @@ export function useAlumnos(options: UseAlumnosOptions = { autoFetch: true }): Us
     try {
       setLoading(true)
       setError(null)
-      const data = await getAlumnos()
+      const { data } = await alumnosService.getAlumnos()
       setAlumnos(data)
     } catch (err) {
       setError(err instanceof Error ? err : new Error('Error al cargar alumnos'))

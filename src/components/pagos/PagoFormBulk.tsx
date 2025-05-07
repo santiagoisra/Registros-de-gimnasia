@@ -5,7 +5,7 @@ import { toast } from 'react-hot-toast'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 import type { Alumno, MetodoPago } from '@/types'
-import { getAlumnos } from '@/services/alumnos'
+import { alumnosService } from '@/services/alumnos'
 import { usePagos } from '@/hooks/usePagos'
 
 interface PagoFormBulkProps {
@@ -41,7 +41,7 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
 
   const cargarAlumnos = async () => {
     try {
-      const data = await getAlumnos()
+      const { data } = await alumnosService.getAlumnos()
       setAlumnos(data.filter(alumno => alumno.activo))
     } catch {
       toast.error('Error al cargar los alumnos')
@@ -115,9 +115,10 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
           </label>
           <DatePicker
             selected={fecha}
-            onChange={(date: Date) => setFecha(date)}
+            onChange={(date: Date | null) => setFecha(date || new Date())}
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
             dateFormat="dd/MM/yyyy"
+            showPopperArrow={false}
           />
         </div>
         <div>
@@ -164,9 +165,10 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
               </label>
               <DatePicker
                 selected={periodoDesde}
-                onChange={(date: Date) => setPeriodoDesde(date)}
+                onChange={(date: Date | null) => setPeriodoDesde(date || new Date())}
                 className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
                 dateFormat="dd/MM/yyyy"
+                showPopperArrow={false}
               />
             </div>
             <div>
@@ -175,10 +177,11 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
               </label>
               <DatePicker
                 selected={periodoHasta}
-                onChange={(date: Date) => setPeriodoHasta(date)}
+                onChange={(date: Date | null) => setPeriodoHasta(date || new Date())}
                 className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
                 dateFormat="dd/MM/yyyy"
                 minDate={periodoDesde}
+                showPopperArrow={false}
               />
             </div>
             <div>
@@ -242,40 +245,20 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
                   ? 'bg-primary/10 border-primary'
                   : 'border-gray-200 hover:border-primary'
               }`}
-              onClick={() => toggleAlumno(alumno.id)}
-              tabIndex={0}
-              role="checkbox"
-              aria-checked={alumnosSeleccionados.includes(alumno.id) ? "true" : "false"}
-              onKeyDown={e => {
-                if (e.key === ' ' || e.key === 'Enter') toggleAlumno(alumno.id)
-              }}
             >
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  checked={alumnosSeleccionados.includes(alumno.id)}
-                  onChange={() => toggleAlumno(alumno.id)}
-                  className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-                  tabIndex={-1}
-                  aria-label={`Seleccionar ${alumno.nombre}`}
-                />
-                <span className="ml-3 text-sm">{alumno.nombre}</span>
-              </div>
-              {alumnosSeleccionados.includes(alumno.id) && (
-                <div className="mt-2">
-                  <label className="block text-xs text-gray-500 mb-1">Monto</label>
-                  <input
-                    type="number"
-                    value={montos[alumno.id] || alumno.precioMensual || ''}
-                    onChange={e => handleMontoChange(alumno.id, e.target.value)}
-                    onClick={e => e.stopPropagation()}
-                    className="block w-full rounded-md border-2 border-primary/50 focus:border-primary focus:ring-primary sm:text-base py-2 px-3 text-base"
-                    placeholder="0.00"
-                    min="0"
-                    required
-                  />
-                </div>
-              )}
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={alumnosSeleccionados.includes(alumno.id)}
+                onChange={() => toggleAlumno(alumno.id)}
+                id={`alumno-${alumno.id}`}
+              />
+              <label
+                htmlFor={`alumno-${alumno.id}`}
+                className="flex items-center cursor-pointer"
+              >
+                <span className="text-sm">{alumno.nombre}</span>
+              </label>
             </div>
           ))}
         </div>

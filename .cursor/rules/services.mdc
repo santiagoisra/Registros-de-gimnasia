@@ -1,0 +1,159 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Servicios
+
+## Estructura y Exportación
+
+Los servicios deben ser exportados como objetos que contienen todas sus funciones relacionadas, no como funciones individuales.
+
+### ✅ Correcto
+
+```typescript
+// services/alumnos.ts
+export const alumnosService = {
+  getAlumnos: async () => { /* ... */ },
+  createAlumno: async () => { /* ... */ },
+  updateAlumno: async () => { /* ... */ }
+}
+
+// components/AlumnosList.tsx
+import { alumnosService } from '@/services/alumnos'
+
+// Desestructurar la respuesta para obtener data
+const { data } = await alumnosService.getAlumnos()
+```
+
+### ❌ Incorrecto
+
+```typescript
+// services/alumnos.ts
+export const getAlumnos = async () => { /* ... */ }
+export const createAlumno = async () => { /* ... */ }
+
+// components/AlumnosList.tsx
+import { getAlumnos } from '@/services/alumnos'
+
+// Importar funciones individuales
+const data = await getAlumnos()
+```
+
+## Manejo de Respuestas
+
+Los servicios deben devolver un objeto con una propiedad `data` que contenga los resultados. Esto permite una estructura consistente y facilita el manejo de errores y metadatos adicionales.
+
+### ✅ Correcto
+
+```typescript
+// services/alumnos.ts
+export const alumnosService = {
+  getAlumnos: async () => {
+    const response = await fetch('/api/alumnos')
+    const data = await response.json()
+    return { data }
+  }
+}
+
+// components/AlumnosList.tsx
+const { data } = await alumnosService.getAlumnos()
+setAlumnos(data)
+```
+
+### ❌ Incorrecto
+
+```typescript
+// services/alumnos.ts
+export const getAlumnos = async () => {
+  const response = await fetch('/api/alumnos')
+  return response.json()
+}
+
+// components/AlumnosList.tsx
+const alumnos = await getAlumnos()
+setAlumnos(alumnos)
+```
+
+## Manejo de Errores
+
+Los servicios deben manejar los errores de manera consistente y proporcionar mensajes de error útiles.
+
+### ✅ Correcto
+
+```typescript
+// services/alumnos.ts
+export const alumnosService = {
+  getAlumnos: async () => {
+    try {
+      const response = await fetch('/api/alumnos')
+      if (!response.ok) {
+        throw new Error('Error al obtener alumnos')
+      }
+      const data = await response.json()
+      return { data }
+    } catch (error) {
+      throw error instanceof Error ? error : new Error('Error desconocido')
+    }
+  }
+}
+
+// components/AlumnosList.tsx
+try {
+  const { data } = await alumnosService.getAlumnos()
+  setAlumnos(data)
+} catch (error) {
+  toast.error(error.message)
+}
+```
+
+### ❌ Incorrecto
+
+```typescript
+// services/alumnos.ts
+export const getAlumnos = async () => {
+  const response = await fetch('/api/alumnos')
+  return response.json()
+}
+
+// components/AlumnosList.tsx
+const data = await getAlumnos()
+setAlumnos(data)
+```
+
+## Mapeo de Datos
+
+Los servicios deben encapsular la lógica de mapeo entre modelos de base de datos y modelos de frontend.
+
+### ✅ Correcto
+
+```typescript
+function mapAlumnoFromDB(dbAlumno: AlumnoDB): Alumno {
+  return {
+    id: dbAlumno.id,
+    nombre: dbAlumno.nombre,
+    // ... resto del mapeo
+  }
+}
+
+const alumnosService = {
+  async getAlumnos() {
+    const { data } = await query
+    return { 
+      data: data.map(mapAlumnoFromDB),
+      totalPages 
+    }
+  }
+}
+```
+
+### ❌ Incorrecto
+
+```typescript
+// Mapeo directo en componentes
+const alumnos = data.map(a => ({
+  id: a.id,
+  nombre: a.nombre,
+  // ... mapeo inconsistente
+}))
+```
