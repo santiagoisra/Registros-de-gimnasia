@@ -19,6 +19,7 @@ import {
 import { Bar } from 'react-chartjs-2'
 import { toast } from 'react-hot-toast'
 import { supabase } from '@/lib/supabase'
+import { PaymentStatusBadge } from '@/components/ui/PaymentStatusBadge'
 
 ChartJS.register(
   CategoryScale,
@@ -197,11 +198,18 @@ export default function ReporteGeneral() {
         </div>
 
         <div className="p-4 bg-red-50 rounded-lg">
-          <div className="flex items-center">
-            <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
-            <span className="ml-2 text-sm font-medium text-gray-600">
-              Pagos Pendientes
-            </span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
+              <span className="ml-2 text-sm font-medium text-gray-600">
+                Pagos Pendientes
+              </span>
+            </div>
+            <PaymentStatusBadge
+              status="atrasado"
+              tooltipContent={`${estadisticas.pagosPendientes} alumnos con pagos pendientes`}
+              size="sm"
+            />
           </div>
           <p className="mt-2 text-2xl font-semibold text-gray-900">
             {estadisticas.pagosPendientes}

@@ -4,6 +4,15 @@ export type MetodoPago = 'Efectivo' | 'Transferencia' | 'Mercado Pago';
 
 export type EstadoPago = 'al_dia' | 'pendiente' | 'atrasado';
 
+export type AlertType = 'pago' | 'asistencia' | 'general'
+
+export interface AlertConfig {
+  type: AlertType
+  enabled: boolean
+  threshold?: number // Para alertas de asistencia (días sin asistir)
+  reminderDays?: number // Para alertas de pago (días antes del vencimiento)
+}
+
 /**
  * Modelo extendido de Alumno para frontend.
  * Incluye todos los campos de la base (ver src/types/supabase.ts) y campos adicionales para UI/lógica.
@@ -22,23 +31,27 @@ export interface Alumno {
   /** Dirección (extendido/UI) */
   direccion?: string;
   /** Teléfono (base) */
-  telefono?: string;
+  telefono: string;
   /** Email (base) */
-  email?: string;
+  email: string;
   /** Fecha de alta (base: created_at) */
   createdAt: string;
   /** Fecha de última actualización (base: updated_at) */
   updatedAt: string;
   /** Estado de actividad (base) */
-  activo?: boolean;
+  activo: boolean;
   /** Alertas activas (base) */
-  alertasActivas?: boolean;
+  alertasActivas: boolean;
   /** Fecha última asistencia (base) */
-  fechaUltimaAsistencia?: string;
+  fechaUltimaAsistencia: string;
   /** Días consecutivos de asistencia (base) */
-  diasConsecutivosAsistencia?: number;
+  diasConsecutivosAsistencia: number;
   /** Estado de pago (base) */
-  estadoPago?: EstadoPago;
+  estadoPago: EstadoPago;
+  sede: 'Plaza Arenales' | 'Plaza Terán';
+  precioMensual: number;
+  notas: string;
+  alertConfig?: AlertConfig[];
 }
 
 /**

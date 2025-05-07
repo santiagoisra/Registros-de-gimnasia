@@ -7,6 +7,7 @@ import { toast } from 'react-hot-toast'
 import type { Pago, Alumno } from '@/types'
 import { alumnosService } from '@/services/alumnos'
 import { usePagos } from '@/hooks/usePagos'
+import { PaymentStatusBadge } from '@/components/ui/PaymentStatusBadge'
 
 export default function PagosList() {
   const [alumnos, setAlumnos] = useState<Record<string, Alumno>>({})
@@ -166,13 +167,13 @@ export default function PagosList() {
                     {pago.metodoPago}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      pago.estado === 'Pagado' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {pago.estado}
-                    </span>
+                    <PaymentStatusBadge
+                      status={pago.estado === 'Pagado' ? 'al_dia' : 'pendiente'}
+                      tooltipContent={`Pago ${pago.estado.toLowerCase()} el ${format(new Date(pago.fecha), "d 'de' MMMM, yyyy", {
+                        locale: es,
+                      })}`}
+                      size="sm"
+                    />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <button
