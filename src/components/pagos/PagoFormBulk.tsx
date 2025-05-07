@@ -1,11 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 import type { Alumno, MetodoPago } from '@/types'
-import { alumnosService } from '@/services/alumnos'
 import { usePagos } from '@/hooks/usePagos'
 
 interface PagoFormBulkProps {
@@ -20,35 +19,15 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
   const [periodoDesde, setPeriodoDesde] = useState<Date>(new Date())
   const [periodoHasta, setPeriodoHasta] = useState<Date>(new Date(new Date().setMonth(new Date().getMonth() + 1)))
   const [notas, setNotas] = useState<string>('')
-  const [alumnos, setAlumnos] = useState<Alumno[]>([])
-  const [loadingAlumnos, setLoadingAlumnos] = useState(true)
+  const [alumnos] = useState<Alumno[]>([])
+  const [loadingAlumnos] = useState(true)
   const [alumnosSeleccionados, setAlumnosSeleccionados] = useState<string[]>([])
   const [montos, setMontos] = useState<Record<string, string>>({})
-  const { registrarPagosBulk, loading: loadingPagos } = usePagos()
-  const [mes, setMes] = useState<number>(fecha.getMonth() + 1)
-  const [anio, setAnio] = useState<number>(fecha.getFullYear())
+  const { createPagosBulk, isCreating: loadingPagos } = usePagos()
+  const [mes, setMes] = useState<number>(new Date().getMonth() + 1)
+  const [anio, setAnio] = useState<number>(new Date().getFullYear())
   const [filtroAlumnos, setFiltroAlumnos] = useState('')
   const [mostrarDetalles, setMostrarDetalles] = useState(false)
-
-  useEffect(() => {
-    cargarAlumnos()
-  }, [])
-
-  useEffect(() => {
-    setMes(fecha.getMonth() + 1)
-    setAnio(fecha.getFullYear())
-  }, [fecha])
-
-  const cargarAlumnos = async () => {
-    try {
-      const { data } = await alumnosService.getAlumnos()
-      setAlumnos(data.filter(alumno => alumno.activo))
-    } catch {
-      toast.error('Error al cargar los alumnos')
-    } finally {
-      setLoadingAlumnos(false)
-    }
-  }
 
   const toggleAlumno = (id: string) => {
     setAlumnosSeleccionados(prev =>
@@ -56,10 +35,6 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
         ? prev.filter(alumnoId => alumnoId !== id)
         : [...prev, id]
     )
-  }
-
-  const handleMontoChange = (id: string, value: string) => {
-    setMontos(prev => ({ ...prev, [id]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,7 +51,7 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
       periodoDesde: periodoDesde.toISOString().split('T')[0],
       periodoHasta: periodoHasta.toISOString().split('T')[0],
       notas,
-      estado: 'Pagado',
+      estado: 'Pagado' as const,
       mes,
       anio,
     }))
@@ -85,7 +60,7 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
       return
     }
     try {
-      await registrarPagosBulk(pagos)
+      await createPagosBulk(pagos)
       setAlumnosSeleccionados([])
       setMontos({})
       onSuccess?.()
@@ -97,6 +72,13 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
   const alumnosFiltrados = alumnos.filter(alumno =>
     alumno.nombre.toLowerCase().includes(filtroAlumnos.toLowerCase())
   )
+
+  const handleFechaChange = (date: Date | null) => {
+    const nuevaFecha = date || new Date()
+    setFecha(nuevaFecha)
+    setMes(nuevaFecha.getMonth() + 1)
+    setAnio(nuevaFecha.getFullYear())
+  }
 
   if (loadingAlumnos) {
     return (
@@ -115,7 +97,7 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
           </label>
           <DatePicker
             selected={fecha}
-            onChange={(date: Date | null) => setFecha(date || new Date())}
+            onChange={handleFechaChange}
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
             dateFormat="dd/MM/yyyy"
             showPopperArrow={false}

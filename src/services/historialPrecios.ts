@@ -38,7 +38,7 @@ function mapHistorialPrecioFromDB(dbHistorial: HistorialPreciosDB): HistorialPre
     descuento: dbHistorial.descuento ? JSON.parse(dbHistorial.descuento) : undefined,
     incrementoProgramado: dbHistorial.incremento_programado ? JSON.parse(dbHistorial.incremento_programado) : undefined,
     historialCambios: dbHistorial.historial_cambios ? JSON.parse(dbHistorial.historial_cambios) : undefined,
-    notas: dbHistorial.notas,
+    notas: dbHistorial.notas ?? undefined,
     createdAt: dbHistorial.created_at,
     updatedAt: dbHistorial.updated_at
   }

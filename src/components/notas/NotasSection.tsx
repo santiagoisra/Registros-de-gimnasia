@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
 import { ChevronDownIcon } from '@heroicons/react/24/outline'
 import { useNotas } from '@/hooks/useNotas'
 import { useAutoSave } from '@/hooks/useAutoSave'
 import { RichTextEditor } from '@/components/ui/RichTextEditor'
 import { formatDate } from '@/utils'
+import { useState } from 'react'
 import type { Nota } from '@/types'
 
 interface NotasSectionProps {
@@ -20,7 +20,8 @@ export function NotasSection({ alumnoId }: NotasSectionProps) {
   // Auto-guardado de la nota actual
   useAutoSave({
     value: currentContent,
-    onSave: async (content) => {
+    onSave: async (value: unknown) => {
+      const content = String(value ?? '')
       if (!content.trim()) return
 
       await createNota({
@@ -79,7 +80,7 @@ export function NotasSection({ alumnoId }: NotasSectionProps) {
             {notas.length === 0 ? (
               <p className="text-sm text-gray-500 italic">No hay notas registradas</p>
             ) : (
-              notas.map((nota) => (
+              notas.map((nota: Nota) => (
                 <div
                   key={nota.id}
                   className="bg-white rounded-lg border border-gray-200 p-4"
@@ -105,8 +106,8 @@ export function NotasSection({ alumnoId }: NotasSectionProps) {
                   </div>
                   <div className="prose max-w-none text-sm text-gray-700">
                     <RichTextEditor
-                      content={nota.contenido}
-                      onChange={async (content) => {
+                      content={nota.contenido as string}
+                      onChange={async (content: string) => {
                         await updateNota(nota.id, {
                           ...nota,
                           contenido: content,

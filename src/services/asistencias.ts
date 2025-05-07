@@ -1,6 +1,5 @@
 import { supabase } from '@/lib/supabase'
 import type { Asistencia as AsistenciaDB, Alumno as AlumnoDB } from '@/types/supabase'
-import type { Asistencia, Alumno } from '@/types'
 import { handleDatabaseError } from '@/utils/errorHandling'
 import { PostgrestError } from '@supabase/supabase-js'
 
@@ -21,7 +20,7 @@ interface GetAsistenciasOptions {
 /**
  * Mapea una asistencia desde la base de datos al modelo del frontend
  */
-function mapAsistenciaFromDB(dbAsistencia: AsistenciaDB & { alumnos: AlumnoDB | null }): Asistencia {
+function mapAsistenciaFromDB(dbAsistencia: AsistenciaDB & { alumnos: AlumnoDB | null }): AsistenciaDB {
   return {
     id: dbAsistencia.id,
     alumno_id: dbAsistencia.alumno_id,
@@ -43,7 +42,7 @@ function mapAsistenciaFromDB(dbAsistencia: AsistenciaDB & { alumnos: AlumnoDB | 
       diasConsecutivosAsistencia: dbAsistencia.alumnos.dias_consecutivos_asistencia || undefined,
       estadoPago: dbAsistencia.alumnos.estado_pago || undefined,
       createdAt: dbAsistencia.alumnos.created_at,
-      updatedAt: dbAsistencia.alumnos.updated_at
+      // updatedAt: dbAsistencia.alumnos.updated_at // TODO: revisar si existe updated_at en Alumno
     } : undefined
   }
 }
@@ -248,7 +247,7 @@ export const asistenciasService = {
           else acc[a.fecha].ausentes++
           return acc
         }, {} as Record<string, { presentes: number, ausentes: number }>)
-      ).map(([fecha, stats]) => ({ fecha, ...stats }))
+      ).map(([fecha, stats]) => ({ fecha, ...(typeof stats === 'object' && stats !== null ? stats : {}) }))
 
       return {
         total,

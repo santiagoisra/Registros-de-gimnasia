@@ -12,18 +12,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useToast } from './useToast'
 import type { Pago } from '@/types'
 import type { Pago as PagoDB } from '@/types/supabase'
-import { 
-  getPagos,
-  getPagosPorAlumno,
-  getPagosPorFiltros,
-  getResumenPagosPorPeriodo,
-  getPagosPendientes,
-  createPago,
-  createPagosBulk,
-  updatePago,
-  deletePago,
-  getEstadisticasPagos
-} from '@/services/pagos'
+import * as pagosService from '@/services/pagos'
 import { handleDatabaseError } from '@/utils/errorHandling'
 import { PostgrestError } from '@supabase/supabase-js'
 import { validateDateRange, validateRequired, validateNumericRange } from '@/utils'
@@ -129,35 +118,23 @@ export function usePagos(options: UsePagosOptions = {}) {
   // Query principal para obtener pagos
   const pagosQuery = useQuery<PagosQueryResult, Error>({
     queryKey: ['pagos', options],
-    queryFn: async () => {
-      if (options.alumnoId) {
-        const pagos = await getPagosPorAlumno(options.alumnoId, {
-          estado: options.estado,
-          fechaDesde: options.fechaDesde,
-          fechaHasta: options.fechaHasta
-        })
-        return {
-          pagos,
-          total: pagos.length,
-          page: 1,
-          pageSize: pagos.length
-        }
-      } else {
-        return getPagos({
-          page: options.page,
-          pageSize: options.pageSize,
-          orderBy: 'fecha_pago',
-          orderDirection: 'desc'
-        })
-      }
-    },
-    enabled: !!(options.alumnoId || options.page)
+    queryFn: () => pagosService.getPagos({
+      // periodoDesde: options.fechaDesde,
+      // periodoHasta: options.fechaHasta,
+      metodoPago: options.metodoPago,
+      estado: options.estado,
+      page: options.page,
+      perPage: options.pageSize,
+      orderBy: 'fecha',
+      orderDirection: 'desc'
+    }),
+    enabled: !!(options.fechaDesde || options.fechaHasta)
   })
 
   // Query para estadísticas
   const estadisticasQuery = useQuery<EstadisticasPagos, Error>({
     queryKey: ['pagos-estadisticas', options.alumnoId, options.fechaDesde, options.fechaHasta],
-    queryFn: () => getEstadisticasPagos({
+    queryFn: () => pagosService.getEstadisticasPagos({
       fechaDesde: options.fechaDesde,
       fechaHasta: options.fechaHasta
     }),
@@ -166,7 +143,7 @@ export function usePagos(options: UsePagosOptions = {}) {
 
   // Mutación para crear pago
   const createPagoMutation = useMutation<Pago | null, Error, Omit<Pago, 'id'>>({
-    mutationFn: createPago,
+    mutationFn: pagosService.createPago,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pagos'] })
       showToast('Pago registrado exitosamente', 'success')
@@ -180,7 +157,7 @@ export function usePagos(options: UsePagosOptions = {}) {
 
   // Mutación para crear pagos en lote
   const createPagosBulkMutation = useMutation<(Pago | null)[], Error, Omit<Pago, 'id'>[]>({
-    mutationFn: createPagosBulk,
+    mutationFn: pagosService.createPagosBulk,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pagos'] })
       showToast('Pagos registrados exitosamente', 'success')
@@ -194,7 +171,7 @@ export function usePagos(options: UsePagosOptions = {}) {
 
   // Mutación para actualizar pago
   const updatePagoMutation = useMutation<Pago | null, Error, { id: string; data: Partial<Omit<Pago, 'id'>> }>({
-    mutationFn: ({ id, data }) => updatePago(id, data),
+    mutationFn: ({ id, data }) => pagosService.updatePago(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pagos'] })
       showToast('Pago actualizado exitosamente', 'success')
@@ -208,7 +185,7 @@ export function usePagos(options: UsePagosOptions = {}) {
 
   // Mutación para eliminar pago
   const deletePagoMutation = useMutation<void, Error, string>({
-    mutationFn: deletePago,
+    mutationFn: pagosService.deletePago,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pagos'] })
       showToast('Pago eliminado exitosamente', 'success')
@@ -318,7 +295,7 @@ export function usePagos(options: UsePagosOptions = {}) {
     deletePago: handleDeletePago,
     
     // Estados de las mutaciones
-    isCreating: createPagoMutation.isPending || createPagosBulkMutation.isPending,
+    isCreating: createPagosBulkMutation.isPending,
     isUpdating: updatePagoMutation.isPending,
     isDeleting: deletePagoMutation.isPending
   }

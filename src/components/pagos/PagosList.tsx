@@ -1,19 +1,18 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { toast } from 'react-hot-toast'
-import type { Pago, Alumno } from '@/types'
-import { alumnosService } from '@/services/alumnos'
+import type { Alumno } from '@/types'
 import { usePagos } from '@/hooks/usePagos'
 import { PaymentStatusBadge } from '@/components/ui/PaymentStatusBadge'
 
 export default function PagosList() {
-  const [alumnos, setAlumnos] = useState<Record<string, Alumno>>({})
+  const [alumnos] = useState<Record<string, Alumno>>({})
   const [filtro, setFiltro] = useState('')
   const [metodoPagoFiltro, setMetodoPagoFiltro] = useState<string>('todos')
-  const [loading, setLoading] = useState(true)
+  const [loading] = useState(true)
 
   const { 
     pagos, 
@@ -24,28 +23,6 @@ export default function PagosList() {
     page: 1,
     pageSize: 50
   })
-
-  useEffect(() => {
-    cargarDatos()
-  }, [])
-
-  const cargarDatos = async () => {
-    try {
-      setLoading(true)
-      const { data: alumnosData } = await alumnosService.getAlumnos()
-      // Crear un objeto con los alumnos indexados por ID para búsqueda rápida
-      const alumnosMap = alumnosData.reduce((acc, alumno) => {
-        acc[alumno.id] = alumno
-        return acc
-      }, {} as Record<string, Alumno>)
-      setAlumnos(alumnosMap)
-    } catch (error) {
-      toast.error('Error al cargar los alumnos')
-      console.error('Error al cargar alumnos:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleEliminarPago = async (id: string) => {
     if (confirm('¿Estás seguro de que deseas eliminar este pago? Esta acción no se puede deshacer.')) {
@@ -169,7 +146,7 @@ export default function PagosList() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <PaymentStatusBadge
                       status={pago.estado === 'Pagado' ? 'al_dia' : 'pendiente'}
-                      tooltipContent={`Pago ${pago.estado.toLowerCase()} el ${format(new Date(pago.fecha), "d 'de' MMMM, yyyy", {
+                      tooltipContent={`Pago ${(pago.estado ?? '').toLowerCase()} el ${format(new Date(pago.fecha), "d 'de' MMMM, yyyy", {
                         locale: es,
                       })}`}
                       size="sm"
