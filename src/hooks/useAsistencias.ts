@@ -4,14 +4,7 @@ import { useCallback, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useToast } from './useToast'
 import { handleDatabaseError } from '@/utils/errorHandling'
-import { 
-  getAsistencias, 
-  getAsistenciasPorPeriodo, 
-  getEstadisticasAsistencia,
-  createAsistencia,
-  updateAsistencia,
-  deleteAsistencia 
-} from '@/services/asistencias'
+import { asistenciasService } from '@/services/asistencias'
 import type { Asistencia, EstadisticasAsistencia } from '@/types/supabase'
 
 export const useAsistencias = (options?: { 
@@ -30,7 +23,7 @@ export const useAsistencias = (options?: {
     isLoading: asistenciasLoading 
   } = useQuery({
     queryKey: ['asistencias', options?.alumnoId, options?.page, options?.pageSize],
-    queryFn: () => getAsistencias(options),
+    queryFn: () => asistenciasService.getAsistencias(options),
     enabled: !!options
   })
 
@@ -41,15 +34,15 @@ export const useAsistencias = (options?: {
     isLoading: estadisticasLoading
   } = useQuery({
     queryKey: ['estadisticas', options?.alumnoId],
-    queryFn: () => getEstadisticasAsistencia(options?.alumnoId),
+    queryFn: () => options?.alumnoId ? asistenciasService.getEstadisticasAsistencia(options.alumnoId!) : Promise.resolve(undefined),
     enabled: !!options?.alumnoId
   })
 
   // Mutation para crear asistencia
   const { mutate: crearAsistencia } = useMutation({
-    mutationFn: createAsistencia,
+    mutationFn: asistenciasService.createAsistencia,
     onSuccess: () => {
-      queryClient.invalidateQueries(['asistencias'])
+      queryClient.invalidateQueries({ queryKey: ['asistencias'] })
       showToast('Asistencia registrada correctamente', 'success')
     },
     onError: (error) => {
@@ -61,9 +54,9 @@ export const useAsistencias = (options?: {
 
   // Mutation para actualizar asistencia
   const { mutate: actualizarAsistencia } = useMutation({
-    mutationFn: updateAsistencia,
+    mutationFn: (args: { id: string, data: Partial<Asistencia> }) => asistenciasService.updateAsistencia(args.id, args.data),
     onSuccess: () => {
-      queryClient.invalidateQueries(['asistencias'])
+      queryClient.invalidateQueries({ queryKey: ['asistencias'] })
       showToast('Asistencia actualizada correctamente', 'success')
     },
     onError: (error) => {
@@ -75,9 +68,9 @@ export const useAsistencias = (options?: {
 
   // Mutation para eliminar asistencia
   const { mutate: eliminarAsistencia } = useMutation({
-    mutationFn: deleteAsistencia,
+    mutationFn: (id: string) => asistenciasService.deleteAsistencia(id),
     onSuccess: () => {
-      queryClient.invalidateQueries(['asistencias'])
+      queryClient.invalidateQueries({ queryKey: ['asistencias'] })
       showToast('Asistencia eliminada correctamente', 'success')
     },
     onError: (error) => {
@@ -90,7 +83,7 @@ export const useAsistencias = (options?: {
   const obtenerAsistenciasPorPeriodo = useCallback(async (periodo: { desde: string; hasta: string }) => {
     try {
       setLoading(true)
-      const data = await getAsistenciasPorPeriodo(periodo)
+      const data = await asistenciasService.getAsistencias({ ...options, ...periodo })
       return data
     } catch (error) {
       showToast('Error al obtener las asistencias del periodo', 'error')
@@ -99,7 +92,7 @@ export const useAsistencias = (options?: {
     } finally {
       setLoading(false)
     }
-  }, [showToast])
+  }, [showToast, options])
 
   return {
     asistencias: asistenciasData?.data || [],

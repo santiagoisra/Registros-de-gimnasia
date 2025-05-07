@@ -1,8 +1,10 @@
 'use client'
 
-import { useState, useCallback, useEffect } from 'react'
-import { toast } from 'react-hot-toast'
+import { useCallback } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useToast } from './useToast'
 import type { Nota } from '@/types'
+import type { Nota as NotaDB } from '@/types/supabase'
 import {
   getNotas,
   getNota,
@@ -13,235 +15,188 @@ import {
   getNotasPorPeriodo
 } from '@/services/notas'
 import { 
-  PaginationParams, 
-  OrderParams, 
-  DateRangeParams,
   handleDatabaseError,
   validateDateRange,
   validateRequired,
   validateNumericRange
 } from '@/utils'
+import { PostgrestError } from '@supabase/supabase-js'
 
-interface UseNotasOptions extends PaginationParams, OrderParams, DateRangeParams {
+interface UseNotasOptions {
   alumnoId?: string
-  tipo?: Nota['tipo']
+  tipo?: NotaDB['tipo']
   categoria?: Nota['categoria']
   visibleEnReporte?: boolean
   calificacionMin?: number
   calificacionMax?: number
-  autoFetch?: boolean
+  page?: number
+  pageSize?: number
+  fechaDesde?: string
+  fechaHasta?: string
 }
 
-interface NotasEstadisticas {
-  totalNotas: number
-  porTipo: Record<Nota['tipo'], number>
-  porCategoria: Record<NonNullable<Nota['categoria']>, number>
-  promedioCalificaciones: number
-  tendencias: {
-    ausencias: number
-    lesiones: number
-    vacaciones: number
-    general: number
-    evaluaciones: number
-    progresos: number
-    competencias: number
+// Función para convertir de modelo frontend a modelo DB
+function mapNotaToDB(nota: Partial<Nota>): Partial<NotaDB> {
+  return {
+    alumno_id: nota.alumnoId,
+    fecha: nota.fecha,
+    contenido: nota.contenido,
+    tipo: nota.tipo as NotaDB['tipo'],
+    visible_en_reporte: nota.visibleEnReporte
   }
-  objetivosCumplidos: number
-  objetivosPendientes: number
 }
 
 export function useNotas(options: UseNotasOptions = {}) {
-  const [notas, setNotas] = useState<Nota[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
-  const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(options.page || 1)
-  const [pageSize, setPageSize] = useState(options.pageSize || 10)
-  const [estadisticas, setEstadisticas] = useState<NotasEstadisticas | null>(null)
+  const queryClient = useQueryClient()
+  const { showToast } = useToast()
 
-  const fetchNotas = useCallback(async () => {
-    if (!options.alumnoId) return
+  // Validar fechas si se proporcionan
+  if (options.fechaDesde && options.fechaHasta) {
+    validateDateRange(options.fechaDesde, options.fechaHasta)
+  }
 
+  // Query principal para obtener notas
+  const notasQuery = useQuery({
+    queryKey: ['notas', options],
+    queryFn: () => getNotas({
+      alumnoId: options.alumnoId,
+      tipo: options.tipo,
+      visibleEnReporte: options.visibleEnReporte,
+      page: options.page,
+      perPage: options.pageSize,
+      orderBy: 'fecha',
+      orderDirection: 'desc'
+    }),
+    enabled: !!(options.alumnoId || options.tipo || options.visibleEnReporte)
+  })
+
+  // Query para estadísticas
+  const estadisticasQuery = useQuery({
+    queryKey: ['notas-estadisticas', options.alumnoId, options.fechaDesde, options.fechaHasta, options.tipo, options.categoria],
+    queryFn: () => getEstadisticasNotas(options.alumnoId!, {
+      fechaDesde: options.fechaDesde,
+      fechaHasta: options.fechaHasta,
+      tipo: options.tipo,
+      categoria: options.categoria
+    }),
+    enabled: !!options.alumnoId
+  })
+
+  // Query para notas por período
+  const notasPorPeriodoQuery = useQuery({
+    queryKey: ['notas-periodo', options.fechaDesde, options.fechaHasta, options.tipo],
+    queryFn: () => getNotasPorPeriodo(options.fechaDesde!, options.fechaHasta!, options.tipo),
+    enabled: !!(options.fechaDesde && options.fechaHasta)
+  })
+
+  // Mutación para crear nota
+  const createNotaMutation = useMutation({
+    mutationFn: (data: Partial<Nota>) => createNota(mapNotaToDB(data)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notas'] })
+      showToast('Nota creada exitosamente', 'success')
+    },
+    onError: (error) => {
+      const err = handleDatabaseError(error as Error | PostgrestError, 'crear nota')
+      showToast(err.message, 'error')
+      console.error(err)
+    }
+  })
+
+  // Mutación para actualizar nota
+  const updateNotaMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Partial<Nota> }) => 
+      updateNota(id, mapNotaToDB(data)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notas'] })
+      showToast('Nota actualizada exitosamente', 'success')
+    },
+    onError: (error) => {
+      const err = handleDatabaseError(error as Error | PostgrestError, 'actualizar nota')
+      showToast(err.message, 'error')
+      console.error(err)
+    }
+  })
+
+  // Mutación para eliminar nota
+  const deleteNotaMutation = useMutation({
+    mutationFn: deleteNota,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notas'] })
+      showToast('Nota eliminada exitosamente', 'success')
+    },
+    onError: (error) => {
+      const err = handleDatabaseError(error as Error | PostgrestError, 'eliminar nota')
+      showToast(err.message, 'error')
+      console.error(err)
+    }
+  })
+
+  // Función para crear nota con validación
+  const handleCreateNota = useCallback(async (data: Partial<Nota>) => {
     try {
-      validateRequired(options.alumnoId, 'alumnoId')
-      if (options.fechaDesde && options.fechaHasta) {
-        validateDateRange(options.fechaDesde, options.fechaHasta)
+      validateRequired(data.alumnoId, 'alumnoId')
+      validateRequired(data.fecha, 'fecha')
+      validateRequired(data.tipo, 'tipo')
+      
+      if (data.calificacion !== undefined) {
+        validateNumericRange(data.calificacion, 1, 10, 'calificación')
       }
-      if (options.calificacionMin !== undefined && options.calificacionMax !== undefined) {
-        validateNumericRange(options.calificacionMin, 0, 10, 'calificación mínima')
-        validateNumericRange(options.calificacionMax, 0, 10, 'calificación máxima')
+
+      await createNotaMutation.mutateAsync(data)
+    } catch (error) {
+      const err = handleDatabaseError(error as Error | PostgrestError, 'crear nota')
+      showToast(err.message, 'error')
+      throw err
+    }
+  }, [createNotaMutation, showToast])
+
+  // Función para actualizar nota con validación
+  const handleUpdateNota = useCallback(async (id: string, data: Partial<Nota>) => {
+    try {
+      if (data.calificacion !== undefined) {
+        validateNumericRange(data.calificacion, 1, 10, 'calificación')
       }
 
-      setLoading(true)
-      setError(null)
-
-      const result = await getNotas({
-        ...options,
-        page: options.page || 1,
-        pageSize: options.pageSize || 10
-      })
-
-      setNotas(result.notas)
-      setTotal(result.total)
-      setEstadisticas(result.estadisticas)
-    } catch (err) {
-      setError(handleDatabaseError(err as Error, 'fetchNotas'))
-    } finally {
-      setLoading(false)
-    }
-  }, [options])
-
-  useEffect(() => {
-    if (options.autoFetch !== false) {
-      fetchNotas()
-    }
-  }, [fetchNotas, options.autoFetch])
-
-  const createNota = useCallback(async (nota: Omit<Nota, 'id'>) => {
-    try {
-      setLoading(true)
-      setError(null)
-      const nuevaNota = await createNota(nota)
-      setNotas(prev => [nuevaNota, ...prev])
-      await fetchNotas() // Recargar para actualizar estadísticas
-      return nuevaNota
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Error al crear nota'))
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }, [fetchNotas])
-
-  const updateNota = useCallback(async (id: string, nota: Partial<Omit<Nota, 'id'>>) => {
-    try {
-      setLoading(true)
-      setError(null)
-      const notaActualizada = await updateNota(id, nota)
-      setNotas(prev => prev.map(n => n.id === id ? notaActualizada : n))
-      await fetchNotas() // Recargar para actualizar estadísticas
-      return notaActualizada
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Error al actualizar nota'))
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }, [fetchNotas])
-
-  const deleteNota = useCallback(async (id: string) => {
-    try {
-      setLoading(true)
-      setError(null)
-      await deleteNota(id)
-      setNotas(prev => prev.filter(n => n.id !== id))
-      await fetchNotas() // Recargar para actualizar estadísticas
-      return true
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Error al eliminar nota'))
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }, [fetchNotas])
-
-  const getNota = useCallback(async (id: string) => {
-    try {
-      setLoading(true)
-      setError(null)
-      const nota = await getNota(id)
-      return nota
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Error al obtener nota'))
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  const getNotasPorPeriodo = useCallback(async (fechaInicio: string, fechaFin: string, tipo?: Nota['tipo']) => {
-    try {
-      setLoading(true)
-      setError(null)
-      const notas = await getNotasPorPeriodo(fechaInicio, fechaFin, tipo)
-      return notas
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Error al obtener notas por periodo'))
-      throw err
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  const actualizarObjetivo = useCallback(async (
-    id: string, 
-    objetivoIndex: number, 
-    seguimientoUpdate: Nota['seguimiento'][0]
-  ) => {
-    try {
-      const nota = await getNota(id)
-      if (!nota) throw new Error('Nota no encontrada')
-
-      const seguimiento = [...(nota.seguimiento || [])]
-      seguimiento[objetivoIndex] = seguimientoUpdate
-
-      return await updateNota(id, { seguimiento })
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Error al actualizar objetivo'))
+      await updateNotaMutation.mutateAsync({ id, data })
+    } catch (error) {
+      const err = handleDatabaseError(error as Error | PostgrestError, 'actualizar nota')
+      showToast(err.message, 'error')
       throw err
     }
-  }, [getNota, updateNota])
+  }, [updateNotaMutation, showToast])
 
-  const agregarAdjunto = useCallback(async (
-    id: string,
-    adjunto: Nota['adjuntos'][0]
-  ) => {
+  // Función para eliminar nota
+  const handleDeleteNota = useCallback(async (id: string) => {
     try {
-      const nota = await getNota(id)
-      if (!nota) throw new Error('Nota no encontrada')
-
-      const adjuntos = [...(nota.adjuntos || []), adjunto]
-      return await updateNota(id, { adjuntos })
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Error al agregar adjunto'))
+      await deleteNotaMutation.mutateAsync(id)
+    } catch (error) {
+      const err = handleDatabaseError(error as Error | PostgrestError, 'eliminar nota')
+      showToast(err.message, 'error')
       throw err
     }
-  }, [getNota, updateNota])
-
-  const eliminarAdjunto = useCallback(async (
-    id: string,
-    adjuntoUrl: string
-  ) => {
-    try {
-      const nota = await getNota(id)
-      if (!nota) throw new Error('Nota no encontrada')
-
-      const adjuntos = nota.adjuntos?.filter(adj => adj.url !== adjuntoUrl) || []
-      return await updateNota(id, { adjuntos })
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Error al eliminar adjunto'))
-      throw err
-    }
-  }, [getNota, updateNota])
+  }, [deleteNotaMutation, showToast])
 
   return {
-    notas,
-    loading,
-    error,
-    total,
-    page,
-    pageSize,
-    estadisticas,
-    setPage,
-    setPageSize,
-    fetchNotas,
-    createNota,
-    updateNota,
-    deleteNota,
-    getNota,
-    getNotasPorPeriodo,
-    actualizarObjetivo,
-    agregarAdjunto,
-    eliminarAdjunto
+    // Queries
+    notas: notasQuery.data?.data || [],
+    totalPages: notasQuery.data?.totalPages || 1,
+    estadisticas: estadisticasQuery.data,
+    notasPorPeriodo: notasPorPeriodoQuery.data,
+    
+    // Estados de carga y error
+    isLoading: notasQuery.isLoading || estadisticasQuery.isLoading || notasPorPeriodoQuery.isLoading,
+    isError: notasQuery.isError || estadisticasQuery.isError || notasPorPeriodoQuery.isError,
+    error: notasQuery.error || estadisticasQuery.error || notasPorPeriodoQuery.error,
+
+    // Mutaciones
+    createNota: handleCreateNota,
+    updateNota: handleUpdateNota,
+    deleteNota: handleDeleteNota,
+    
+    // Estados de las mutaciones
+    isCreating: createNotaMutation.isPending,
+    isUpdating: updateNotaMutation.isPending,
+    isDeleting: deleteNotaMutation.isPending
   }
-} 
+}
