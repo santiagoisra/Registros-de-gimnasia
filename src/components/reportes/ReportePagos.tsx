@@ -12,6 +12,7 @@ import {
   Legend,
 } from 'chart.js'
 import { Line } from 'react-chartjs-2'
+import { PaymentStatusBadge } from '@/components/ui/PaymentStatusBadge'
 
 ChartJS.register(
   CategoryScale,
@@ -107,13 +108,20 @@ export default function ReportePagos() {
               key={index}
               className="flex justify-between items-center p-3 bg-red-50 rounded-lg"
             >
-              <div>
-                <p className="text-sm font-medium text-gray-900">
-                  {pago.alumno}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {pago.diasAtraso} días de atraso
-                </p>
+              <div className="flex items-center gap-3">
+                <PaymentStatusBadge
+                  status="atrasado"
+                  tooltipContent={`${pago.diasAtraso} días de atraso`}
+                  size="sm"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">
+                    {pago.alumno}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {pago.diasAtraso} días de atraso
+                  </p>
+                </div>
               </div>
               <span className="text-sm font-medium text-red-600">
                 ${pago.monto}
