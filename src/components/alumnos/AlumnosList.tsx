@@ -5,7 +5,7 @@ import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
 import type { Alumno } from '@/types'
 import AlumnoForm from './AlumnoForm'
-import { getAlumnos, deleteAlumno } from '@/services/alumnos'
+import { alumnosService } from '@/services/alumnos'
 
 export default function AlumnosList() {
   const [alumnos, setAlumnos] = useState<Alumno[]>([])
@@ -18,7 +18,7 @@ export default function AlumnosList() {
 
   const cargarAlumnos = async () => {
     try {
-      const data = await getAlumnos()
+      const { data } = await alumnosService.getAlumnos()
       setAlumnos(data)
     } catch {
       toast.error('Error al cargar los alumnos')
@@ -30,7 +30,7 @@ export default function AlumnosList() {
   const handleEliminar = async (id: string) => {
     if (!confirm('¿Estás seguro de que deseas eliminar este alumno?')) return
     try {
-      await deleteAlumno(id)
+      await alumnosService.deleteAlumno(id)
       toast.success('Alumno eliminado')
       cargarAlumnos()
     } catch {
@@ -101,12 +101,14 @@ export default function AlumnosList() {
                 <button
                   onClick={() => setAlumnoEditar(alumno)}
                   className="text-primary hover:text-primary/80 mr-3"
+                  title="Editar alumno"
                 >
                   <PencilIcon className="h-5 w-5" />
                 </button>
                 <button
                   onClick={() => handleEliminar(alumno.id)}
                   className="text-red-600 hover:text-red-800"
+                  title="Eliminar alumno"
                 >
                   <TrashIcon className="h-5 w-5" />
                 </button>

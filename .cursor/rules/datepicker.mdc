@@ -1,0 +1,78 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# DatePicker
+
+## Configuración Básica
+
+Los componentes DatePicker deben seguir estas reglas para evitar advertencias y asegurar un comportamiento consistente:
+
+### ✅ Correcto
+
+```typescript
+// Manejo correcto de tipos y valores nulos
+<DatePicker
+  selected={fecha}
+  onChange={(date: Date | null) => setFecha(date || new Date())}
+  className="w-full rounded-md border-gray-300"
+  dateFormat="dd/MM/yyyy"
+  showPopperArrow={false}
+/>
+```
+
+### ❌ Incorrecto
+
+```typescript
+// No manejar valores nulos o no tipar el parámetro date
+<DatePicker
+  selected={fecha}
+  onChange={(date) => setFecha(date)}
+  dateFormat="dd/MM/yyyy"
+/>
+```
+
+## Propiedades Requeridas
+
+- **selected**: Debe ser un objeto `Date`
+- **onChange**: Debe manejar tanto `Date` como `null` y proporcionar un valor por defecto
+- **dateFormat**: Usar "dd/MM/yyyy" para consistencia
+- **showPopperArrow**: Establecer en `false` para una apariencia más limpia
+- **className**: Usar las clases de Tailwind establecidas para mantener consistencia
+
+## Manejo de Valores Nulos
+
+Siempre proporcionar un valor por defecto (generalmente `new Date()`) cuando el valor seleccionado es `null`:
+
+```typescript
+onChange={(date: Date | null) => setFecha(date || new Date())}
+```
+
+## Estilos Consistentes
+
+Usar las siguientes clases de Tailwind para mantener consistencia:
+
+```typescript
+className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
+```
+
+## Validación de Rangos de Fechas
+
+Cuando se usan dos DatePickers para un rango de fechas:
+
+```typescript
+<DatePicker
+  selected={fechaInicio}
+  onChange={(date: Date | null) => setFechaInicio(date || new Date())}
+  dateFormat="dd/MM/yyyy"
+  showPopperArrow={false}
+/>
+<DatePicker
+  selected={fechaFin}
+  onChange={(date: Date | null) => setFechaFin(date || new Date())}
+  dateFormat="dd/MM/yyyy"
+  minDate={fechaInicio} // Asegura que la fecha fin no sea anterior a la fecha inicio
+  showPopperArrow={false}
+/>
+```

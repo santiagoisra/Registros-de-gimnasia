@@ -5,16 +5,24 @@ import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import { toast } from 'react-hot-toast'
 import type { Pago, Alumno } from '@/types'
-import { getAlumnos } from '@/services/alumnos'
+import { alumnosService } from '@/services/alumnos'
 import { usePagos } from '@/hooks/usePagos'
 
 export default function PagosList() {
-  const { pagos, loading: loadingPagos, fetchPagos, eliminarPago } = usePagos()
   const [alumnos, setAlumnos] = useState<Record<string, Alumno>>({})
-  const [loading, setLoading] = useState(true)
   const [filtro, setFiltro] = useState('')
   const [metodoPagoFiltro, setMetodoPagoFiltro] = useState<string>('todos')
-  const [pagoAEliminar, setPagoAEliminar] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  const { 
+    pagos, 
+    isLoading: loadingPagos, 
+    error,
+    deletePago: eliminarPago 
+  } = usePagos({
+    page: 1,
+    pageSize: 50
+  })
 
   useEffect(() => {
     cargarDatos()
@@ -23,18 +31,16 @@ export default function PagosList() {
   const cargarDatos = async () => {
     try {
       setLoading(true)
-      const [alumnosData] = await Promise.all([
-        getAlumnos(),
-        fetchPagos()
-      ])
+      const { data: alumnosData } = await alumnosService.getAlumnos()
       // Crear un objeto con los alumnos indexados por ID para búsqueda rápida
       const alumnosMap = alumnosData.reduce((acc, alumno) => {
         acc[alumno.id] = alumno
         return acc
       }, {} as Record<string, Alumno>)
       setAlumnos(alumnosMap)
-    } catch {
-      toast.error('Error al cargar los datos')
+    } catch (error) {
+      toast.error('Error al cargar los alumnos')
+      console.error('Error al cargar alumnos:', error)
     } finally {
       setLoading(false)
     }
@@ -44,8 +50,10 @@ export default function PagosList() {
     if (confirm('¿Estás seguro de que deseas eliminar este pago? Esta acción no se puede deshacer.')) {
       try {
         await eliminarPago(id)
+        toast.success('Pago eliminado correctamente')
       } catch (error) {
         console.error('Error al eliminar el pago:', error)
+        toast.error('Error al eliminar el pago')
       }
     }
   }
@@ -63,10 +71,18 @@ export default function PagosList() {
     return coincideFiltro && coincideMetodoPago
   })
 
-  if (loading) {
+  if (loading || loadingPagos) {
     return (
       <div className="flex items-center justify-center h-32">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="text-center text-red-600 p-4">
+        Error al cargar los pagos. Por favor, intenta recargar la página.
       </div>
     )
   }
@@ -79,7 +95,7 @@ export default function PagosList() {
             Últimos Pagos
           </h3>
           <div className="text-sm text-gray-500">
-            Total: ${pagosFiltrados.reduce((sum, pago) => sum + pago.monto, 0).toLocaleString()}
+            Total: ${pagosFiltrados.reduce((sum, pago) => sum + Number(pago.monto), 0).toLocaleString()}
           </div>
         </div>
         <div className="mt-4 flex flex-col sm:flex-row gap-4">
@@ -98,15 +114,15 @@ export default function PagosList() {
               aria-label="Filtrar por método de pago"
             >
               <option value="todos">Todos los métodos</option>
-              <option value="efectivo">Efectivo</option>
-              <option value="transferencia">Transferencia</option>
-              <option value="debito">Débito</option>
-              <option value="credito">Crédito</option>
+              <option value="Efectivo">Efectivo</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Mercado Pago">Mercado Pago</option>
             </select>
           </div>
         </div>
       </div>
-      <div className="border-t border-gray-200 overflow-x-auto">
+      
+      <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
@@ -144,7 +160,7 @@ export default function PagosList() {
                     })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${pago.monto.toLocaleString()}
+                    ${Number(pago.monto).toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {pago.metodoPago}
