@@ -34,14 +34,15 @@ function mapAsistenciaFromDB(dbAsistencia: AsistenciaDB & { alumnos: AlumnoDB | 
       id: dbAsistencia.alumnos.id,
       nombre: dbAsistencia.alumnos.nombre,
       apellido: dbAsistencia.alumnos.apellido,
-      email: dbAsistencia.alumnos.email || undefined,
-      telefono: dbAsistencia.alumnos.telefono || undefined,
+      email: dbAsistencia.alumnos.email || '',
+      telefono: dbAsistencia.alumnos.telefono || '',
       activo: dbAsistencia.alumnos.activo,
-      alertasActivas: dbAsistencia.alumnos.alertas_activas || undefined,
-      fechaUltimaAsistencia: dbAsistencia.alumnos.fecha_ultima_asistencia || undefined,
-      diasConsecutivosAsistencia: dbAsistencia.alumnos.dias_consecutivos_asistencia || undefined,
-      estadoPago: dbAsistencia.alumnos.estado_pago || undefined,
-      createdAt: dbAsistencia.alumnos.created_at,
+      alertas_activas: dbAsistencia.alumnos.alertas_activas ?? false,
+      fecha_ultima_asistencia: dbAsistencia.alumnos.fecha_ultima_asistencia || undefined,
+      dias_consecutivos_asistencia: dbAsistencia.alumnos.dias_consecutivos_asistencia || undefined,
+      estado_pago: dbAsistencia.alumnos.estado_pago || undefined,
+      created_at: dbAsistencia.alumnos.created_at,
+      sede: dbAsistencia.alumnos.sede,
       // updatedAt: dbAsistencia.alumnos.updated_at // TODO: revisar si existe updated_at en Alumno
     } : undefined
   }

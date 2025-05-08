@@ -5,11 +5,7 @@ import { useHistorialPrecios } from '@/hooks/useHistorialPrecios'
 import { formatDate } from '@/utils'
 import { useState } from 'react'
 
-interface PriceHistorySectionProps {
-  alumnoId: string
-}
-
-export function PriceHistorySection({ alumnoId }: PriceHistorySectionProps) {
+const PriceHistorySection = () => {
   const [isExpanded, setIsExpanded] = useState(false)
   const { precios, loading, error } = useHistorialPrecios({ autoFetch: true })
 
@@ -94,4 +90,6 @@ export function PriceHistorySection({ alumnoId }: PriceHistorySectionProps) {
       )}
     </div>
   )
-} 
+}
+
+export default PriceHistorySection 

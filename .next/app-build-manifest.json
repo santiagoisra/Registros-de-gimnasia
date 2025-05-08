@@ -26,6 +26,11 @@
       "static/chunks/main-app.js",
       "static/css/app/pagos/page.css",
       "static/chunks/app/pagos/page.js"
+    ],
+    "/reportes/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/reportes/page.js"
     ]
   }
 }

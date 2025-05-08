@@ -5,7 +5,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useToast } from './useToast'
 import type { Nota } from '@/types'
 import type { Nota as NotaDB } from '@/types/supabase'
-import * as notasService from '@/services/notas'
 import { 
   handleDatabaseError,
   validateDateRange,
@@ -25,17 +24,6 @@ interface UseNotasOptions {
   pageSize?: number
   fechaDesde?: string
   fechaHasta?: string
-}
-
-// Función para convertir de modelo frontend a modelo DB
-function mapNotaToDB(nota: Partial<Nota>): Partial<NotaDB> {
-  return {
-    alumno_id: nota.alumnoId,
-    fecha: nota.fecha,
-    contenido: nota.contenido,
-    tipo: nota.tipo as NotaDB['tipo'],
-    visible_en_reporte: nota.visibleEnReporte
-  }
 }
 
 export function useNotas(options: UseNotasOptions = {}) {
@@ -130,7 +118,7 @@ export function useNotas(options: UseNotasOptions = {}) {
   }, [createNotaMutation, showToast])
 
   // Función para actualizar nota con validación
-  const handleUpdateNota = useCallback(async (id: string, data: Partial<Nota>) => {
+  const handleUpdateNota = useCallback(async (data: Partial<Nota>) => {
     try {
       if (data.calificacion !== undefined) {
         validateNumericRange(data.calificacion, 1, 10, 'calificación')
@@ -145,7 +133,7 @@ export function useNotas(options: UseNotasOptions = {}) {
   }, [updateNotaMutation, showToast])
 
   // Función para eliminar nota
-  const handleDeleteNota = useCallback(async (id: string) => {
+  const handleDeleteNota = useCallback(async () => {
     try {
       await deleteNotaMutation.mutateAsync()
     } catch (error) {

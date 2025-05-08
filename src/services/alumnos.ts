@@ -33,7 +33,10 @@ function mapAlumnoFromDB(dbAlumno: AlumnoDB): Alumno {
     alertasActivas: dbAlumno.alertas_activas ?? false,
     fechaUltimaAsistencia: dbAlumno.fecha_ultima_asistencia ?? '',
     diasConsecutivosAsistencia: dbAlumno.dias_consecutivos_asistencia ?? 0,
-    estadoPago: dbAlumno.estado_pago ?? 'al_dia'
+    estadoPago: dbAlumno.estado_pago ?? 'al_dia',
+    sede: dbAlumno.sede,
+    precioMensual: (dbAlumno as unknown as { precio_mensual?: number }).precio_mensual ?? 0,
+    notas: (dbAlumno as unknown as { notas?: string }).notas ?? '',
   }
 }
 
@@ -60,8 +63,10 @@ export const alumnosService = {
       }
 
       if (options.orderBy) {
-        const dbColumn = options.orderBy === 'alumno_id' ? 'alumno_id' : undefined
-        query = query.order(dbColumn, { ascending: options.orderDirection !== 'desc' })
+        const dbColumn = (options.orderBy as string) === 'alumno_id' ? 'alumno_id' : options.orderBy
+        if (dbColumn) {
+          query = query.order(dbColumn, { ascending: options.orderDirection !== 'desc' })
+        }
       }
 
       if (options.page && options.perPage) {
