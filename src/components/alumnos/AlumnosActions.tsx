@@ -22,8 +22,8 @@ export default function AlumnosActions({ onSuccess }: AlumnosActionsProps) {
       </button>
 
       {showForm && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-2 sm:p-4 z-50 overflow-y-auto">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-4 sm:p-6 max-h-screen overflow-y-auto">
             <h2 className="text-lg font-medium mb-4">Nuevo Alumno</h2>
             <AlumnoForm 
               onClose={() => setShowForm(false)} 
