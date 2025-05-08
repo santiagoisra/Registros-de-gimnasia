@@ -11,6 +11,7 @@ export const useAsistencias = (options?: {
   alumnoId?: string
   page?: number 
   pageSize?: number
+  sede?: 'Plaza Arenales' | 'Plaza Terán'
 }) => {
   const queryClient = useQueryClient()
   const { showToast } = useToast()

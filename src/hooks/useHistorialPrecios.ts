@@ -1,9 +1,6 @@
 'use client'
 
 import { useState, useCallback, useEffect } from 'react'
-import { toast } from 'react-hot-toast'
-import type { HistorialPrecio, EstadisticasPrecios } from '@/types'
-import * as historialPreciosService from '@/services/historialPrecios'
 import { 
   PaginationParams, 
   OrderParams, 
@@ -12,6 +9,7 @@ import {
   validateDateRange,
   formatDate
 } from '@/utils'
+import type { HistorialPrecio, EstadisticasPrecios } from '@/types'
 
 interface UseHistorialPreciosOptions extends PaginationParams, OrderParams, DateRangeParams {
   servicio?: string
@@ -30,8 +28,8 @@ interface UseHistorialPreciosReturn {
   loading: boolean
   error: Error | null
   fetchPrecios: () => Promise<void>
-  fetchPrecioVigente: (servicio: string, fecha?: string) => Promise<void>
-  fetchEstadisticas: (fechaInicio: string, fechaFin: string) => Promise<void>
+  fetchPrecioVigente: () => Promise<void>
+  fetchEstadisticas: () => Promise<void>
   verificarIncrementos: () => Promise<void>
   createPrecio: (precio: Omit<HistorialPrecio, 'id'>) => Promise<HistorialPrecio>
   updatePrecio: (id: string, precio: Partial<Omit<HistorialPrecio, 'id'>>) => Promise<HistorialPrecio>
@@ -69,9 +67,11 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
       // Obtener incrementos pendientes
       const hoy = formatDate(new Date())
       const incrementosPendientes = result.precios
-        .filter((precio: any) => precio.incrementoProgramado?.some((inc: any) => 
-          !inc.notificado && inc.fecha > hoy
-        ))
+        .filter((precio: { incrementoProgramado?: { notificado?: boolean; fecha: string }[] }) =>
+          precio.incrementoProgramado?.some((inc) =>
+            !inc.notificado && inc.fecha > hoy
+          )
+        )
       setIncrementosPendientes(incrementosPendientes)
     } catch (err) {
       setError(handleDatabaseError(err as Error, 'fetchPrecios'))
@@ -80,7 +80,7 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
     }
   }, [options])
 
-  const fetchPrecioVigente = useCallback(async (servicio: string, fecha?: string) => {
+  const fetchPrecioVigente = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -95,7 +95,7 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
     }
   }, [])
 
-  const fetchEstadisticas = useCallback(async (fechaInicio: string, fechaFin: string) => {
+  const fetchEstadisticas = useCallback(async () => {
     if (!options.servicio) {
       setError(new Error('Se requiere especificar un servicio para obtener estadísticas'))
       return
@@ -105,15 +105,6 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
       setLoading(true)
       setError(null)
       // TODO: Implementar o importar correctamente getPreciosTendencia
-      // const { estadisticas: stats } = await historialPreciosService.getPreciosTendencia(
-      //   options.servicio,
-      //   fechaInicio,
-      //   fechaFin,
-      //   {
-      //     tipoServicio: options.tipoServicio,
-      //     moneda: options.moneda
-      //   }
-      // )
       const stats = null
       setEstadisticas(stats)
     } catch (err) {
@@ -121,7 +112,7 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
     } finally {
       setLoading(false)
     }
-  }, [options.servicio, options.tipoServicio, options.moneda])
+  }, [options.servicio])
 
   const verificarIncrementos = useCallback(async () => {
     try {
@@ -157,15 +148,15 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
     fetchPrecioVigente,
     fetchEstadisticas,
     verificarIncrementos,
-    createPrecio: async (precio: Omit<HistorialPrecio, 'id'>) => {
+    createPrecio: async () => {
       // Implementation needed
       throw new Error('Method not implemented')
     },
-    updatePrecio: async (id: string, precio: Partial<Omit<HistorialPrecio, 'id'>>) => {
+    updatePrecio: async () => {
       // Implementation needed
       throw new Error('Method not implemented')
     },
-    deletePrecio: async (id: string) => {
+    deletePrecio: async () => {
       // Implementation needed
       throw new Error('Method not implemented')
     }

@@ -118,16 +118,20 @@ export function usePagos(options: UsePagosOptions = {}) {
   // Query principal para obtener pagos
   const pagosQuery = useQuery<PagosQueryResult, Error>({
     queryKey: ['pagos', options],
-    queryFn: () => pagosService.getPagos({
-      // periodoDesde: options.fechaDesde,
-      // periodoHasta: options.fechaHasta,
-      metodoPago: options.metodoPago,
-      estado: options.estado,
-      page: options.page,
-      perPage: options.pageSize,
-      orderBy: 'fecha',
-      orderDirection: 'desc'
-    }),
+    queryFn: async () => {
+      const pagos = await pagosService.getPagosPorFiltros({
+        metodoPago: options.metodoPago,
+        estado: options.estado,
+        fechaDesde: options.fechaDesde,
+        fechaHasta: options.fechaHasta
+      });
+      return {
+        pagos,
+        total: pagos.length,
+        page: 1,
+        pageSize: pagos.length
+      };
+    },
     enabled: !!(options.fechaDesde || options.fechaHasta)
   })
 

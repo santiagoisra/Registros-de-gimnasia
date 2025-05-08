@@ -119,27 +119,43 @@ export type Database = {
         Row: Alumno
         Insert: Omit<Alumno, 'id' | 'created_at'>
         Update: Partial<Omit<Alumno, 'id' | 'created_at'>>
+        Relationships: Record<string, never>
       }
       asistencias: {
         Row: Asistencia
         Insert: Omit<Asistencia, 'id' | 'created_at'>
         Update: Partial<Omit<Asistencia, 'id' | 'created_at'>>
+        Relationships: Record<string, never>
       }
       pagos: {
         Row: Pago
         Insert: Omit<Pago, 'id' | 'created_at'>
         Update: Partial<Omit<Pago, 'id' | 'created_at'>>
+        Relationships: Record<string, never>
       }
       historial_precios: {
         Row: HistorialPrecios
         Insert: Omit<HistorialPrecios, 'id'>
         Update: Partial<Omit<HistorialPrecios, 'id'>>
+        Relationships: Record<string, never>
       }
       notas: {
         Row: Nota
         Insert: Omit<Nota, 'id'>
         Update: Partial<Omit<Nota, 'id'>>
+        Relationships: Record<string, never>
       }
     }
   }
+  Views: Record<string, never>
+  Functions: Record<string, never>
+}
+
+/**
+ * Tipo compatible con GenericSchema de Supabase para helpers genéricos
+ */
+export type SupabaseSchema = {
+  Tables: Database['public']['Tables']
+  Views: Record<string, never>
+  Functions: Record<string, never>
 } 
