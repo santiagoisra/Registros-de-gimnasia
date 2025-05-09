@@ -34,23 +34,6 @@ export default function PagosPage() {
         ) : (
           <PagoFormBulk onSuccess={() => {}} />
         )}
-        <button
-          type="button"
-          onClick={() => setMostrarDetalles(!mostrarDetalles)}
-          className="flex items-center text-sm text-gray-600 hover:text-primary focus:outline-none focus:text-primary"
-          aria-label={`${mostrarDetalles ? 'Ocultar' : 'Mostrar'} detalles adicionales del pago`}
-        >
-          <svg
-            className={`h-5 w-5 transform transition-transform ${mostrarDetalles ? 'rotate-180' : ''}`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            aria-hidden="true"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-          <span className="ml-2">Detalles adicionales del pago</span>
-        </button>
       </div>
       <PagosList />
     </div>

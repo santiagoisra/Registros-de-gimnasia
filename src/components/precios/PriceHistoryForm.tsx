@@ -9,6 +9,8 @@ interface PriceHistoryFormProps {
   onClose: () => void
   loading?: boolean
   error?: string | null
+  alumnos?: { id: string; nombre: string; apellido: string }[]
+  alumnosLoading?: boolean
 }
 
 export default function PriceHistoryForm({
@@ -17,7 +19,9 @@ export default function PriceHistoryForm({
   onSubmit,
   onClose,
   loading = false,
-  error = null
+  error = null,
+  alumnos,
+  alumnosLoading
 }: PriceHistoryFormProps) {
   const [form, setForm] = useState<Omit<HistorialPrecio, 'id'>>({
     alumnoId: initialData.alumnoId || '',
@@ -72,6 +76,10 @@ export default function PriceHistoryForm({
     e.preventDefault()
     setFormError(null)
     // Validaciones básicas
+    if (!form.alumnoId || form.alumnoId.trim() === '') {
+      setFormError('Debe seleccionarse un alumno válido para el historial de precios.')
+      return
+    }
     if (!form.precio || form.precio <= 0) {
       setFormError('El precio debe ser mayor a 0')
       return
@@ -108,6 +116,27 @@ export default function PriceHistoryForm({
         </button>
         <h2 className="text-lg font-bold mb-2">{initialData.id ? 'Editar precio' : 'Nuevo precio'}</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {alumnos && (
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium">Alumno</label>
+              <select
+                name="alumnoId"
+                value={form.alumnoId}
+                onChange={handleChange}
+                className="mt-1 block w-full border rounded px-2 py-1"
+                required
+                disabled={loading || alumnosLoading}
+                title="Seleccionar alumno"
+              >
+                <option value="">Seleccionar alumno...</option>
+                {alumnos.map(a => (
+                  <option key={a.id} value={a.id}>
+                    {a.nombre} {a.apellido}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium">Precio</label>
             <input

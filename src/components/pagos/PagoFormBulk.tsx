@@ -6,6 +6,7 @@ import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 import type { Alumno, MetodoPago } from '@/types'
 import { usePagos } from '@/hooks/usePagos'
+import { useAlumnos } from '@/hooks/useAlumnos'
 
 interface PagoFormBulkProps {
   onSuccess?: () => void
@@ -19,8 +20,7 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
   const [periodoDesde, setPeriodoDesde] = useState<Date>(new Date())
   const [periodoHasta, setPeriodoHasta] = useState<Date>(new Date(new Date().setMonth(new Date().getMonth() + 1)))
   const [notas, setNotas] = useState<string>('')
-  const [alumnos] = useState<Alumno[]>([])
-  const [loadingAlumnos] = useState(true)
+  const { alumnos, loading: loadingAlumnos, error: errorAlumnos } = useAlumnos({ autoFetch: true })
   const [alumnosSeleccionados, setAlumnosSeleccionados] = useState<string[]>([])
   const [montos, setMontos] = useState<Record<string, string>>({})
   const { createPagosBulk, isCreating: loadingPagos } = usePagos()
@@ -28,6 +28,7 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
   const [anio, setAnio] = useState<number>(new Date().getFullYear())
   const [filtroAlumnos, setFiltroAlumnos] = useState('')
   const [mostrarDetalles, setMostrarDetalles] = useState(false)
+  const [pagosRegistrados, setPagosRegistrados] = useState(false)
 
   const toggleAlumno = (id: string) => {
     setAlumnosSeleccionados(prev =>
@@ -35,6 +36,7 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
         ? prev.filter(alumnoId => alumnoId !== id)
         : [...prev, id]
     )
+    setPagosRegistrados(false)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -63,6 +65,7 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
       await createPagosBulk(pagos)
       setAlumnosSeleccionados([])
       setMontos({})
+      setPagosRegistrados(true)
       onSuccess?.()
     } catch {
       toast.error('Error al registrar los pagos')
@@ -272,7 +275,7 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
       {loadingPagos && (
         <div className="mt-4 text-primary text-center animate-pulse">Registrando pagos en lote...</div>
       )}
-      {!loadingPagos && alumnosSeleccionados.length === 0 && (
+      {pagosRegistrados && !loadingPagos && (
         <div className="mt-4 text-green-600 text-center">¡Pagos registrados correctamente!</div>
       )}
     </form>

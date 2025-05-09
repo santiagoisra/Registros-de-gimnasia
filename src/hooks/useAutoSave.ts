@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useRef } from 'react'
 
 interface UseAutoSaveOptions {
-  onSave: (value: unknown) => Promise<void>
-  value: unknown
+  onSave: (value: any) => Promise<void>
+  value: any
   delay?: number
   enabled?: boolean
 }
@@ -16,8 +16,8 @@ export function useAutoSave({
   enabled = true,
 }: UseAutoSaveOptions) {
   const timeoutRef = useRef<NodeJS.Timeout>()
-  const valueRef = useRef<unknown>(value)
-  const onSaveRef = useRef<(value: unknown) => Promise<void>>(onSave)
+  const valueRef = useRef(value)
+  const onSaveRef = useRef(onSave)
 
   // Actualizar las refs cuando cambien las props
   useEffect(() => {

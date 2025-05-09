@@ -6,14 +6,20 @@ import { formatDate } from '@/utils'
 import { useState } from 'react'
 import PriceHistoryForm from './PriceHistoryForm'
 import type { HistorialPrecio } from '@/types'
+import { useAlumnos } from '@/hooks/useAlumnos'
 
-const PriceHistorySection = () => {
+interface PriceHistorySectionProps {
+  alumnoId?: string
+}
+
+const PriceHistorySection = ({ alumnoId }: PriceHistorySectionProps) => {
   const [isExpanded, setIsExpanded] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [editData, setEditData] = useState<HistorialPrecio | null>(null)
   const [formLoading, setFormLoading] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
-  const { precios, loading, error, createPrecio, updatePrecio, deletePrecio, fetchPrecios } = useHistorialPrecios({ autoFetch: true })
+  const { alumnos, loading: alumnosLoading } = useAlumnos({ autoFetch: true })
+  const { precios, loading, error, createPrecio, updatePrecio, deletePrecio, fetchPrecios } = useHistorialPrecios({ autoFetch: true, alumnoId })
 
   const handleAdd = () => {
     setEditData(null)
@@ -44,11 +50,11 @@ const PriceHistorySection = () => {
     setFormLoading(true)
     setFormError(null)
     try {
-      if (editData) {
-        await updatePrecio((editData as HistorialPrecio).id, data)
-      } else {
-        await createPrecio(data)
+      let dataToSend = { ...data }
+      if (alumnoId) {
+        dataToSend.alumnoId = alumnoId
       }
+      await (editData ? updatePrecio((editData as HistorialPrecio).id, dataToSend) : createPrecio(dataToSend))
       setShowForm(false)
       setEditData(null)
     } catch (err: any) {
@@ -165,12 +171,14 @@ const PriceHistorySection = () => {
 
       {showForm && (
         <PriceHistoryForm
-          initialData={editData || undefined}
+          initialData={editData || (alumnoId ? { alumnoId } : undefined)}
           preciosExistentes={precios}
           onSubmit={handleFormSubmit}
           onClose={() => { setShowForm(false); setEditData(null); setFormError(null) }}
           loading={formLoading}
           error={formError}
+          alumnos={!alumnoId ? alumnos : undefined}
+          alumnosLoading={!alumnoId ? alumnosLoading : undefined}
         />
       )}
     </div>

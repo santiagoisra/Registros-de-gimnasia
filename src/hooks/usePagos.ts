@@ -119,20 +119,30 @@ export function usePagos(options: UsePagosOptions = {}) {
   const pagosQuery = useQuery<PagosQueryResult, Error>({
     queryKey: ['pagos', options],
     queryFn: async () => {
-      const pagos = await pagosService.getPagosPorFiltros({
-        metodoPago: options.metodoPago,
-        estado: options.estado,
-        fechaDesde: options.fechaDesde,
-        fechaHasta: options.fechaHasta
-      });
-      return {
-        pagos,
-        total: pagos.length,
-        page: 1,
-        pageSize: pagos.length
-      };
+      if (options.fechaDesde || options.fechaHasta || options.metodoPago || options.estado) {
+        const pagos = await pagosService.getPagosPorFiltros({
+          metodoPago: options.metodoPago,
+          estado: options.estado,
+          fechaDesde: options.fechaDesde,
+          fechaHasta: options.fechaHasta
+        });
+        return {
+          pagos,
+          total: pagos.length,
+          page: 1,
+          pageSize: pagos.length
+        };
+      } else {
+        const { pagos, total, page, pageSize } = await pagosService.getPagos({
+          page: options.page,
+          pageSize: options.pageSize,
+          orderBy: 'fecha_pago',
+          orderDirection: 'desc'
+        });
+        return { pagos, total, page, pageSize };
+      }
     },
-    enabled: !!(options.fechaDesde || options.fechaHasta)
+    enabled: true
   })
 
   // Query para estadísticas
