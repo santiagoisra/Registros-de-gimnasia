@@ -10,6 +10,7 @@ import {
   formatDate
 } from '@/utils'
 import type { HistorialPrecio, EstadisticasPrecios } from '@/types'
+import { historialPreciosService } from '@/services/historialPrecios'
 
 interface UseHistorialPreciosOptions extends PaginationParams, OrderParams, DateRangeParams {
   servicio?: string
@@ -37,6 +38,20 @@ interface UseHistorialPreciosReturn {
 }
 
 export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): UseHistorialPreciosReturn {
+  const {
+    page,
+    pageSize,
+    orderBy,
+    orderDirection,
+    fechaDesde,
+    fechaHasta,
+    servicio,
+    soloActivos,
+    tipoServicio,
+    moneda,
+    autoFetch
+  } = options
+
   const [precios, setPrecios] = useState<HistorialPrecio[]>([])
   const [precioVigente, setPrecioVigente] = useState<HistorialPrecio | null>(null)
   const [estadisticas, setEstadisticas] = useState<EstadisticasPrecios | null>(null)
@@ -46,31 +61,32 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
 
   const fetchPrecios = useCallback(async () => {
     try {
-      if (options.fechaDesde && options.fechaHasta) {
-        validateDateRange(options.fechaDesde, options.fechaHasta)
+      if (fechaDesde && fechaHasta) {
+        validateDateRange(fechaDesde, fechaHasta)
       }
-
       setLoading(true)
       setError(null)
-
-      // TODO: Implementar o importar correctamente getHistorialPrecios
-      // const result = await historialPreciosService.getHistorialPrecios({
-      //   ...options,
-      //   page: options.page || 1,
-      //   pageSize: options.pageSize || 10
-      // })
-      const result = { precios: [], estadisticas: null } // Dummy para compilar
-
-      setPrecios(result.precios)
-      setEstadisticas(result.estadisticas)
-      
+      const { data: precios, totalPages } = await historialPreciosService.getHistorialPrecios({
+        page,
+        perPage: pageSize,
+        orderBy: orderBy as keyof import('@/types/supabase').HistorialPrecios,
+        orderDirection,
+        fechaDesde,
+        fechaHasta,
+        servicio: servicio as import('@/types/supabase').HistorialPrecios['servicio'],
+        tipoServicio: tipoServicio as import('@/types/supabase').HistorialPrecios['tipo_servicio'],
+        activo: soloActivos,
+        moneda: moneda as import('@/types/supabase').HistorialPrecios['moneda']
+      })
+      setPrecios(precios)
+      // TODO: setEstadisticas si el servicio lo devuelve
       // Obtener incrementos pendientes
       const hoy = formatDate(new Date())
-      const incrementosPendientes = result.precios
-        .filter((precio: { incrementoProgramado?: { notificado?: boolean; fecha: string }[] }) =>
-          precio.incrementoProgramado?.some((inc) =>
-            !inc.notificado && inc.fecha > hoy
-          )
+      const incrementosPendientes = precios
+        .filter((precio) =>
+          precio.incrementoProgramado &&
+          !precio.incrementoProgramado.notificado &&
+          precio.incrementoProgramado.fechaEfectiva > hoy
         )
       setIncrementosPendientes(incrementosPendientes)
     } catch (err) {
@@ -78,7 +94,7 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
     } finally {
       setLoading(false)
     }
-  }, [options])
+  }, [page, pageSize, orderBy, orderDirection, fechaDesde, fechaHasta, servicio, soloActivos, tipoServicio, moneda])
 
   const fetchPrecioVigente = useCallback(async () => {
     try {
@@ -96,7 +112,7 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
   }, [])
 
   const fetchEstadisticas = useCallback(async () => {
-    if (!options.servicio) {
+    if (!servicio) {
       setError(new Error('Se requiere especificar un servicio para obtener estadísticas'))
       return
     }
@@ -112,7 +128,7 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
     } finally {
       setLoading(false)
     }
-  }, [options.servicio])
+  }, [servicio])
 
   const verificarIncrementos = useCallback(async () => {
     try {
@@ -129,13 +145,11 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
     }
   }, [])
 
-  // TODO: Implementar createPrecio, updatePrecio y deletePrecio correctamente si es necesario
-
   useEffect(() => {
-    if (options.autoFetch) {
+    if (autoFetch) {
       fetchPrecios()
     }
-  }, [options.autoFetch, fetchPrecios])
+  }, [autoFetch, fetchPrecios])
 
   return {
     precios,
@@ -148,17 +162,47 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
     fetchPrecioVigente,
     fetchEstadisticas,
     verificarIncrementos,
-    createPrecio: async () => {
-      // Implementation needed
-      throw new Error('Method not implemented')
+    createPrecio: async (precio) => {
+      setLoading(true)
+      setError(null)
+      try {
+        const nuevo = await historialPreciosService.createHistorialPrecio(precio)
+        await fetchPrecios()
+        return nuevo
+      } catch (err) {
+        setError(handleDatabaseError(err as Error, 'createPrecio'))
+        throw err
+      } finally {
+        setLoading(false)
+      }
     },
-    updatePrecio: async () => {
-      // Implementation needed
-      throw new Error('Method not implemented')
+    updatePrecio: async (id, precio) => {
+      setLoading(true)
+      setError(null)
+      try {
+        const actualizado = await historialPreciosService.updateHistorialPrecio(id, precio)
+        await fetchPrecios()
+        return actualizado
+      } catch (err) {
+        setError(handleDatabaseError(err as Error, 'updatePrecio'))
+        throw err
+      } finally {
+        setLoading(false)
+      }
     },
-    deletePrecio: async () => {
-      // Implementation needed
-      throw new Error('Method not implemented')
+    deletePrecio: async (id) => {
+      setLoading(true)
+      setError(null)
+      try {
+        await historialPreciosService.deleteHistorialPrecio(id)
+        await fetchPrecios()
+        return true
+      } catch (err) {
+        setError(handleDatabaseError(err as Error, 'deletePrecio'))
+        return false
+      } finally {
+        setLoading(false)
+      }
     }
   }
 } 

@@ -53,6 +53,9 @@ export default function ReporteGeneral() {
       fechaInicio.setDate(1) // Primer día del mes actual
       const fechaFin = new Date()
 
+      const fechaInicioStr = fechaInicio.toISOString().split('T')[0]
+      const fechaFinStr = fechaFin.toISOString().split('T')[0]
+
       // Obtener alumnos activos
       const { count: alumnosActivos } = await supabase
         .from('alumnos')
@@ -63,36 +66,52 @@ export default function ReporteGeneral() {
       const { count: asistenciasMes } = await supabase
         .from('asistencias')
         .select('*', { count: 'exact', head: true })
-        .gte('fecha', fechaInicio.toISOString())
-        .lte('fecha', fechaFin.toISOString())
+        .gte('fecha', fechaInicioStr)
+        .lte('fecha', fechaFinStr)
 
       // Obtener ingresos del mes
       const { data: pagos } = await supabase
         .from('pagos')
         .select('monto')
-        .gte('fecha', fechaInicio.toISOString())
-        .lte('fecha', fechaFin.toISOString())
+        .gte('fecha_pago', fechaInicioStr)
+        .lte('fecha_pago', fechaFinStr)
 
       const ingresosMes = pagos?.reduce((sum, pago) => sum + pago.monto, 0) || 0
 
       // Obtener pagos pendientes
-      const { count: pagosPendientes } = await supabase
-        .from('alumnos')
-        .select('*', { count: 'exact', head: true })
-        .eq('activo', true)
-        .not('id', 'in', (
-          supabase
-            .from('pagos')
-            .select('alumno_id')
-            .gte('periodo_hasta', fechaInicio.toISOString().split('T')[0])
-        ))
+      // 1. Traer IDs de alumnos con pagos al día
+      const { data: pagosAlDia } = await supabase
+        .from('pagos')
+        .select('alumno_id')
+        .gte('periodo_hasta', fechaInicioStr)
+
+      const idsAlDia = Array.from(new Set((pagosAlDia || [])
+        .map((p: any) => p.alumno_id)
+        .filter(Boolean)))
+
+      let pagosPendientes = 0
+      if (idsAlDia.length > 0) {
+        const { count } = await supabase
+          .from('alumnos')
+          .select('*', { count: 'exact', head: true })
+          .eq('activo', true)
+          .not('id', 'in', idsAlDia)
+        pagosPendientes = count || 0
+      } else {
+        // Si no hay ninguno al día, todos los activos están pendientes
+        const { count } = await supabase
+          .from('alumnos')
+          .select('*', { count: 'exact', head: true })
+          .eq('activo', true)
+        pagosPendientes = count || 0
+      }
 
       // Obtener asistencias por día de la semana
       const { data: asistenciasSemana } = await supabase
         .from('asistencias')
         .select('fecha')
-        .gte('fecha', fechaInicio.toISOString())
-        .lte('fecha', fechaFin.toISOString())
+        .gte('fecha', fechaInicioStr)
+        .lte('fecha', fechaFinStr)
 
       const asistenciasPorDia = {
         labels: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'],

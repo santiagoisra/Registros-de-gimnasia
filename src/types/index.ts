@@ -139,27 +139,7 @@ export interface HistorialPrecio {
   fechaHasta: string; // mapeo de fecha_hasta
   servicio: 'Clases' | 'Competencia' | 'Equipamiento' | 'Otro';
   tipoServicio: 'Individual' | 'Grupal' | 'Personalizado' | 'Evento' | 'Material' | 'Otro'; // mapeo de tipo_servicio
-  activo: boolean;
   moneda: 'ARS' | 'USD' | 'EUR';
-  descuento?: { // extendido/UI
-    tipo: 'Porcentaje' | 'Monto Fijo';
-    valor: number;
-    motivo?: string;
-    fechaExpiracion?: string;
-  };
-  incrementoProgramado?: { // extendido/UI
-    tipo: 'Porcentaje' | 'Monto Fijo';
-    valor: number;
-    fechaEfectiva: string;
-    notificado?: boolean;
-  };
-  historialCambios?: { // extendido/UI
-    fecha: string;
-    precioAnterior: number;
-    precioNuevo: number;
-    motivo?: string;
-    usuario?: string;
-  }[];
   notas?: string;
   createdAt: string; // mapeo de created_at
   updatedAt: string; // mapeo de updated_at
