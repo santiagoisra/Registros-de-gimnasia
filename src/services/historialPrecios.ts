@@ -17,7 +17,6 @@ interface GetHistorialPreciosOptions {
   fechaHasta?: string
   servicio?: HistorialPreciosDB['servicio']
   tipoServicio?: HistorialPreciosDB['tipo_servicio']
-  activo?: boolean
   moneda?: HistorialPreciosDB['moneda']
 }
 
@@ -33,11 +32,7 @@ function mapHistorialPrecioFromDB(dbHistorial: HistorialPreciosDB): HistorialPre
     fechaHasta: dbHistorial.fecha_hasta,
     servicio: dbHistorial.servicio,
     tipoServicio: dbHistorial.tipo_servicio,
-    activo: dbHistorial.activo,
     moneda: dbHistorial.moneda,
-    descuento: dbHistorial.descuento ? JSON.parse(dbHistorial.descuento) : undefined,
-    incrementoProgramado: dbHistorial.incremento_programado ? JSON.parse(dbHistorial.incremento_programado) : undefined,
-    historialCambios: dbHistorial.historial_cambios ? JSON.parse(dbHistorial.historial_cambios) : undefined,
     notas: dbHistorial.notas ?? undefined,
     createdAt: dbHistorial.created_at,
     updatedAt: dbHistorial.updated_at
@@ -55,11 +50,7 @@ function mapHistorialPrecioToDB(historial: Partial<HistorialPrecio>): Partial<Hi
     fecha_hasta: historial.fechaHasta,
     servicio: historial.servicio,
     tipo_servicio: historial.tipoServicio,
-    activo: historial.activo,
     moneda: historial.moneda,
-    descuento: historial.descuento ? JSON.stringify(historial.descuento) : null,
-    incremento_programado: historial.incrementoProgramado ? JSON.stringify(historial.incrementoProgramado) : null,
-    historial_cambios: historial.historialCambios ? JSON.stringify(historial.historialCambios) : null,
     notas: historial.notas
   }
 }
@@ -92,10 +83,6 @@ export const historialPreciosService = {
 
       if (options.tipoServicio) {
         query = query.eq('tipo_servicio', options.tipoServicio)
-      }
-
-      if (typeof options.activo === 'boolean') {
-        query = query.eq('activo', options.activo)
       }
 
       if (options.moneda) {
@@ -274,17 +261,11 @@ export const historialPreciosService = {
         return acc
       }, {} as Record<string, number>)
 
-      const descuentosAplicados = historial.filter(h => h.descuento).length
-      const incrementosProgramados = historial.filter(h => h.incrementoProgramado).length
-
       return {
         total: historial.length,
         porServicio,
         porTipoServicio,
         preciosPromedio,
-        descuentosAplicados,
-        incrementosProgramados,
-        activos: historial.filter(h => h.activo).length,
         porMoneda: historial.reduce((acc, h) => {
           if (h.moneda) {
             acc[h.moneda] = (acc[h.moneda] || 0) + 1

@@ -1,6 +1,3 @@
 {
-  "/page": "app/page.js",
-  "/reportes/page": "app/reportes/page.js",
-  "/alumnos/page": "app/alumnos/page.js",
-  "/asistencias/page": "app/asistencias/page.js"
+  "/configuracion/historial-precios/page": "app/configuracion/historial-precios/page.js"
 }

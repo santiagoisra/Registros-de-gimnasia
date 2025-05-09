@@ -12,6 +12,7 @@ import {
   XMarkIcon,
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
+  Cog6ToothIcon,
 } from '@heroicons/react/24/outline'
 
 const navigation = [
@@ -22,10 +23,15 @@ const navigation = [
   { name: 'Reportes', href: '/reportes', icon: ChartBarIcon },
 ]
 
+const configMenu = [
+  { name: 'Historial de precios', href: '/configuracion/historial-precios' }
+]
+
 export default function Sidebar() {
   const pathname = usePathname()
   const [collapsed, setCollapsed] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [configOpen, setConfigOpen] = useState(false)
 
   // Sidebar para escritorio
   const sidebarContent = (
@@ -61,6 +67,40 @@ export default function Sidebar() {
             </li>
           )
         })}
+        {/* Configuración */}
+        <li>
+          <button
+            type="button"
+            className={`flex items-center w-full p-2 rounded-lg group transition-colors duration-150 outline-none focus:ring-2 focus:ring-primary focus:bg-primary/20 ${pathname.startsWith('/configuracion') ? 'bg-primary/10 text-primary font-semibold' : 'text-gray-600 hover:bg-gray-100'} ${collapsed ? 'justify-center' : ''}`}
+            onClick={() => setConfigOpen((o) => !o)}
+            aria-expanded={configOpen}
+            aria-controls="config-menu"
+          >
+            <Cog6ToothIcon className={`w-6 h-6 mr-3 ${pathname.startsWith('/configuracion') ? 'text-primary' : 'text-gray-500 group-hover:text-primary'} ${collapsed ? 'mr-0' : ''}`} aria-hidden="true" />
+            {!collapsed && 'Configuración'}
+            {!collapsed && (
+              <span className="ml-auto">
+                <svg className={`w-4 h-4 inline transition-transform ${configOpen ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+              </span>
+            )}
+          </button>
+          {/* Submenú */}
+          {configOpen && !collapsed && (
+            <ul id="config-menu" className="ml-8 mt-1 space-y-1">
+              {configMenu.map((item) => (
+                <li key={item.name}>
+                  <Link
+                    href={item.href}
+                    tabIndex={0}
+                    className={`block px-2 py-1 rounded transition-colors duration-150 ${pathname === item.href ? 'bg-primary/20 text-primary font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
       </ul>
     </nav>
   )
@@ -108,6 +148,40 @@ export default function Sidebar() {
                   </li>
                 )
               })}
+              {/* Configuración */}
+              <li>
+                <button
+                  type="button"
+                  className={`flex items-center w-full p-2 rounded-lg group transition-colors duration-150 outline-none focus:ring-2 focus:ring-primary focus:bg-primary/20 ${pathname.startsWith('/configuracion') ? 'bg-primary/10 text-primary font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}
+                  onClick={() => setConfigOpen((o) => !o)}
+                  aria-expanded={configOpen}
+                  aria-controls="config-menu"
+                >
+                  <Cog6ToothIcon className={`w-6 h-6 mr-3 ${pathname.startsWith('/configuracion') ? 'text-primary' : 'text-gray-500 group-hover:text-primary'}`} aria-hidden="true" />
+                  {!collapsed && 'Configuración'}
+                  {!collapsed && (
+                    <span className="ml-auto">
+                      <svg className={`w-4 h-4 inline transition-transform ${configOpen ? 'rotate-90' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" /></svg>
+                    </span>
+                  )}
+                </button>
+                {/* Submenú */}
+                {configOpen && !collapsed && (
+                  <ul id="config-menu" className="ml-8 mt-1 space-y-1">
+                    {configMenu.map((item) => (
+                      <li key={item.name}>
+                        <Link
+                          href={item.href}
+                          tabIndex={0}
+                          className={`block px-2 py-1 rounded transition-colors duration-150 ${pathname === item.href ? 'bg-primary/20 text-primary font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}
+                        >
+                          {item.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
             </ul>
           </nav>
           {/* Fondo oscuro para cerrar el menú */}

@@ -4,10 +4,59 @@ import { ChevronDownIcon } from '@heroicons/react/24/outline'
 import { useHistorialPrecios } from '@/hooks/useHistorialPrecios'
 import { formatDate } from '@/utils'
 import { useState } from 'react'
+import PriceHistoryForm from './PriceHistoryForm'
+import type { HistorialPrecio } from '@/types'
 
 const PriceHistorySection = () => {
   const [isExpanded, setIsExpanded] = useState(false)
-  const { precios, loading, error } = useHistorialPrecios({ autoFetch: true })
+  const [showForm, setShowForm] = useState(false)
+  const [editData, setEditData] = useState<HistorialPrecio | null>(null)
+  const [formLoading, setFormLoading] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
+  const { precios, loading, error, createPrecio, updatePrecio, deletePrecio, fetchPrecios } = useHistorialPrecios({ autoFetch: true })
+
+  const handleAdd = () => {
+    setEditData(null)
+    setShowForm(true)
+    setFormError(null)
+  }
+
+  const handleEdit = (precio: HistorialPrecio) => {
+    setEditData(precio)
+    setShowForm(true)
+    setFormError(null)
+  }
+
+  const handleDelete = async (precio: HistorialPrecio) => {
+    if (!window.confirm('¿Seguro que querés eliminar este precio?')) return
+    setFormLoading(true)
+    setFormError(null)
+    try {
+      await deletePrecio(precio.id)
+    } catch (err: any) {
+      setFormError(err.message || 'Error al eliminar el precio')
+    } finally {
+      setFormLoading(false)
+    }
+  }
+
+  const handleFormSubmit = async (data: Omit<HistorialPrecio, 'id'>) => {
+    setFormLoading(true)
+    setFormError(null)
+    try {
+      if (editData) {
+        await updatePrecio((editData as HistorialPrecio).id, data)
+      } else {
+        await createPrecio(data)
+      }
+      setShowForm(false)
+      setEditData(null)
+    } catch (err: any) {
+      setFormError(err.message || 'Error al guardar el precio')
+    } finally {
+      setFormLoading(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -25,42 +74,51 @@ const PriceHistorySection = () => {
     )
   }
 
-  if (!precios?.length) {
-    return (
-      <div className="bg-yellow-50 text-yellow-800 p-4 rounded-lg">
-        No hay historial de precios registrado
-      </div>
-    )
-  }
-
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-medium text-gray-900">Historial de precios</h3>
-        <button
-          type="button"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="text-gray-400 hover:text-gray-500 bg-transparent border-none p-0"
-          title={isExpanded ? 'Ocultar historial' : 'Mostrar historial'}
-        >
-          <ChevronDownIcon 
-            className={`h-5 w-5 transform transition-transform duration-200 ${
-              isExpanded ? 'rotate-180' : ''
-            }`}
-          />
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={handleAdd}
+            className="text-white bg-primary hover:bg-primary/90 px-3 py-1 rounded shadow text-sm"
+          >
+            Agregar precio
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="text-gray-400 hover:text-gray-500 bg-transparent border-none p-0"
+            title={isExpanded ? 'Ocultar historial' : 'Mostrar historial'}
+          >
+            <ChevronDownIcon 
+              className={`h-5 w-5 transform transition-transform duration-200 ${
+                isExpanded ? 'rotate-180' : ''
+              }`}
+            />
+          </button>
+        </div>
       </div>
+
+      {formError && (
+        <div className="bg-red-100 text-red-700 px-3 py-2 rounded text-sm mb-2">{formError}</div>
+      )}
 
       {isExpanded && (
         <div className="mt-4 space-y-4">
-          {precios.map((precio, index) => (
-            <div
-              key={precio.id}
-              className={`p-4 rounded-lg ${
-                index === 0 ? 'bg-green-50 border border-green-200' : 'bg-gray-50'
-              }`}
-            >
-              <div className="flex justify-between items-start">
+          {precios.length === 0 ? (
+            <div className="bg-yellow-50 text-yellow-800 p-4 rounded-lg">
+              No hay historial de precios registrado
+            </div>
+          ) : (
+            precios.map((precio, index) => (
+              <div
+                key={precio.id}
+                className={`p-4 rounded-lg flex flex-col gap-2 md:flex-row md:items-center md:justify-between ${
+                  index === 0 ? 'bg-green-50 border border-green-200' : 'bg-gray-50'
+                }`}
+              >
                 <div>
                   <p className="text-sm font-medium text-gray-900">
                     {precio.moneda} {precio.precio}
@@ -72,21 +130,48 @@ const PriceHistorySection = () => {
                   </p>
                   <p className="mt-1 text-sm text-gray-500">
                     Desde: {formatDate(precio.fechaDesde)}
+                    {precio.fechaHasta && ` hasta ${formatDate(precio.fechaHasta)}`}
                   </p>
+                  <p className="text-sm text-gray-500">{precio.servicio} - {precio.tipoServicio}</p>
+                  {precio.notas && (
+                    <p className="mt-2 text-sm text-gray-600 whitespace-pre-wrap">
+                      {precio.notas}
+                    </p>
+                  )}
                 </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-gray-900">{precio.servicio}</p>
-                  <p className="mt-1 text-sm text-gray-500">{precio.moneda}</p>
+                <div className="flex gap-2 mt-2 md:mt-0">
+                  <button
+                    type="button"
+                    className="text-primary hover:underline text-sm"
+                    onClick={() => handleEdit(precio)}
+                    disabled={formLoading}
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    className="text-red-600 hover:underline text-sm"
+                    onClick={() => handleDelete(precio)}
+                    disabled={formLoading}
+                  >
+                    Eliminar
+                  </button>
                 </div>
               </div>
-              {precio.notas && (
-                <p className="mt-2 text-sm text-gray-600 whitespace-pre-wrap">
-                  {precio.notas}
-                </p>
-              )}
-            </div>
-          ))}
+            ))
+          )}
         </div>
+      )}
+
+      {showForm && (
+        <PriceHistoryForm
+          initialData={editData || undefined}
+          preciosExistentes={precios}
+          onSubmit={handleFormSubmit}
+          onClose={() => { setShowForm(false); setEditData(null); setFormError(null) }}
+          loading={formLoading}
+          error={formError}
+        />
       )}
     </div>
   )
