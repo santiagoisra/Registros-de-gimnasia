@@ -1,0 +1,11 @@
+# Task ID: 2
+# Title: Implement Batch Editing for Attendance
+# Status: done
+# Dependencies: 1
+# Priority: high
+# Description: Create functionality to mark attendance for multiple students simultaneously
+# Details:
+Develop a multi-select interface in the attendance section allowing the teacher to select multiple students and mark them present at once. Include location selection (Plaza Arenales or Plaza Terán) and date picker with today as default. Create necessary API endpoints and services in src/app/asistencias/ and src/components/asistencias/. Update existing attendance hooks to support batch operations.
+
+# Test Strategy:
+Test batch creation, validation of inputs, error handling, and performance with large batches. Verify UI responsiveness on both desktop and mobile devices.

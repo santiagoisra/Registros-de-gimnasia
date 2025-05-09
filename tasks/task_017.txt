@@ -1,0 +1,74 @@
+# Task ID: 17
+# Title: Create and Update React Hooks for Data Management
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Develop and enhance React hooks in src/hooks/ directory for students, attendance, payments, price history, and grades to enable efficient queries and mutations with the new data structure.
+# Details:
+This task involves creating or updating custom React hooks in the src/hooks/ directory for the following data entities:
+
+1. Students (alumnos): 
+   - Create useStudents hook with functions for fetching all students, getting a single student by ID, creating, updating, and deleting student records
+   - Implement proper caching and state management
+   - Handle pagination and filtering if applicable
+
+2. Attendance (asistencias):
+   - Develop useAttendance hook with functions to record, retrieve, and modify attendance data
+   - Include methods for querying attendance by date ranges, student ID, or class
+   - Implement batch operations for recording multiple attendance entries
+
+3. Payments (pagos):
+   - Create usePayments hook with functionality to process, track, and query payment information
+   - Include methods for payment verification, history retrieval, and reporting
+   - Handle different payment statuses and types
+
+4. Price History (historialPrecios):
+   - Implement usePriceHistory hook to track and retrieve historical pricing data
+   - Include methods for analyzing price trends and changes over time
+   - Support filtering by date ranges and service types
+
+5. Grades (notas):
+   - Develop useGrades hook with functions to record, retrieve, and modify student grades
+   - Include methods for calculating averages, generating reports, and tracking progress
+
+Each hook should:
+- Follow a consistent pattern and API design
+- Utilize React Query or a similar library for efficient data fetching and caching
+- Include proper error handling and loading states
+- Be fully typed with TypeScript
+- Support the new data structure requirements
+- Implement optimistic updates where appropriate
+- Include documentation with JSDoc comments
+
+# Test Strategy:
+Testing should be comprehensive and cover all aspects of the hooks:
+
+1. Unit Tests:
+   - Create Jest tests for each hook function
+   - Mock API responses using MSW or similar library
+   - Test success and error scenarios for each operation
+   - Verify proper state updates and cache invalidation
+
+2. Integration Tests:
+   - Create tests that use the hooks in component contexts
+   - Verify that components correctly respond to loading, error, and success states
+   - Test that data mutations properly update the UI
+
+3. Manual Testing:
+   - Implement each hook in relevant components
+   - Verify data is correctly fetched, displayed, and updated
+   - Test edge cases like network failures, concurrent updates
+
+4. Performance Testing:
+   - Verify hooks don't cause unnecessary re-renders
+   - Check that caching works as expected
+   - Test with large datasets to ensure performance
+
+Specific Test Cases:
+- Verify that useStudents.getAll() returns the correct list of students
+- Test that useAttendance.markPresent() correctly updates attendance records
+- Confirm usePayments.processPayment() handles both successful and failed payments
+- Verify usePriceHistory.getPriceAtDate() returns the correct historical price
+- Test that useGrades.calculateAverage() produces accurate results
+
+All tests should pass before considering this task complete.

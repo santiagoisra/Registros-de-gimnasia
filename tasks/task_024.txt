@@ -1,0 +1,129 @@
+# Task ID: 24
+# Title: Task #24: Implement Configurable Shift Management System with Student Integration
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Develop a flexible shift management system that allows for predefined and custom shifts with specific time ranges, complete with an administration panel and full integration with the existing student management system.
+# Details:
+The implementation should include:
+
+1. Database schema extensions:
+   - Create new tables for shifts (id, name, start_time, end_time, is_active)
+   - Add shift_id foreign key to the students table
+   - Include necessary indexes for performance optimization
+
+2. Backend implementation:
+   - Create RESTful API endpoints for CRUD operations on shifts
+   - Implement validation for shift time ranges to prevent overlaps
+   - Develop services to handle shift assignment to students
+   - Add middleware to validate shift-related requests
+
+3. Frontend components:
+   - Build a shift configuration panel in the admin section
+   - Create UI for predefined shifts (morning, afternoon, evening)
+   - Implement forms for custom shift creation with time pickers
+   - Add shift selection dropdown to student creation/edit forms
+   - Develop shift filtering functionality in student list views
+
+4. Integration requirements:
+   - Ensure backward compatibility with existing student data
+   - Implement migration strategy for existing students (default shift assignment)
+   - Update all relevant student views to display shift information
+   - Modify existing filters to include shift-based filtering
+
+5. User experience considerations:
+   - Provide clear visual indicators for different shifts
+   - Implement responsive design for the shift management panel
+   - Add confirmation dialogs for actions that affect multiple students
+
+6. Performance optimizations:
+   - Implement caching for shift data to reduce database queries
+   - Use pagination for displaying students filtered by shifts
+   - Optimize queries when filtering students by shift
+
+# Test Strategy:
+Testing should be comprehensive and include:
+
+1. Unit tests:
+   - Test shift creation, modification, and deletion functionality
+   - Verify validation logic for shift time ranges
+   - Test shift assignment to students
+   - Ensure proper handling of edge cases (e.g., overlapping shifts)
+
+2. Integration tests:
+   - Verify proper integration with the student management system
+   - Test the migration of existing students to the new shift system
+   - Ensure all student views correctly display shift information
+   - Validate that filtering by shift works across all relevant views
+
+3. UI/UX testing:
+   - Test the shift configuration panel on different devices and screen sizes
+   - Verify that the shift selection UI is intuitive and user-friendly
+   - Test accessibility of all new UI components
+   - Ensure proper error handling and user feedback
+
+4. Performance testing:
+   - Measure load times when filtering large numbers of students by shift
+   - Test system performance with a high number of defined shifts
+   - Verify caching mechanisms are working correctly
+
+5. User acceptance testing:
+   - Create test scenarios for administrators configuring shifts
+   - Test scenarios for assigning students to shifts
+   - Verify filtering and viewing students by shift meets user requirements
+
+6. Regression testing:
+   - Ensure existing student management functionality works correctly
+   - Verify that no regressions were introduced in related features
+
+Documentation of test results should include screenshots of the shift management panel, examples of student assignments to shifts, and performance metrics for shift-based filtering operations.
+
+# Subtasks:
+## 1. Design and implement database schema extensions for shift management [pending]
+### Dependencies: None
+### Description: Create the necessary database tables and relationships to support the shift management system, including tables for shifts and modifications to the students table.
+### Details:
+Create a 'shifts' table with columns: id (PK), name (VARCHAR), start_time (TIME), end_time (TIME), is_active (BOOLEAN). Add a shift_id (FK) column to the students table referencing the shifts table. Create appropriate indexes on shift_id in the students table and on frequently queried columns in the shifts table. Include constraints to ensure shift data integrity.
+
+## 2. Develop backend API endpoints for shift management [pending]
+### Dependencies: 24.1
+### Description: Create RESTful API endpoints for CRUD operations on shifts, including validation logic to prevent shift time overlaps.
+### Details:
+Implement the following endpoints: GET /api/shifts (list all), GET /api/shifts/:id (get one), POST /api/shifts (create), PUT /api/shifts/:id (update), DELETE /api/shifts/:id (delete). Include validation middleware to check for time range overlaps and valid time formats. Implement error handling for all endpoints.
+
+## 3. Implement shift assignment service and student integration [pending]
+### Dependencies: 24.1, 24.2
+### Description: Develop services to handle shift assignment to students and update existing student-related endpoints to include shift information.
+### Details:
+Create a ShiftAssignmentService with methods for assigning/removing shifts from students. Update student creation and update endpoints to accept shift_id. Implement batch assignment functionality for updating multiple students. Modify student retrieval endpoints to include shift details in the response.
+
+## 4. Create migration strategy for existing student data [pending]
+### Dependencies: 24.1, 24.3
+### Description: Develop and implement a data migration plan to assign default shifts to existing students in the system.
+### Details:
+Create a migration script that: 1) Creates default shifts (morning, afternoon, evening), 2) Analyzes existing student data to determine appropriate shift assignment based on available information, 3) Updates all existing students with a default shift_id if no determination can be made. Include logging and error handling for the migration process.
+
+## 5. Build shift configuration UI components for admin panel [pending]
+### Dependencies: 24.2
+### Description: Develop the frontend components for managing shifts in the admin section, including forms for creating and editing shifts.
+### Details:
+Create a ShiftManagement component for the admin panel. Implement a ShiftList component with sorting and filtering. Build ShiftForm component with time pickers for creating/editing shifts. Add validation for time ranges on the client side. Include toggle for shift activation/deactivation. Use appropriate UI components to make time selection intuitive.
+
+## 6. Integrate shift selection into student forms and views [pending]
+### Dependencies: 24.3, 24.5
+### Description: Update student creation and editing forms to include shift selection, and modify student list views to display shift information.
+### Details:
+Add a shift selection dropdown to StudentForm component, populated with active shifts. Update StudentList and StudentDetail views to display shift information. Implement visual indicators for different shifts (color coding, icons). Ensure responsive design works for all new UI elements.
+
+## 7. Implement shift-based filtering and search functionality [pending]
+### Dependencies: 24.6
+### Description: Enhance the student list view with the ability to filter and search students by their assigned shifts.
+### Details:
+Add shift filter dropdown to the existing student filters. Implement backend query modifications to support filtering by shift_id. Update the frontend to handle shift-based filtering parameters. Optimize queries for performance when filtering by shift. Add the ability to combine shift filters with other existing filters.
+
+## 8. Implement performance optimizations and caching [pending]
+### Dependencies: 24.2, 24.3, 24.7
+### Description: Optimize the shift management system for performance, including implementing caching strategies and query optimizations.
+### Details:
+Implement caching for shift data using an appropriate caching strategy (Redis, in-memory, etc.). Add pagination for shift-filtered student lists. Optimize database queries by adding specific indexes based on common query patterns. Implement eager loading of shift data when retrieving student lists to reduce N+1 query problems. Add monitoring for shift-related API endpoint performance.
+

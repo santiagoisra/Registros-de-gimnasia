@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Implement Price Increase Management
+# Status: pending
+# Dependencies: 1
+# Priority: medium
+# Description: Create functionality to manage price changes and track price history
+# Details:
+Develop interface for recording price increases with effective dates. Update the HistorialPrecios model implementation. Create UI for viewing price history. Implement logic to apply the correct price based on payment date in reports and calculations. Add this to src/app/configuracion/ (create if not exists) and corresponding components in src/components/configuracion/.
+
+# Test Strategy:
+Test price history recording, retrieval of correct prices for specific dates, and verification that reports use appropriate prices based on time periods.

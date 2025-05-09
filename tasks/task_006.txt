@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Create Custom Report Generator
+# Status: pending
+# Dependencies: 4, 5
+# Priority: medium
+# Description: Develop functionality to generate customizable reports with export options
+# Details:
+Implement a report builder interface allowing selection of time periods, metrics, and filtering options. Create exportable formats (PDF, CSV) for reports. Include student-specific reports for sharing payment/attendance summaries. Implement in src/app/reportes/ and src/components/reportes/. Create report templates and a report generation service in src/services/reportGenerator.ts.
+
+# Test Strategy:
+Test report generation with various parameters, validate export functionality and format correctness, verify calculations match dashboard data, and test with different time ranges and filter combinations.

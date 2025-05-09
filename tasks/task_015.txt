@@ -1,0 +1,67 @@
+# Task ID: 15
+# Title: Update Service Layer to Support New Database Schema
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Modify the service code in src/services/ to support the new fields and tables created in the SQL migration (alumnos, asistencias, pagos, historial_precios, notas) and ensure all CRUD operations and advanced queries work correctly.
+# Details:
+This task involves updating all relevant service files in the src/services/ directory to properly interact with the newly created database tables and fields. Specifically:
+
+1. Update or create service files for each new entity:
+   - AlumnosService.js
+   - AsistenciasService.js
+   - PagosService.js
+   - HistorialPreciosService.js
+   - NotasService.js
+
+2. For each service, implement:
+   - Standard CRUD operations (create, read, update, delete)
+   - Any specialized queries needed for business logic
+   - Proper error handling and validation
+   - Transaction support where appropriate (especially for operations affecting multiple tables)
+
+3. Ensure services properly handle relationships between entities:
+   - Student attendance tracking
+   - Payment processing and history
+   - Grade/note recording and retrieval
+   - Price history tracking
+
+4. Update any existing services that might reference these new tables
+
+5. Follow the existing service architecture patterns for consistency
+
+6. Document any new methods with JSDoc comments
+
+7. Ensure proper parameter validation and sanitization to prevent SQL injection
+
+# Test Strategy:
+Testing should be comprehensive and cover all aspects of the updated services:
+
+1. Unit Tests:
+   - Create unit tests for each CRUD operation in each service
+   - Test edge cases (null values, invalid inputs, etc.)
+   - Mock database connections to isolate service logic
+
+2. Integration Tests:
+   - Test services with actual database connections
+   - Verify data persistence and retrieval
+   - Test transactions and rollback functionality
+
+3. Specific Test Cases:
+   - Create a new student and verify all fields are saved correctly
+   - Record attendance and verify it's associated with the correct student
+   - Process payments and verify payment history is updated
+   - Update pricing and ensure history is maintained
+   - Record grades/notes and verify retrieval functions
+   - Test advanced queries like:
+     * Students with outstanding payments
+     * Attendance reports by date range
+     * Grade averages and statistics
+
+4. Performance Testing:
+   - Test with larger datasets to ensure query efficiency
+   - Verify indexing is properly utilized
+
+5. Manual Testing:
+   - Use API endpoints or a test client to manually verify service functionality
+   - Verify data integrity across related tables
