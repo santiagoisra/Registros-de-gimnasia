@@ -1,0 +1,143 @@
+# Task ID: 11
+# Title: Update Service Modules to Support New Fields and Tables
+# Status: done
+# Dependencies: None
+# Priority: medium
+# Description: Enhance the service modules in src/services/ to support new fields and tables for students, attendance, payments, price history, and grades, including CRUD operations and advanced queries for dashboards and reports.
+# Details:
+This task involves updating the following service modules in the src/services/ directory:
+
+1. alumnos.ts (Students):
+   - Add support for new student fields (likely including contact information, enrollment status, etc.)
+   - Implement CRUD operations (create, read, update, delete)
+   - Add methods for advanced queries like filtering by status, course, or enrollment date
+   - Include aggregation methods for dashboard statistics (total students, new enrollments, etc.)
+
+2. asistencias.ts (Attendance):
+   - Support attendance tracking with date, status, and student references
+   - Implement methods to record, update and query attendance records
+   - Add reporting functions for attendance rates, absences, and trends
+   - Include batch operations for recording multiple attendance entries
+
+3. pagos.ts (Payments):
+   - Support payment tracking with amount, date, payment method, and status
+   - Implement CRUD operations for payment records
+   - Add methods for filtering payments by date range, status, or student
+   - Include reporting functions for revenue analysis and pending payments
+
+4. historialPrecios.ts (Price History):
+   - Implement version tracking for price changes over time
+   - Add methods to query historical prices by date range or service type
+   - Support effective date ranges for different price points
+   - Include comparison methods for price trend analysis
+
+5. notas.ts (Grades):
+   - Support grade recording with evaluation type, score, and student references
+   - Implement CRUD operations for grade entries
+   - Add methods for calculating averages, identifying performance trends
+   - Include reporting functions for academic performance analysis
+
+Each service should follow the existing project architecture pattern and include proper error handling, input validation, and transaction support where appropriate. Services should also implement pagination for large result sets and support sorting and filtering options for advanced queries.
+
+# Test Strategy:
+Testing should be comprehensive and cover the following aspects for each service module:
+
+1. Unit Tests:
+   - Test each CRUD operation independently with valid and invalid inputs
+   - Verify proper error handling for edge cases (null values, invalid IDs, etc.)
+   - Test advanced query methods with different filter combinations
+   - Verify aggregation and reporting functions return correct results
+
+2. Integration Tests:
+   - Test interactions between related services (e.g., student payments, attendance records)
+   - Verify database transactions work correctly for complex operations
+   - Test pagination, sorting, and filtering with large datasets
+
+3. Performance Tests:
+   - Benchmark query performance for dashboard and reporting functions
+   - Test with large datasets to ensure acceptable response times
+
+4. Specific Test Cases:
+   - Create a new student and verify all fields are saved correctly
+   - Update student information and verify changes are reflected
+   - Record attendance for multiple students and verify reporting accuracy
+   - Process payments and verify balance calculations
+   - Test historical price queries for different date ranges
+   - Record grades and verify average calculations
+
+All tests should use a test database with predefined test data to ensure consistent results. Mock the database layer when appropriate for unit tests to improve test speed and isolation.
+
+# Subtasks:
+## 1. Update alumnos.ts service module with new fields and advanced queries [done]
+### Dependencies: None
+### Description: Enhance the students service module to support new fields, CRUD operations, and implement advanced query methods for filtering and dashboard statistics.
+### Details:
+1. Identify and add new student fields to the data model (contact information, enrollment status, etc.)
+2. Implement or update CRUD operations for the enhanced student model
+3. Add methods for filtering students by status, course, and enrollment date
+4. Implement aggregation methods for dashboard statistics (total students, new enrollments by period)
+5. Ensure proper error handling and input validation
+6. Add pagination support for large result sets
+
+## 2. Enhance asistencias.ts service with attendance tracking capabilities [done]
+### Dependencies: 11.1
+### Description: Update the attendance service module to support comprehensive attendance tracking with date, status, and student references, including reporting functions.
+### Details:
+1. Define the attendance data structure with date, status, and student reference fields
+2. Implement CRUD operations for attendance records
+3. Add methods for querying attendance by date range, student, or status
+4. Develop reporting functions for attendance rates, absences, and trends
+5. Implement batch operations for recording multiple attendance entries at once
+6. Add transaction support for batch operations
+
+## 3. Update pagos.ts service with payment tracking and reporting [done]
+### Dependencies: 11.1
+### Description: Enhance the payments service module to support payment tracking with amount, date, method, and status, plus reporting functions for revenue analysis.
+### Details:
+1. Update the payment data model with fields for amount, date, payment method, and status
+2. Implement CRUD operations for payment records
+3. Add methods for filtering payments by date range, status, or student
+4. Develop reporting functions for revenue analysis and pending payments
+5. Implement transaction support for payment operations
+6. Add validation for payment amounts and status transitions
+
+## 4. Implement historialPrecios.ts service for price version tracking [done]
+### Dependencies: None
+### Description: Create a price history service module that supports version tracking for price changes over time, with effective date ranges and comparison methods.
+### Details:
+1. Design the price history data model with fields for price, service type, effective start/end dates
+2. Implement methods to add, update, and query price records
+3. Add functions to retrieve prices effective at a specific date
+4. Develop methods for querying historical prices by date range or service type
+5. Implement comparison methods for price trend analysis
+6. Ensure data integrity when updating price records (no overlapping effective dates)
+
+## 5. Enhance notas.ts service with grade recording and performance analysis [done]
+### Dependencies: 11.1
+### Description: Update the grades service module to support grade recording with evaluation type, score, and student references, plus methods for performance analysis.
+### Details:
+1. Define the grade data structure with fields for evaluation type, score, and student reference
+2. Implement CRUD operations for grade entries
+3. Add methods for calculating individual and class averages
+4. Develop functions for identifying performance trends over time
+5. Implement reporting functions for academic performance analysis
+6. Add validation for grade scores and evaluation types
+
+## 6. Implementar funcionalidad de eliminación de pagos en la UI [done]
+### Dependencies: None
+### Description: Agregar la capacidad de eliminar pagos desde la interfaz de usuario con confirmación para prevenir eliminaciones accidentales.
+### Details:
+La implementación debe incluir:
+
+1. Agregar un botón de eliminar en cada fila de la tabla de pagos
+2. Implementar un diálogo de confirmación antes de eliminar
+3. Utilizar la función `eliminarPago` del hook `usePagos` que ya está implementada
+4. Mostrar feedback visual (toast) del resultado de la operación
+5. Actualizar la lista de pagos después de eliminar
+
+El servicio y el hook ya tienen la funcionalidad base implementada en:
+- `src/services/pagos.ts`: función `deletePago`
+- `src/hooks/usePagos.ts`: función `eliminarPago`
+
+Solo falta implementar la UI y la interacción con el usuario.
+

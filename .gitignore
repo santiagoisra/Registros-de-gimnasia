@@ -24,8 +24,6 @@ node_modules/
 # OS specific
 .DS_Store
 # Task files
-tasks.json
-tasks/ 
 *.local
 .env.example
 .env.local

@@ -1,0 +1,11 @@
+# Task ID: 4
+# Title: Develop Monthly Dashboard with Key Metrics
+# Status: pending
+# Dependencies: 1, 2, 3
+# Priority: medium
+# Description: Create visual dashboard showing monthly attendance, payments, and student status
+# Details:
+Implement a dashboard component displaying: monthly attendance trends, payment status overview, student activity levels, and financial summary. Use charts/graphs for visual representation. Create reusable chart components in src/components/ui/charts/. Implement data aggregation services in a new src/services/reports.ts file. Add month selection and filtering capabilities.
+
+# Test Strategy:
+Verify data accuracy against raw database queries, test performance with different data volumes, ensure responsive design works on all devices, and validate filter functionality.

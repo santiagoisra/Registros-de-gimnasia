@@ -1,0 +1,59 @@
+# Task ID: 16
+# Title: Implement Price History and Notes Services with CRUD Operations
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Create and expose service modules for price history and notes in src/services/ directory, implementing CRUD operations and advanced query capabilities for reports and dashboards.
+# Details:
+Develop two service modules in the src/services/ directory:
+
+1. **HistorialPreciosService**:
+   - Implement standard CRUD operations (create, read, update, delete)
+   - Add specialized methods for time-series data retrieval
+   - Include functions for price trend analysis (e.g., getVariationByPeriod, getMaxMinPrices)
+   - Implement filtering capabilities by date ranges, product categories, and price thresholds
+   - Add aggregation methods for dashboard visualizations (e.g., getAveragePriceByPeriod)
+
+2. **NotasService**:
+   - Implement standard CRUD operations for notes
+   - Add search functionality by content, date, and associated entities
+   - Include methods for categorization and tagging of notes
+   - Implement pagination and sorting for efficient data retrieval
+   - Add methods to link notes with other entities in the system
+
+Both services should:
+- Follow the established project architecture patterns
+- Include proper error handling and validation
+- Use appropriate data models and repositories
+- Be properly documented with JSDoc comments
+- Implement logging for important operations
+- Be designed with performance considerations for large datasets
+
+# Test Strategy:
+Testing should cover the following areas:
+
+1. **Unit Tests**:
+   - Test each CRUD operation for both services independently
+   - Verify error handling for invalid inputs and edge cases
+   - Mock dependencies to isolate service functionality
+   - Test advanced query methods with various parameters
+
+2. **Integration Tests**:
+   - Test interaction between services and their dependencies
+   - Verify database operations with a test database
+   - Test complex queries that span multiple database operations
+
+3. **Performance Tests**:
+   - Benchmark response times for retrieving large datasets
+   - Test pagination efficiency with large result sets
+   - Verify indexing strategies are effective for common queries
+
+4. **Specific Test Cases**:
+   - Create a price history record and verify it's retrievable
+   - Update a price and verify the history is properly maintained
+   - Test date range filtering returns correct price history data
+   - Create notes with different attributes and verify search functionality
+   - Test linking notes to other entities and retrieving them by association
+   - Verify aggregation methods return accurate statistical data
+
+All tests should be automated and included in the CI/CD pipeline.

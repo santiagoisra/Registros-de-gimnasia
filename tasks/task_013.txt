@@ -1,0 +1,149 @@
+# Task ID: 13
+# Title: Update Forms and Components for New Fields Management
+# Status: in-progress
+# Dependencies: None
+# Priority: medium
+# Description: Enhance existing forms and components to support new fields including alert activation/deactivation, payment status display, price history management, and notes functionality.
+# Details:
+This task involves updating the UI components and their underlying logic to handle several new fields:
+
+1. Alert Management:
+   - Add toggle controls for activating/deactivating alerts
+   - Implement validation logic for alert settings
+   - Ensure alert state is properly persisted to the database
+
+2. Payment Status Display:
+   - Create a visual indicator showing current payment status
+   - Implement color-coding based on status (paid, pending, overdue)
+   - Add tooltips with payment details on hover
+   - NOTE: Payment form testing is dependent on the student creation form being completed first
+
+3. Price History Management:
+   - Develop a collapsible section to display historical prices
+   - Add functionality to add new price points with effective dates
+   - Implement sorting and filtering of price history entries
+
+4. Notes Functionality:
+   - Add rich text editor for notes
+   - Implement auto-save functionality for notes
+   - Add timestamp and user attribution for note entries
+
+Ensure all new fields are properly bound to the data models and that changes are correctly persisted. Update any relevant validation rules and error messages. Maintain responsive design across all device sizes.
+
+# Test Strategy:
+Testing should cover the following areas:
+
+1. Unit Tests:
+   - Verify each new field component renders correctly
+   - Test validation logic for all new input fields
+   - Ensure proper state management for toggles and selectors
+
+2. Integration Tests:
+   - Confirm data is correctly saved to and retrieved from the backend
+   - Test the interaction between related components (e.g., price history affecting payment status)
+   - Verify form submission with various combinations of the new fields
+   - IMPORTANT: Payment form testing must be postponed until the student creation form is completed and at least one student exists in the system
+
+3. UI/UX Testing:
+   - Validate responsive behavior on mobile, tablet, and desktop views
+   - Ensure accessibility standards are met for all new components
+   - Test keyboard navigation through the new form elements
+
+4. Edge Cases:
+   - Test with empty/null values for optional fields
+   - Verify behavior with extremely long text inputs
+   - Test performance with large datasets (especially for price history)
+
+5. Dependencies:
+   - Payment functionality testing is blocked until student creation is implemented
+   - Create test students in the system before attempting to test the payment workflow
+
+Manual testing should include verification that all new fields appear correctly in both create and edit modes, and that data persistence works as expected across page refreshes and user sessions.
+
+# Subtasks:
+## 1. Implement Alert Management Controls [done]
+### Dependencies: None
+### Description: Add toggle controls for activating/deactivating alerts and implement the underlying validation and persistence logic.
+### Details:
+Create a reusable AlertToggle component with ON/OFF states. Implement validation rules to ensure alerts have all required parameters before activation. Update the data model to include alert status fields. Add event handlers to persist alert state changes to the database. Include visual feedback for successful activation/deactivation.
+<info added on 2025-05-07T00:56:52.614Z>
+Create a reusable AlertToggle component with ON/OFF states. Implement validation rules to ensure alerts have all required parameters before activation. Update the data model to include alert status fields. Add event handlers to persist alert state changes to the database. Include visual feedback for successful activation/deactivation.
+
+The implementation includes:
+
+1. AlertToggle.tsx component:
+   - Customizable switch for activating/deactivating alerts
+   - Support for multiple sizes (sm, md, lg)
+   - Handling of loading and disabled states
+   - Visual feedback with icons and toast messages
+   - Built using @headlessui/react Switch component
+
+2. AlertConfigPanel.tsx component:
+   - Detailed alert configuration panel
+   - Support for three alert types: payment, attendance, and general
+   - Configuration of thresholds and reminder days
+   - Intuitive UI with toggles and numeric fields
+
+3. Type definitions in index.ts:
+   - New AlertType and AlertConfig types
+   - Integration with the existing Student model
+   - Support for threshold and reminder configurations
+
+4. Integration in StudentForm.tsx:
+   - Replacement of simple checkbox with AlertToggle component
+   - Addition of conditional configuration panel
+   - State management for alert configuration
+   - Validation and persistence of configuration settings
+
+The implementation provides complete and flexible alert management per student with a modern and accessible interface, utilizing @headlessui/react, @heroicons/react, and react-hot-toast libraries.
+</info added on 2025-05-07T00:56:52.614Z>
+
+## 2. Develop Payment Status Display Component [done]
+### Dependencies: None
+### Description: Create a visual indicator component showing payment status with appropriate color-coding and hover tooltips.
+### Details:
+Design a PaymentStatusBadge component that accepts a status prop ('paid', 'pending', 'overdue'). Implement color-coding (green for paid, yellow for pending, red for overdue). Add tooltips that display payment details on hover, including amount, due date, and payment method if available. Ensure the component is responsive and accessible.
+<info added on 2025-05-07T00:58:43.020Z>
+Design a PaymentStatusBadge component that accepts a status prop ('paid', 'pending', 'overdue'). Implement color-coding (green for paid, yellow for pending, red for overdue). Add tooltips that display payment details on hover, including amount, due date, and payment method if available. Ensure the component is responsive and accessible.
+
+Implementation completed for the payment status display component with the following features:
+
+1. New PaymentStatusBadge.tsx component:
+   - Modern design with rounded badges and borders
+   - Support for three states: paid/current (green), pending (yellow), overdue (red)
+   - Intuitive icons for each status
+   - Informative tooltips on hover
+   - Three available sizes: sm, md, lg
+   - Customizable with additional classes
+
+2. Integration into existing components:
+   - PagosList: Replaced simple badge with PaymentStatusBadge with date tooltip
+   - AlumnoForm: Added payment status with descriptive tooltip
+   - ReporteGeneral: Integrated in the pending payments section
+   - ReportePagos: Added to each item in the pending payments list
+
+3. Dependencies added:
+   - react-tooltip for tooltips
+   - Already had @heroicons/react for icons
+
+The implementation provides a consistent and clear visualization of payment status throughout the application, significantly improving the user experience.
+</info added on 2025-05-07T00:58:43.020Z>
+
+## 3. Create Price History Management Section [done]
+### Dependencies: None
+### Description: Develop a collapsible section for displaying and managing historical price points with effective dates.
+### Details:
+Implement a PriceHistorySection component with a collapsible UI. Create a form for adding new price points with date pickers for effective dates. Implement a sortable and filterable table to display historical prices. Add validation to prevent overlapping effective dates. Include confirmation dialogs for price changes. Ensure the UI handles empty states appropriately.
+
+## 4. Implement Rich Text Notes Functionality [done]
+### Dependencies: None
+### Description: Add a rich text editor for notes with auto-save functionality and user attribution.
+### Details:
+Integrate a rich text editor library (e.g., Draft.js, Quill). Implement auto-save functionality that triggers after user stops typing (debounce). Add metadata display showing timestamp and user information for each note entry. Create a notes history view that shows all previous notes in chronological order. Implement proper error handling for failed saves.
+
+## 5. Integrate and Test All New Fields in Existing Forms [done]
+### Dependencies: 13.1, 13.2, 13.3, 13.4
+### Description: Integrate all new components into existing forms and ensure proper data binding, validation, and responsive design.
+### Details:
+Update form layouts to incorporate the new components. Implement form-level validation that accounts for all new fields. Ensure data models are properly updated to include all new fields. Test form submission with various combinations of new field values. Update any relevant error messages to include guidance for the new fields. Verify responsive design across mobile, tablet, and desktop views.
+

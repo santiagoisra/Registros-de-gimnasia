@@ -1,0 +1,101 @@
+# Task ID: 22
+# Title: Optimize Student Creation Modal for Mobile UX and Supabase Data Integrity
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Redesign the student creation modal to improve mobile UX and ensure perfect alignment between form fields and Supabase table structure, while optimizing load times by prioritizing essential data collection.
+# Details:
+This task involves several key components:
+
+1. UX Improvements:
+   - Redesign the student creation modal with mobile-first principles
+   - Ensure all form elements are properly sized for touch interactions (larger inputs)
+   - Implement responsive layouts that work seamlessly across device sizes
+   - Add clear visual feedback for form interactions
+
+2. Data Structure Alignment:
+   - Add missing required field 'sede' (location/branch) to the form
+   - Add missing optional field 'apellido' (last name) to the form
+   - Address the 'precio_mensual' field discrepancy - it exists in the form but not in the Supabase table
+   - Prepare SQL to add 'precio_mensual' to the Supabase 'alumnos' table
+   - Document any other discrepancies found between the form and database
+
+3. Performance Optimization:
+   - Make only essential fields required (nombre, sede)
+   - Make non-essential fields optional (email, teléfono, apellido, notas, etc.)
+   - Implement progressive form loading to prioritize essential fields
+   - Optimize any API calls or data validation to minimize latency
+
+4. Implementation Requirements:
+   - Use responsive design patterns and CSS media queries
+   - Ensure form validation works correctly for required fields
+   - Provide clear visual feedback for mobile users
+   - Triple-check data structure alignment before finalizing
+   - Document the SQL changes needed for the Supabase table
+
+# Test Strategy:
+Testing should cover the following areas:
+
+1. Mobile Usability Testing:
+   - Test on at least 3 different mobile devices with varying screen sizes
+   - Verify all form elements are easily tappable and visible
+   - Test with both portrait and landscape orientations
+   - Validate that keyboard input doesn't obscure important form elements
+
+2. Data Integrity Testing:
+   - Create test students with various combinations of data
+   - Verify all data is correctly saved to the Supabase table, especially the newly added fields
+   - Test the required fields (nombre, sede) cannot be bypassed
+   - Confirm optional fields (email, teléfono, apellido, etc.) work correctly
+   - Test the 'precio_mensual' field after implementing the SQL changes
+
+3. Performance Testing:
+   - Measure and document load time improvements
+   - Test on slow network connections (3G simulation)
+   - Verify the form remains responsive during submission
+   - Test the progressive loading of non-essential fields
+
+4. Cross-browser Testing:
+   - Verify functionality in Chrome, Safari, and Firefox mobile browsers
+   - Test with different OS versions (iOS and Android)
+   - Document any browser-specific issues and their resolutions
+
+Acceptance Criteria: The modal should load in under 2 seconds on 3G connections, all form data should perfectly match Supabase structure, and the UX should receive positive feedback from at least 3 test users on mobile devices.
+
+# Subtasks:
+## 22.1. Implement mobile-first UX improvements [done]
+### Dependencies: None
+### Description: Redesign the student creation form with larger inputs, responsive layout, and clear visual feedback for mobile users.
+### Details:
+
+
+## 22.2. Add missing fields to align with Supabase [done]
+### Dependencies: None
+### Description: Add 'sede' (required) and 'apellido' (optional) fields to the form to match the database structure.
+### Details:
+
+
+## 22.3. Prepare SQL for 'precio_mensual' field [done]
+### Dependencies: None
+### Description: Create SQL commands to add the 'precio_mensual' field to the 'alumnos' table in Supabase to match the frontend implementation.
+### Details:
+
+
+## 22.4. Implement field validation and requirements [done]
+### Dependencies: None
+### Description: Update form validation to make only essential fields required (nombre, sede) and make all other fields optional.
+### Details:
+
+
+## 22.5. Optimize form loading and performance [done]
+### Dependencies: None
+### Description: Implement progressive loading of form fields, prioritizing essential data collection first.
+### Details:
+
+
+## 22.6. Document all data structure changes [done]
+### Dependencies: None
+### Description: Create comprehensive documentation of all changes made to align the form with the Supabase table structure.
+### Details:
+
+

@@ -1,0 +1,11 @@
+# Task ID: 9
+# Title: Implement Suggested Workflows
+# Status: pending
+# Dependencies: 7, 8
+# Priority: low
+# Description: Create guided workflows for common daily tasks
+# Details:
+Develop suggested workflow paths for common scenarios (daily attendance, end-of-month reconciliation, etc.). Create a workflow component that guides the teacher through optimal steps. Implement quick-action buttons for common tasks. Add a dashboard widget showing suggested tasks for today. Create components in src/components/workflows/ and integrate throughout the application.
+
+# Test Strategy:
+Test workflow suggestions against actual usage patterns, verify that suggested tasks are contextually appropriate, and validate that workflows reduce time and clicks for common operations.
