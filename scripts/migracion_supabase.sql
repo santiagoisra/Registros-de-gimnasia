@@ -13,7 +13,8 @@ CREATE TABLE alumnos (
   alertas_activas BOOLEAN DEFAULT TRUE,
   fecha_ultima_asistencia DATE,
   dias_consecutivos_asistencia INTEGER DEFAULT 0,
-  estado_pago TEXT CHECK (estado_pago IN ('al_dia', 'pendiente', 'atrasado'))
+  estado_pago TEXT CHECK (estado_pago IN ('al_dia', 'pendiente', 'atrasado')),
+  shift_id UUID REFERENCES shifts(id)
 );
 
 -- Tabla asistencias
@@ -55,4 +56,21 @@ CREATE TABLE notas (
   contenido TEXT NOT NULL,
   tipo TEXT CHECK (tipo IN ('Ausencia', 'Lesión', 'Vacaciones', 'General')) NOT NULL,
   visible_en_reporte BOOLEAN DEFAULT FALSE
-); 
+);
+
+-- Tabla shifts (turnos)
+CREATE TABLE shifts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
+);
+
+-- Agregar columna shift_id a alumnos
+ALTER TABLE alumnos ADD COLUMN shift_id UUID REFERENCES shifts(id);
+
+-- Índices para optimización
+CREATE INDEX idx_alumnos_shift_id ON alumnos(shift_id);
+CREATE INDEX idx_shifts_active_time ON shifts(is_active, start_time, end_time);

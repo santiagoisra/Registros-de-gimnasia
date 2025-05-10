@@ -579,7 +579,7 @@
       "description": "Develop a flexible shift management system that allows for predefined and custom shifts with specific time ranges, complete with an administration panel and full integration with the existing student management system.",
       "details": "The implementation should include:\n\n1. Database schema extensions:\n   - Create new tables for shifts (id, name, start_time, end_time, is_active)\n   - Add shift_id foreign key to the students table\n   - Include necessary indexes for performance optimization\n\n2. Backend implementation:\n   - Create RESTful API endpoints for CRUD operations on shifts\n   - Implement validation for shift time ranges to prevent overlaps\n   - Develop services to handle shift assignment to students\n   - Add middleware to validate shift-related requests\n\n3. Frontend components:\n   - Build a shift configuration panel in the admin section\n   - Create UI for predefined shifts (morning, afternoon, evening)\n   - Implement forms for custom shift creation with time pickers\n   - Add shift selection dropdown to student creation/edit forms\n   - Develop shift filtering functionality in student list views\n\n4. Integration requirements:\n   - Ensure backward compatibility with existing student data\n   - Implement migration strategy for existing students (default shift assignment)\n   - Update all relevant student views to display shift information\n   - Modify existing filters to include shift-based filtering\n\n5. User experience considerations:\n   - Provide clear visual indicators for different shifts\n   - Implement responsive design for the shift management panel\n   - Add confirmation dialogs for actions that affect multiple students\n\n6. Performance optimizations:\n   - Implement caching for shift data to reduce database queries\n   - Use pagination for displaying students filtered by shifts\n   - Optimize queries when filtering students by shift",
       "testStrategy": "Testing should be comprehensive and include:\n\n1. Unit tests:\n   - Test shift creation, modification, and deletion functionality\n   - Verify validation logic for shift time ranges\n   - Test shift assignment to students\n   - Ensure proper handling of edge cases (e.g., overlapping shifts)\n\n2. Integration tests:\n   - Verify proper integration with the student management system\n   - Test the migration of existing students to the new shift system\n   - Ensure all student views correctly display shift information\n   - Validate that filtering by shift works across all relevant views\n\n3. UI/UX testing:\n   - Test the shift configuration panel on different devices and screen sizes\n   - Verify that the shift selection UI is intuitive and user-friendly\n   - Test accessibility of all new UI components\n   - Ensure proper error handling and user feedback\n\n4. Performance testing:\n   - Measure load times when filtering large numbers of students by shift\n   - Test system performance with a high number of defined shifts\n   - Verify caching mechanisms are working correctly\n\n5. User acceptance testing:\n   - Create test scenarios for administrators configuring shifts\n   - Test scenarios for assigning students to shifts\n   - Verify filtering and viewing students by shift meets user requirements\n\n6. Regression testing:\n   - Ensure existing student management functionality works correctly\n   - Verify that no regressions were introduced in related features\n\nDocumentation of test results should include screenshots of the shift management panel, examples of student assignments to shifts, and performance metrics for shift-based filtering operations.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [],
       "priority": "high",
       "subtasks": [
@@ -588,8 +588,8 @@
           "title": "Design and implement database schema extensions for shift management",
           "description": "Create the necessary database tables and relationships to support the shift management system, including tables for shifts and modifications to the students table.",
           "dependencies": [],
-          "details": "Create a 'shifts' table with columns: id (PK), name (VARCHAR), start_time (TIME), end_time (TIME), is_active (BOOLEAN). Add a shift_id (FK) column to the students table referencing the shifts table. Create appropriate indexes on shift_id in the students table and on frequently queried columns in the shifts table. Include constraints to ensure shift data integrity.",
-          "status": "pending",
+          "details": "Create a 'shifts' table with columns: id (PK), name (VARCHAR), start_time (TIME), end_time (TIME), is_active (BOOLEAN). Add a shift_id (FK) column to the students table referencing the shifts table. Create appropriate indexes on shift_id in the students table and on frequently queried columns in the shifts table. Include constraints to ensure shift data integrity.\n<info added on 2025-05-09T22:53:25.117Z>\nCreate a 'shifts' table with the following structure:\n- id UUID PRIMARY KEY DEFAULT gen_random_uuid()\n- name VARCHAR NOT NULL\n- start_time TIME NOT NULL\n- end_time TIME NOT NULL\n- is_active BOOLEAN DEFAULT TRUE\n- created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())\n\nAdd a shift_id (UUID, FK) column to the 'alumnos' table referencing the shifts(id).\n\nCreate the following indexes:\n- On alumnos(shift_id) to optimize queries filtering or joining by shift\n- On shifts(is_active, start_time, end_time) for optimized shift lookup operations\n\nImplement constraints to ensure data integrity:\n- Foreign key constraint on alumnos.shift_id referencing shifts.id\n- Application-level or trigger-based constraint to prevent shift time overlaps\n\nUpdate the TypeScript type definitions in src/types/supabase.ts to reflect these schema changes.\n\nThe implementation should consider that:\n- The 'alumnos' table currently exists but has no shift-related fields\n- No 'shifts' table exists in the initial migration\n- A plan for default shift assignment for existing students will be needed\n</info added on 2025-05-09T22:53:25.117Z>",
+          "status": "done",
           "testStrategy": "Write unit tests to verify schema creation, foreign key constraints, and indexes. Test data insertion, retrieval, and cascading updates/deletes."
         },
         {
@@ -600,7 +600,7 @@
             1
           ],
           "details": "Implement the following endpoints: GET /api/shifts (list all), GET /api/shifts/:id (get one), POST /api/shifts (create), PUT /api/shifts/:id (update), DELETE /api/shifts/:id (delete). Include validation middleware to check for time range overlaps and valid time formats. Implement error handling for all endpoints.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Create integration tests for each endpoint, testing successful operations and validation failures. Mock the database layer for unit tests."
         },
         {
@@ -612,7 +612,7 @@
             2
           ],
           "details": "Create a ShiftAssignmentService with methods for assigning/removing shifts from students. Update student creation and update endpoints to accept shift_id. Implement batch assignment functionality for updating multiple students. Modify student retrieval endpoints to include shift details in the response.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Test individual service methods with unit tests. Create integration tests for the updated student endpoints to verify shift data is properly handled."
         },
         {
@@ -624,7 +624,7 @@
             3
           ],
           "details": "Create a migration script that: 1) Creates default shifts (morning, afternoon, evening), 2) Analyzes existing student data to determine appropriate shift assignment based on available information, 3) Updates all existing students with a default shift_id if no determination can be made. Include logging and error handling for the migration process.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Test the migration on a copy of production data. Verify all students have a valid shift_id after migration. Create rollback procedures in case of issues."
         },
         {
@@ -635,7 +635,7 @@
             2
           ],
           "details": "Create a ShiftManagement component for the admin panel. Implement a ShiftList component with sorting and filtering. Build ShiftForm component with time pickers for creating/editing shifts. Add validation for time ranges on the client side. Include toggle for shift activation/deactivation. Use appropriate UI components to make time selection intuitive.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Write unit tests for individual components. Create integration tests for form submission and validation. Perform usability testing with admin users."
         },
         {
@@ -647,7 +647,7 @@
             5
           ],
           "details": "Add a shift selection dropdown to StudentForm component, populated with active shifts. Update StudentList and StudentDetail views to display shift information. Implement visual indicators for different shifts (color coding, icons). Ensure responsive design works for all new UI elements.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Test form submission with shift selection. Verify shift information displays correctly in all student views. Test responsive behavior on different screen sizes."
         },
         {
@@ -658,7 +658,7 @@
             6
           ],
           "details": "Add shift filter dropdown to the existing student filters. Implement backend query modifications to support filtering by shift_id. Update the frontend to handle shift-based filtering parameters. Optimize queries for performance when filtering by shift. Add the ability to combine shift filters with other existing filters.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Test filter functionality with various combinations of filters. Verify query performance with large datasets. Test edge cases like filtering with no results."
         },
         {
@@ -671,7 +671,7 @@
             7
           ],
           "details": "Implement caching for shift data using an appropriate caching strategy (Redis, in-memory, etc.). Add pagination for shift-filtered student lists. Optimize database queries by adding specific indexes based on common query patterns. Implement eager loading of shift data when retrieving student lists to reduce N+1 query problems. Add monitoring for shift-related API endpoint performance.",
-          "status": "pending",
+          "status": "done",
           "testStrategy": "Conduct performance testing with large datasets. Measure response times before and after optimizations. Test cache invalidation scenarios to ensure data consistency."
         }
       ]
@@ -783,6 +783,17 @@
       "details": "The redesign of the attendance dashboard should focus on the following key aspects:\n\n1. One-Touch Attendance Marking:\n   - Implement a simplified interface where instructors can mark attendance with a single tap/click\n   - Include options for present, absent, late, and excused statuses\n   - Add confirmation feedback (visual/haptic) after marking attendance\n\n2. Filtering Capabilities:\n   - Develop robust filtering by location/campus\n   - Implement shift/time period filtering\n   - Allow for combination filters (e.g., morning shift at north campus)\n   - Include date range selection with calendar integration\n\n3. Mobile Optimization:\n   - Create responsive design that works seamlessly across devices\n   - Optimize touch targets for mobile users\n   - Implement progressive loading for faster performance on mobile networks\n   - Ensure all dashboard features are accessible on smaller screens\n\n4. Visual Indicators:\n   - Design clear visual status indicators (color coding for attendance status)\n   - Add progress bars or charts showing attendance trends\n   - Implement alerts for students with attendance issues\n   - Include visual confirmation of successful attendance marking\n\n5. Multi-Student Selection:\n   - Allow batch selection of multiple students\n   - Implement group actions (mark all selected as present/absent)\n   - Add \"select all\" and \"select by criteria\" options\n   - Include drag selection for desktop users\n\n6. Technical Implementation:\n   - Use modern frontend frameworks (React/Vue.js) for responsive UI\n   - Implement efficient API calls to minimize data transfer\n   - Ensure offline capability with local storage for temporary data\n   - Optimize database queries for performance\n\n7. Integration Requirements:\n   - Ensure compatibility with existing student management system\n   - Maintain data consistency with other modules\n   - Preserve historical attendance data during migration",
       "testStrategy": "The testing strategy should include the following approaches:\n\n1. Functional Testing:\n   - Verify all attendance marking options work correctly (present, absent, late, excused)\n   - Test all filter combinations for accurate results\n   - Confirm multi-student selection and batch operations function as expected\n   - Validate that visual indicators correctly reflect attendance status\n\n2. Usability Testing:\n   - Conduct user testing sessions with actual instructors/administrators\n   - Gather feedback on the intuitiveness of the new interface\n   - Measure time to complete common tasks compared to the old dashboard\n   - Evaluate the effectiveness of visual indicators and feedback mechanisms\n\n3. Responsive Design Testing:\n   - Test on multiple devices (phones, tablets, desktops) with various screen sizes\n   - Verify all features are accessible and functional on mobile devices\n   - Measure load times and performance across different devices\n   - Test touch interactions on mobile devices\n\n4. Performance Testing:\n   - Benchmark dashboard loading times with various data volumes\n   - Test system performance with concurrent users\n   - Measure response time for attendance marking operations\n   - Evaluate database query efficiency\n\n5. Integration Testing:\n   - Verify data consistency between the dashboard and other system modules\n   - Test integration with the student management system\n   - Confirm historical data is correctly displayed and maintained\n   - Validate that changes in one module are reflected in others\n\n6. Acceptance Criteria:\n   - Dashboard loads within 2 seconds on standard connections\n   - Attendance marking takes no more than 1 click/tap per student\n   - All features are accessible on mobile devices with screens ≥ 4.7\"\n   - Filtering operations return results in under 1 second\n   - Multi-student operations support at least 50 students simultaneously\n   - Visual indicators are distinguishable by users with color vision deficiencies",
       "status": "pending",
+      "dependencies": [],
+      "priority": "medium",
+      "subtasks": []
+    },
+    {
+      "id": 28,
+      "title": "Task #28: Implement Shift Editing Functionality in Frontend Interface",
+      "description": "Develop and implement a comprehensive shift editing feature in the frontend that allows users to modify existing shift data including name, schedule, and status through an intuitive user interface with proper form validation.",
+      "details": "The implementation should include the following components:\n\n1. **Edit Button/Action**: Add an edit button or action to each shift in the existing list view that opens an editable form.\n\n2. **Edit Form Development**:\n   - Create a modal or dedicated page for shift editing\n   - Pre-populate form fields with existing shift data\n   - Include fields for name, schedule (date and time pickers), and status (dropdown)\n   - Implement responsive design for all device sizes\n   - Add cancel and save buttons with appropriate confirmation dialogs\n\n3. **Form Validation**:\n   - Implement client-side validation for all fields\n   - Show clear error messages for invalid inputs\n   - Prevent submission of incomplete or invalid data\n   - Add validation for time conflicts with existing shifts\n\n4. **API Integration**:\n   - Connect to the existing backend API for updating shift data\n   - Implement proper error handling for API responses\n   - Show loading states during API calls\n   - Display success/error notifications after submission\n\n5. **State Management**:\n   - Update the shifts list after successful edits\n   - Maintain consistent state across the application\n   - Implement optimistic UI updates where appropriate\n\n6. **User Experience Considerations**:\n   - Ensure keyboard accessibility for form navigation\n   - Implement autofocus on the first field when opening the form\n   - Add confirmation before discarding unsaved changes\n   - Provide clear visual feedback for form interactions\n\n7. **Documentation**:\n   - Update relevant documentation with the new functionality\n   - Document any new components or services created",
+      "testStrategy": "Testing for this feature should be comprehensive and include:\n\n1. **Unit Tests**:\n   - Test form validation logic for all fields\n   - Test state management for the edit form component\n   - Test API integration methods with mocked responses\n   - Verify proper handling of success and error scenarios\n\n2. **Integration Tests**:\n   - Verify the edit form correctly loads and displays existing shift data\n   - Test the complete edit workflow from button click to form submission\n   - Verify state updates correctly after successful edits\n   - Test navigation flows and modal behaviors\n\n3. **End-to-End Tests**:\n   - Create scenarios that test the complete editing workflow\n   - Test form submission with valid and invalid data\n   - Verify UI updates after successful edits\n   - Test error handling and user notifications\n\n4. **Cross-browser Testing**:\n   - Verify functionality works correctly across Chrome, Firefox, Safari, and Edge\n   - Test responsive behavior on different screen sizes\n   - Verify date/time picker components work consistently across browsers\n\n5. **Accessibility Testing**:\n   - Verify keyboard navigation works for all form elements\n   - Test with screen readers to ensure accessibility\n   - Verify color contrast meets WCAG standards\n   - Test focus management throughout the editing workflow\n\n6. **User Acceptance Testing**:\n   - Create test scenarios for stakeholders to verify the functionality meets requirements\n   - Document any feedback for potential improvements\n   - Verify the feature aligns with existing UI/UX patterns\n\n7. **Performance Testing**:\n   - Measure and optimize form rendering and submission times\n   - Test with large datasets to ensure performance remains acceptable",
+      "status": "done",
       "dependencies": [],
       "priority": "medium",
       "subtasks": []

@@ -7,7 +7,7 @@
 /**
  * Modelo de Alumno según Supabase
  */
-export type Alumno = {
+export interface Alumno {
   id: string
   created_at: string
   nombre: string
@@ -20,12 +20,14 @@ export type Alumno = {
   fecha_ultima_asistencia?: string
   dias_consecutivos_asistencia?: number
   estado_pago?: 'al_dia' | 'pendiente' | 'atrasado'
+  shift_id?: string // FK a shifts.id
+  [key: string]: any
 }
 
 /**
  * Modelo de Asistencia según Supabase
  */
-export type Asistencia = {
+export interface Asistencia {
   id: string
   created_at: string
   updated_at: string
@@ -35,12 +37,13 @@ export type Asistencia = {
   estado: 'presente' | 'ausente'
   notas?: string
   alumno?: Alumno // relación opcional (join)
+  [key: string]: any
 }
 
 /**
  * Modelo de Pago según Supabase
  */
-export type Pago = {
+export interface Pago {
   id: string
   created_at: string
   alumno_id: string
@@ -50,6 +53,7 @@ export type Pago = {
   año: number
   metodo_pago: 'Efectivo' | 'Transferencia' | 'Mercado Pago'
   estado: 'Pendiente' | 'Pagado'
+  [key: string]: any
 }
 
 /**
@@ -72,6 +76,7 @@ export interface HistorialPrecios {
   notas: string | null;
   created_at: string;
   updated_at: string;
+  [key: string]: any;
 }
 
 /**
@@ -92,6 +97,7 @@ export interface Nota {
   adjuntos: string | null; // JSON string
   created_at: string;
   updated_at: string;
+  [key: string]: any;
 }
 
 /**
@@ -110,6 +116,19 @@ export type EstadisticasAsistencia = {
 }
 
 /**
+ * Modelo de Shift según Supabase
+ */
+export interface Shift {
+  id: string
+  name: string
+  start_time: string // formato HH:MM:SS
+  end_time: string   // formato HH:MM:SS
+  is_active: boolean
+  created_at: string
+  [key: string]: any
+}
+
+/**
  * Tipado de tablas para Supabase (usado por servicios generados)
  */
 export type Database = {
@@ -119,31 +138,37 @@ export type Database = {
         Row: Alumno
         Insert: Omit<Alumno, 'id' | 'created_at'>
         Update: Partial<Omit<Alumno, 'id' | 'created_at'>>
-        Relationships: Record<string, never>
+        Relationships: []
       }
       asistencias: {
         Row: Asistencia
         Insert: Omit<Asistencia, 'id' | 'created_at'>
         Update: Partial<Omit<Asistencia, 'id' | 'created_at'>>
-        Relationships: Record<string, never>
+        Relationships: []
       }
       pagos: {
         Row: Pago
         Insert: Omit<Pago, 'id' | 'created_at'>
         Update: Partial<Omit<Pago, 'id' | 'created_at'>>
-        Relationships: Record<string, never>
+        Relationships: []
       }
       historial_precios: {
         Row: HistorialPrecios
         Insert: Omit<HistorialPrecios, 'id'>
         Update: Partial<Omit<HistorialPrecios, 'id'>>
-        Relationships: Record<string, never>
+        Relationships: []
       }
       notas: {
         Row: Nota
         Insert: Omit<Nota, 'id'>
         Update: Partial<Omit<Nota, 'id'>>
-        Relationships: Record<string, never>
+        Relationships: []
+      }
+      shifts: {
+        Row: Shift
+        Insert: Omit<Shift, 'id' | 'created_at'>
+        Update: Partial<Omit<Shift, 'id' | 'created_at'>>
+        Relationships: []
       }
     }
   }

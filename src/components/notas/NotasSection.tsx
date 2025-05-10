@@ -108,7 +108,7 @@ export function NotasSection({ alumnoId }: NotasSectionProps) {
                     <RichTextEditor
                       content={nota.contenido as string}
                       onChange={async (content: string) => {
-                        await updateNota(nota.id, {
+                        await updateNota({
                           ...nota,
                           contenido: content,
                         })

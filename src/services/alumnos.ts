@@ -15,6 +15,7 @@ interface GetAlumnosOptions {
   sede?: AlumnoDB['sede']
   activo?: boolean
   estadoPago?: AlumnoDB['estado_pago']
+  shift_id?: string
 }
 
 /**
@@ -37,6 +38,7 @@ function mapAlumnoFromDB(dbAlumno: AlumnoDB): Alumno {
     sede: dbAlumno.sede,
     precioMensual: (dbAlumno as unknown as { precio_mensual?: number }).precio_mensual ?? 0,
     notas: (dbAlumno as unknown as { notas?: string }).notas ?? '',
+    shift_id: dbAlumno.shift_id ?? undefined,
   }
 }
 
@@ -62,10 +64,14 @@ export const alumnosService = {
         query = query.eq('estado_pago', options.estadoPago)
       }
 
+      if (options.shift_id) {
+        query = query.eq('shift_id', options.shift_id)
+      }
+
       if (options.orderBy) {
         const dbColumn = (options.orderBy as string) === 'alumno_id' ? 'alumno_id' : options.orderBy
         if (dbColumn) {
-          query = query.order(dbColumn, { ascending: options.orderDirection !== 'desc' })
+          query = query.order(String(dbColumn), { ascending: options.orderDirection !== 'desc' })
         }
       }
 
@@ -138,7 +144,8 @@ export const alumnosService = {
           sede: data.sede,
           activo: data.activo ?? true,
           alertas_activas: data.alertas_activas,
-          estado_pago: data.estado_pago
+          estado_pago: data.estado_pago,
+          shift_id: data.shift_id
         }])
         .select()
         .single()
@@ -176,7 +183,8 @@ export const alumnosService = {
           alertas_activas: data.alertas_activas,
           fecha_ultima_asistencia: data.fecha_ultima_asistencia,
           dias_consecutivos_asistencia: data.dias_consecutivos_asistencia,
-          estado_pago: data.estado_pago
+          estado_pago: data.estado_pago,
+          shift_id: data.shift_id
         })
         .eq('id', id)
         .select()

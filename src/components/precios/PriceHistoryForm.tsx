@@ -30,14 +30,10 @@ export default function PriceHistoryForm({
     fechaHasta: initialData.fechaHasta || '',
     servicio: initialData.servicio || 'Clases',
     tipoServicio: initialData.tipoServicio || 'Individual',
-    activo: initialData.activo ?? true,
     moneda: initialData.moneda || 'ARS',
-    descuento: initialData.descuento,
-    incrementoProgramado: initialData.incrementoProgramado,
-    historialCambios: initialData.historialCambios,
     notas: initialData.notas || '',
-    createdAt: initialData.createdAt || '',
-    updatedAt: initialData.updatedAt || ''
+    createdAt: initialData.createdAt || formatDate(new Date()),
+    updatedAt: initialData.updatedAt || formatDate(new Date()),
   })
   const [formError, setFormError] = useState<string | null>(null)
 
@@ -148,6 +144,8 @@ export default function PriceHistoryForm({
               min={0}
               required
               disabled={loading}
+              title="Precio"
+              placeholder="Ej: 5000"
             />
           </div>
           <div>
@@ -158,6 +156,7 @@ export default function PriceHistoryForm({
               onChange={handleChange}
               className="mt-1 block w-full border rounded px-2 py-1"
               disabled={loading}
+              title="Moneda"
             >
               <option value="ARS">ARS</option>
               <option value="USD">USD</option>
@@ -172,6 +171,7 @@ export default function PriceHistoryForm({
               onChange={handleChange}
               className="mt-1 block w-full border rounded px-2 py-1"
               disabled={loading}
+              title="Servicio"
             >
               <option value="Clases">Clases</option>
               <option value="Competencia">Competencia</option>
@@ -187,6 +187,7 @@ export default function PriceHistoryForm({
               onChange={handleChange}
               className="mt-1 block w-full border rounded px-2 py-1"
               disabled={loading}
+              title="Tipo de servicio"
             >
               <option value="Individual">Individual</option>
               <option value="Grupal">Grupal</option>
@@ -206,6 +207,8 @@ export default function PriceHistoryForm({
               className="mt-1 block w-full border rounded px-2 py-1"
               required
               disabled={loading}
+              title="Fecha desde"
+              placeholder="YYYY-MM-DD"
             />
           </div>
           <div>
@@ -213,10 +216,12 @@ export default function PriceHistoryForm({
             <input
               type="date"
               name="fechaHasta"
-              value={form.fechaHasta || ''}
+              value={form.fechaHasta}
               onChange={handleChange}
               className="mt-1 block w-full border rounded px-2 py-1"
               disabled={loading}
+              title="Fecha hasta"
+              placeholder="YYYY-MM-DD"
             />
           </div>
         </div>
@@ -229,6 +234,8 @@ export default function PriceHistoryForm({
             className="mt-1 block w-full border rounded px-2 py-1"
             rows={2}
             disabled={loading}
+            title="Notas"
+            placeholder="Notas adicionales..."
           />
         </div>
         {/* Aquí se pueden agregar campos para descuento e incrementoProgramado si se requiere */}
