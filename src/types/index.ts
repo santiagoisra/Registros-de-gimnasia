@@ -52,6 +52,7 @@ export interface Alumno {
   precioMensual: number;
   notas: string;
   alertConfig?: AlertConfig[];
+  shift_id?: string;
 }
 
 /**
@@ -171,4 +172,6 @@ export interface OrderParams {
 export interface DateRangeParams {
   fechaDesde?: string;
   fechaHasta?: string;
-} 
+}
+
+export type { Shift } from './supabase' 

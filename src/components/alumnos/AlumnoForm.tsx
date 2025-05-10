@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { toast } from 'react-hot-toast'
-import type { Alumno, EstadoPago } from '@/types'
+import type { Alumno, EstadoPago, Shift } from '@/types'
 import { alumnosService } from '@/services/alumnos'
 import { AlertToggle } from '@/components/ui/AlertToggle'
 import { AlertConfigPanel } from '@/components/ui/AlertConfigPanel'
@@ -46,7 +46,26 @@ export default function AlumnoForm({ alumno, onClose, onSuccess }: AlumnoFormPro
     estadoPago: alumno?.estadoPago || 'al_dia',
     diasConsecutivosAsistencia: alumno?.diasConsecutivosAsistencia || 0,
     fechaUltimaAsistencia: alumno?.fechaUltimaAsistencia || '',
+    shift_id: alumno?.shift_id || '',
   })
+
+  const [shifts, setShifts] = useState<Shift[]>([])
+  const [shiftsLoading, setShiftsLoading] = useState(true)
+  const [shiftsError, setShiftsError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setShiftsLoading(true)
+    fetch('/api/shifts')
+      .then(res => res.json())
+      .then(data => {
+        setShifts(data.filter((s: Shift) => s.is_active))
+        setShiftsLoading(false)
+      })
+      .catch(() => {
+        setShiftsError('Error al cargar los turnos')
+        setShiftsLoading(false)
+      })
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -269,6 +288,31 @@ export default function AlumnoForm({ alumno, onClose, onSuccess }: AlumnoFormPro
             className="mt-1 block w-full rounded-lg border-2 border-gray-300 focus:border-primary focus:ring-primary text-lg py-3 px-4 transition-all duration-150 sm:text-base"
           />
         </div>
+      </div>
+
+      <div>
+        <label htmlFor="shift_id" className="block text-base font-semibold text-gray-800 mb-1">
+          Turno
+        </label>
+        {shiftsLoading ? (
+          <span className="text-gray-500 text-sm">Cargando turnos...</span>
+        ) : shiftsError ? (
+          <span className="text-red-500 text-sm">{shiftsError}</span>
+        ) : (
+          <select
+            id="shift_id"
+            value={formData.shift_id || ''}
+            onChange={e => setFormData({ ...formData, shift_id: e.target.value })}
+            className="mt-1 block w-full rounded-lg border-2 border-gray-300 focus:border-primary focus:ring-primary text-lg py-3 px-4 transition-all duration-150 sm:text-base"
+          >
+            <option value="">Sin turno asignado</option>
+            {shifts.map(shift => (
+              <option key={shift.id} value={shift.id}>
+                {shift.name} ({shift.start_time} - {shift.end_time})
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div>

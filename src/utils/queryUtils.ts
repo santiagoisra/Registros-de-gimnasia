@@ -21,28 +21,28 @@ export interface DateRangeParams {
   fechaHasta?: string
 }
 
-export function applyPagination<T extends TableName>(
-  query: PostgrestFilterBuilder<SupabaseSchema, T, RowType<T>, InsertType<T>, UpdateType<T>>,
+export function applyPagination(
+  query: PostgrestFilterBuilder<any, any, any, any, any>,
   { page = 1, pageSize = 10 }: PaginationParams
-): PostgrestFilterBuilder<SupabaseSchema, T, RowType<T>, InsertType<T>, UpdateType<T>> {
+): PostgrestFilterBuilder<any, any, any, any, any> {
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
   return query.range(from, to)
 }
 
-export function applyOrder<T extends TableName>(
-  query: PostgrestFilterBuilder<SupabaseSchema, T, RowType<T>, InsertType<T>, UpdateType<T>>,
+export function applyOrder(
+  query: PostgrestFilterBuilder<any, any, any, any, any>,
   { orderBy, orderDirection = 'desc' }: OrderParams
-): PostgrestFilterBuilder<SupabaseSchema, T, RowType<T>, InsertType<T>, UpdateType<T>> {
+): PostgrestFilterBuilder<any, any, any, any, any> {
   if (!orderBy) return query
-  return query.order(orderBy, { ascending: orderDirection === 'asc' })
+  return query.order(orderBy as string, { ascending: orderDirection === 'asc' })
 }
 
-export function applyDateRange<T extends TableName>(
-  query: PostgrestFilterBuilder<SupabaseSchema, T, RowType<T>, InsertType<T>, UpdateType<T>>,
+export function applyDateRange(
+  query: PostgrestFilterBuilder<any, any, any, any, any>,
   { fechaDesde, fechaHasta }: DateRangeParams,
   dateField = 'fecha'
-): PostgrestFilterBuilder<SupabaseSchema, T, RowType<T>, InsertType<T>, UpdateType<T>> {
+): PostgrestFilterBuilder<any, any, any, any, any> {
   if (fechaDesde) {
     query = query.gte(dateField, fechaDesde)
   }

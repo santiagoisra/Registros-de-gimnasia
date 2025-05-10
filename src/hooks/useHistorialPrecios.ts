@@ -14,11 +14,11 @@ import { historialPreciosService } from '@/services/historialPrecios'
 
 interface UseHistorialPreciosOptions extends PaginationParams, OrderParams, DateRangeParams {
   servicio?: string
-  soloActivos?: boolean
   tipoServicio?: HistorialPrecio['tipoServicio']
   moneda?: HistorialPrecio['moneda']
   conDescuento?: boolean
   autoFetch?: boolean
+  alumnoId?: string
 }
 
 interface UseHistorialPreciosReturn {
@@ -46,10 +46,10 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
     fechaDesde,
     fechaHasta,
     servicio,
-    soloActivos,
     tipoServicio,
     moneda,
-    autoFetch
+    autoFetch,
+    alumnoId
   } = options
 
   const [precios, setPrecios] = useState<HistorialPrecio[]>([])
@@ -75,26 +75,18 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
         fechaHasta,
         servicio: servicio as import('@/types/supabase').HistorialPrecios['servicio'],
         tipoServicio: tipoServicio as import('@/types/supabase').HistorialPrecios['tipo_servicio'],
-        activo: soloActivos,
-        moneda: moneda as import('@/types/supabase').HistorialPrecios['moneda']
+        moneda: moneda as import('@/types/supabase').HistorialPrecios['moneda'],
+        alumnoId
       })
       setPrecios(precios)
       // TODO: setEstadisticas si el servicio lo devuelve
-      // Obtener incrementos pendientes
-      const hoy = formatDate(new Date())
-      const incrementosPendientes = precios
-        .filter((precio) =>
-          precio.incrementoProgramado &&
-          !precio.incrementoProgramado.notificado &&
-          precio.incrementoProgramado.fechaEfectiva > hoy
-        )
-      setIncrementosPendientes(incrementosPendientes)
+      // Eliminar lógica de incrementosPendientes si no existe en el tipo
     } catch (err) {
       setError(handleDatabaseError(err as Error, 'fetchPrecios'))
     } finally {
       setLoading(false)
     }
-  }, [page, pageSize, orderBy, orderDirection, fechaDesde, fechaHasta, servicio, soloActivos, tipoServicio, moneda])
+  }, [page, pageSize, orderBy, orderDirection, fechaDesde, fechaHasta, servicio, tipoServicio, moneda, alumnoId])
 
   const fetchPrecioVigente = useCallback(async () => {
     try {

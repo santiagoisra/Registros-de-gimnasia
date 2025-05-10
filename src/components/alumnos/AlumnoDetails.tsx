@@ -1,7 +1,7 @@
 'use client'
 
 import { useAlumnos } from '@/hooks/useAlumnos'
-import { PriceHistorySection } from '@/components/precios/PriceHistorySection'
+import PriceHistorySection from '@/components/precios/PriceHistorySection'
 import { NotasSection } from '@/components/notas/NotasSection'
 import { PaymentStatusBadge } from '@/components/ui/PaymentStatusBadge'
 import { AlertToggle } from '@/components/ui/AlertToggle'

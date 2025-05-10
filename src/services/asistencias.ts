@@ -76,7 +76,7 @@ export const asistenciasService = {
 
       if (options.orderBy) {
         const dbColumn = options.orderBy === 'alumno_id' ? 'alumno_id' : options.orderBy
-        query = query.order(dbColumn, { ascending: options.orderDirection !== 'desc' })
+        query = query.order(String(dbColumn), { ascending: options.orderDirection !== 'desc' })
       }
 
       if (options.page && options.perPage) {

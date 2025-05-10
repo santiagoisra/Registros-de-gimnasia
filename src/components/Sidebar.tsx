@@ -98,6 +98,11 @@ export default function Sidebar() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <a href="/configuracion/turnos" className="block px-4 py-2 hover:bg-gray-100 rounded transition">
+                  Gestión de Turnos
+                </a>
+              </li>
             </ul>
           )}
         </li>
@@ -179,6 +184,11 @@ export default function Sidebar() {
                         </Link>
                       </li>
                     ))}
+                    <li>
+                      <a href="/configuracion/turnos" className="block px-4 py-2 hover:bg-gray-100 rounded transition">
+                        Gestión de Turnos
+                      </a>
+                    </li>
                   </ul>
                 )}
               </li>
