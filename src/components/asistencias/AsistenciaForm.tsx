@@ -54,7 +54,7 @@ export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
       {error && <Alert variant="error">{error}</Alert>}
 
       <div>
@@ -66,7 +66,7 @@ export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
           value={alumno_id}
           onChange={(e) => setAlumnoId(e.target.value)}
           required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-sm min-h-[44px]"
         >
           <option value="">Seleccionar alumno</option>
           {alumnos?.map((alumno: Alumno) => (
@@ -87,7 +87,7 @@ export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
           value={fecha}
           onChange={(e) => setFecha(e.target.value)}
           required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-sm min-h-[44px]"
         />
       </div>
 
@@ -100,7 +100,7 @@ export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
           value={sede}
           onChange={(e) => setSede(e.target.value as 'Plaza Arenales' | 'Plaza Terán')}
           required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-sm min-h-[44px]"
         >
           <option value="Plaza Arenales">Plaza Arenales</option>
           <option value="Plaza Terán">Plaza Terán</option>
@@ -116,7 +116,7 @@ export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
           value={estado}
           onChange={(e) => setEstado(e.target.value as 'presente' | 'ausente')}
           required
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-sm min-h-[44px]"
         >
           <option value="presente">Presente</option>
           <option value="ausente">Ausente</option>
@@ -132,7 +132,7 @@ export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
           value={notas}
           onChange={(e) => setNotas(e.target.value)}
           rows={3}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-base sm:text-sm"
         />
       </div>
 
@@ -140,7 +140,7 @@ export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex justify-center py-3 px-4 sm:py-2 sm:px-4 border border-transparent shadow-sm text-base sm:text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] min-w-[44px]"
         >
           {loading ? 'Guardando...' : 'Guardar'}
         </button>

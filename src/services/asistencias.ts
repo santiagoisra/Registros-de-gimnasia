@@ -15,6 +15,7 @@ interface GetAsistenciasOptions {
   estado?: AsistenciaDB['estado']
   fecha?: string
   sede?: AsistenciaDB['sede']
+  shiftId?: string
 }
 
 /**
@@ -72,6 +73,10 @@ export const asistenciasService = {
 
       if (options.sede) {
         query = query.eq('sede', options.sede)
+      }
+
+      if (options.shiftId) {
+        query = query.eq('alumnos.shift_id', options.shiftId)
       }
 
       if (options.orderBy) {
