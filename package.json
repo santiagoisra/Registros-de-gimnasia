@@ -34,6 +34,7 @@
     "react-datepicker": "^5.1.0",
     "react-dom": "^18",
     "react-hot-toast": "^2.5.2",
+    "react-swipeable": "^7.0.2",
     "react-tooltip": "^5.28.1",
     "task-master-ai": "^0.12.1",
     "zod": "^3.22.4"
