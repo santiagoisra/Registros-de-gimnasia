@@ -20,7 +20,7 @@ export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
   const [shifts, setShifts] = useState<Shift[]>([])
 
   const { crearAsistencia, loading } = useAsistencias()
-  const { alumnos } = useAlumnos()
+  const { alumnos, refetch } = useAlumnos()
 
   useEffect(() => {
     fetch('/api/shifts')
@@ -28,6 +28,10 @@ export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
       .then(data => setShifts(data.filter((s: Shift) => s.is_active)))
       .catch(() => setShifts([]))
   }, [])
+
+  useEffect(() => {
+    refetch();
+  }, []);
 
   const alumnoSeleccionado = useMemo(() => alumnos?.find(a => a.id === alumno_id), [alumno_id, alumnos])
   const shiftAsignado = useMemo(() => shifts.find(s => s.id === alumnoSeleccionado?.shift_id), [alumnoSeleccionado, shifts])
@@ -79,7 +83,7 @@ export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
           <option value="">Seleccionar alumno</option>
           {alumnos?.map((alumno: Alumno) => (
             <option key={alumno.id} value={alumno.id}>
-              {alumno.apellido}, {alumno.nombre}
+              {alumno.apellido ? `${alumno.apellido}, ${alumno.nombre}` : alumno.nombre}
             </option>
           ))}
         </select>

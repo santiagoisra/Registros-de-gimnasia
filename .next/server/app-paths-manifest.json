@@ -1,10 +1,7 @@
 {
-  "/asistencias/page": "app/asistencias/page.js",
   "/alumnos/page": "app/alumnos/page.js",
-  "/page": "app/page.js",
-  "/pagos/page": "app/pagos/page.js",
   "/api/shifts/route": "app/api/shifts/route.js",
-  "/reportes/page": "app/reportes/page.js",
-  "/configuracion/turnos/page": "app/configuracion/turnos/page.js",
-  "/configuracion/historial-precios/page": "app/configuracion/historial-precios/page.js"
+  "/asistencias/page": "app/asistencias/page.js",
+  "/page": "app/page.js",
+  "/pagos/page": "app/pagos/page.js"
 }

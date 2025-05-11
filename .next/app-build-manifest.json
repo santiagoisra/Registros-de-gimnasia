@@ -11,25 +11,10 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/page.js"
-    ],
     "/alumnos/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/alumnos/page.js"
-    ],
-    "/configuracion/historial-precios/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/configuracion/historial-precios/page.js"
-    ],
-    "/configuracion/turnos/page": [
-      "static/chunks/webpack.js",
-      "static/chunks/main-app.js",
-      "static/chunks/app/configuracion/turnos/page.js"
     ],
     "/pagos/page": [
       "static/chunks/webpack.js",
@@ -37,10 +22,10 @@
       "static/css/app/pagos/page.css",
       "static/chunks/app/pagos/page.js"
     ],
-    "/reportes/page": [
+    "/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/reportes/page.js"
+      "static/chunks/app/page.js"
     ]
   }
 }
