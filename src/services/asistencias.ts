@@ -28,7 +28,6 @@ function mapAsistenciaFromDB(dbAsistencia: AsistenciaDB & { alumnos: AlumnoDB | 
     fecha: dbAsistencia.fecha,
     estado: dbAsistencia.estado,
     sede: dbAsistencia.sede,
-    notas: dbAsistencia.notas,
     created_at: dbAsistencia.created_at,
     updated_at: dbAsistencia.updated_at,
     alumno: dbAsistencia.alumnos ? {
@@ -67,16 +66,17 @@ export const asistenciasService = {
         query = query.eq('estado', options.estado)
       }
 
-      if (options.fecha) {
-        query = query.eq('fecha', options.fecha)
-      }
-
       if (options.sede) {
         query = query.eq('sede', options.sede)
       }
 
       if (options.shiftId) {
         query = query.eq('alumnos.shift_id', options.shiftId)
+      }
+
+      if (options.fecha) {
+        const fechaNorm = options.fecha.length > 10 ? options.fecha.slice(0, 10) : options.fecha
+        query = query.eq('fecha', fechaNorm)
       }
 
       if (options.orderBy) {
@@ -99,7 +99,9 @@ export const asistenciasService = {
         throw handleDatabaseError(error as PostgrestError, 'Error al obtener asistencias')
       }
 
-      const asistencias = data.map(mapAsistenciaFromDB)
+      const asistencias = data
+        .map(mapAsistenciaFromDB)
+        .filter(a => a.alumno)
       const totalPages = count ? Math.ceil(count / (options.perPage || 10)) : 1
 
       return { data: asistencias, totalPages }
@@ -122,8 +124,7 @@ export const asistenciasService = {
           alumno_id: data.alumno_id,
           fecha: data.fecha,
           estado: data.estado,
-          sede: data.sede,
-          notas: data.notas
+          sede: data.sede
         }])
         .select('*, alumnos(*)')
         .single()
@@ -155,8 +156,7 @@ export const asistenciasService = {
           alumno_id: data.alumno_id,
           fecha: data.fecha,
           estado: data.estado,
-          sede: data.sede,
-          notas: data.notas
+          sede: data.sede
         })
         .eq('id', id)
         .select('*, alumnos(*)')

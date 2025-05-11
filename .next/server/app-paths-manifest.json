@@ -1,8 +1,10 @@
 {
-  "/_not-found/page": "app/_not-found/page.js",
-  "/page": "app/page.js",
-  "/configuracion/turnos/page": "app/configuracion/turnos/page.js",
-  "/reportes/page": "app/reportes/page.js",
   "/asistencias/page": "app/asistencias/page.js",
-  "/api/shifts/route": "app/api/shifts/route.js"
+  "/alumnos/page": "app/alumnos/page.js",
+  "/page": "app/page.js",
+  "/pagos/page": "app/pagos/page.js",
+  "/api/shifts/route": "app/api/shifts/route.js",
+  "/reportes/page": "app/reportes/page.js",
+  "/configuracion/turnos/page": "app/configuracion/turnos/page.js",
+  "/configuracion/historial-precios/page": "app/configuracion/historial-precios/page.js"
 }

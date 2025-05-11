@@ -35,7 +35,6 @@ export interface Asistencia {
   fecha: string
   sede: 'Plaza Arenales' | 'Plaza Terán'
   estado: 'presente' | 'ausente'
-  notas?: string
   alumno?: Alumno // relación opcional (join)
   [key: string]: any
 }
