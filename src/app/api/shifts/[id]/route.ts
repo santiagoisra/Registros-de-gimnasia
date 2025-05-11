@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import type { Shift } from '@/types/supabase'
 
 // GET /api/shifts/[id] - obtener un turno por id
 export async function GET(req: NextRequest, { params }: { params: { id: string } }) {

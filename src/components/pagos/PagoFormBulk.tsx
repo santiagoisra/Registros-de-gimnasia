@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { toast } from 'react-hot-toast'
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
-import type { Alumno, MetodoPago } from '@/types'
+import type { MetodoPago } from '@/types'
 import { usePagos } from '@/hooks/usePagos'
 import { useAlumnos } from '@/hooks/useAlumnos'
 
@@ -20,7 +20,7 @@ export default function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
   const [periodoDesde, setPeriodoDesde] = useState<Date>(new Date())
   const [periodoHasta, setPeriodoHasta] = useState<Date>(new Date(new Date().setMonth(new Date().getMonth() + 1)))
   const [notas, setNotas] = useState<string>('')
-  const { alumnos, loading: loadingAlumnos, error: errorAlumnos } = useAlumnos({ autoFetch: true })
+  const { alumnos, loading: loadingAlumnos } = useAlumnos({ autoFetch: true })
   const [alumnosSeleccionados, setAlumnosSeleccionados] = useState<string[]>([])
   const [montos, setMontos] = useState<Record<string, string>>({})
   const { createPagosBulk, isCreating: loadingPagos } = usePagos()

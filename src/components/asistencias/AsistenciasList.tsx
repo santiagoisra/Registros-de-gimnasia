@@ -4,11 +4,18 @@ import { useState, useEffect, useRef } from 'react'
 import { useAsistencias } from '@/hooks/useAsistencias'
 import { Spinner } from '@/components/ui/Spinner'
 import { Alert } from '@/components/ui/Alert'
-import { format, addDays, subDays, isToday } from 'date-fns'
+import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
 import type { Shift } from '@/types/supabase'
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid'
 import { useSwipeable } from 'react-swipeable'
+
+// Definir tipo mínimo para asistencia
+interface Asistencia {
+  id: string
+  estado: 'presente' | 'ausente'
+  // agregar más campos si se usan en el archivo
+}
 
 export function AsistenciasList() {
   const [page, setPage] = useState(1)
@@ -258,7 +265,7 @@ export function AsistenciasList() {
     { presente: 0, ausente: 0 }
   ) : { presente: 0, ausente: 0 }
 
-  function handleToggleEstado(asistencia: any) {
+  function handleToggleEstado(asistencia: Asistencia) {
     const nuevoEstado = asistencia.estado === 'presente' ? 'ausente' : 'presente'
     // Optimistic UI: actualizar visualmente
     setUndoStack({ id: asistencia.id, prevEstado: asistencia.estado })
@@ -276,7 +283,7 @@ export function AsistenciasList() {
     }
   }
 
-  function handleLongPress(asistencia: any) {
+  function handleLongPress(asistencia: Asistencia) {
     // Por ahora, alternar estado igual que con click
     handleToggleEstado(asistencia)
   }
@@ -377,7 +384,7 @@ export function AsistenciasList() {
                       {format(new Date(asistencia.fecha), 'PPP', { locale: es })}
                     </td>
                     <td className="px-3 sm:px-6 py-3 whitespace-nowrap text-sm">
-                      <SwipeableRow asistencia={asistencia} onToggle={handleToggleEstado} onLongPress={handleLongPress}>
+                      <SwipeableRow asistencia={asistencia} onToggle={handleToggleEstado}>
                         <button
                           type="button"
                           onClick={() => handleToggleEstado(asistencia)}
@@ -462,7 +469,7 @@ export function AsistenciasList() {
 }
 
 // Componente auxiliar para swipe
-function SwipeableRow({ asistencia, onToggle, onLongPress, children }: { asistencia: any, onToggle: (a: any) => void, onLongPress: (a: any) => void, children: React.ReactNode }) {
+function SwipeableRow({ asistencia, onToggle, children }: { asistencia: Asistencia, onToggle: (a: Asistencia) => void, children: React.ReactNode }) {
   const handlers = useSwipeable({
     onSwipedLeft: () => onToggle(asistencia),
     onSwipedRight: () => onToggle(asistencia),

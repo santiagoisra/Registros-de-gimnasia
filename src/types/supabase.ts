@@ -21,7 +21,7 @@ export interface Alumno {
   dias_consecutivos_asistencia?: number
   estado_pago?: 'al_dia' | 'pendiente' | 'atrasado'
   shift_id?: string // FK a shifts.id
-  [key: string]: any
+  [key: string]: unknown
 }
 
 /**
@@ -36,7 +36,7 @@ export interface Asistencia {
   sede: 'Plaza Arenales' | 'Plaza Terán'
   estado: 'presente' | 'ausente'
   alumno?: Alumno // relación opcional (join)
-  [key: string]: any
+  [key: string]: unknown
 }
 
 /**
@@ -52,7 +52,7 @@ export interface Pago {
   año: number
   metodo_pago: 'Efectivo' | 'Transferencia' | 'Mercado Pago'
   estado: 'Pendiente' | 'Pagado'
-  [key: string]: any
+  [key: string]: unknown
 }
 
 /**
@@ -75,7 +75,7 @@ export interface HistorialPrecios {
   notas: string | null;
   created_at: string;
   updated_at: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -96,7 +96,7 @@ export interface Nota {
   adjuntos: string | null; // JSON string
   created_at: string;
   updated_at: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**
@@ -124,7 +124,7 @@ export interface Shift {
   end_time: string   // formato HH:MM:SS
   is_active: boolean
   created_at: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 /**

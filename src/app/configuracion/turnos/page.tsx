@@ -20,7 +20,7 @@ export default function ShiftManagement() {
         setShifts(data)
         setLoading(false)
       })
-      .catch(err => {
+      .catch(() => {
         setError('Error al cargar los turnos')
         setLoading(false)
       })

@@ -43,8 +43,12 @@ export default function ShiftForm({ shift, onSave, onCancel }: ShiftFormProps) {
     setSaving(true)
     try {
       await onSave(form)
-    } catch (err: any) {
-      setError(err.message || 'Error al guardar')
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'message' in err) {
+        setError((err as { message?: string }).message || 'Error al guardar')
+      } else {
+        setError('Error al guardar')
+      }
     } finally {
       setSaving(false)
     }

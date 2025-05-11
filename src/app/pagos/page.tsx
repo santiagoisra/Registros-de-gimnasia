@@ -7,7 +7,6 @@ import PagoFormBulk from '@/components/pagos/PagoFormBulk'
 
 export default function PagosPage() {
   const [tab, setTab] = useState<'individual' | 'lote'>('individual')
-  const [mostrarDetalles, setMostrarDetalles] = useState(false)
 
   return (
     <div className="container mx-auto px-6 py-8">

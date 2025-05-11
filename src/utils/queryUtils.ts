@@ -1,10 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PostgrestFilterBuilder } from '@supabase/postgrest-js'
-import type { SupabaseSchema, Database } from '@/types/supabase'
-
-type TableName = keyof Database['public']['Tables']
-type RowType<T extends TableName> = Database['public']['Tables'][T]['Row']
-type InsertType<T extends TableName> = Database['public']['Tables'][T]['Insert']
-type UpdateType<T extends TableName> = Database['public']['Tables'][T]['Update']
 
 export interface PaginationParams {
   page?: number
@@ -21,6 +16,7 @@ export interface DateRangeParams {
   fechaHasta?: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- requerido por la API de PostgrestFilterBuilder
 export function applyPagination(
   query: PostgrestFilterBuilder<any, any, any, any, any>,
   { page = 1, pageSize = 10 }: PaginationParams
@@ -30,6 +26,7 @@ export function applyPagination(
   return query.range(from, to)
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- requerido por la API de PostgrestFilterBuilder
 export function applyOrder(
   query: PostgrestFilterBuilder<any, any, any, any, any>,
   { orderBy, orderDirection = 'desc' }: OrderParams
@@ -38,6 +35,7 @@ export function applyOrder(
   return query.order(orderBy as string, { ascending: orderDirection === 'asc' })
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- requerido por la API de PostgrestFilterBuilder
 export function applyDateRange(
   query: PostgrestFilterBuilder<any, any, any, any, any>,
   { fechaDesde, fechaHasta }: DateRangeParams,

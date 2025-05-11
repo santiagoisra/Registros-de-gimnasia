@@ -2,19 +2,19 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 
-interface UseAutoSaveOptions {
-  onSave: (value: any) => Promise<void>
-  value: any
+interface UseAutoSaveOptions<T> {
+  onSave: (value: T) => Promise<void>
+  value: T
   delay?: number
   enabled?: boolean
 }
 
-export function useAutoSave({
+export function useAutoSave<T>({
   onSave,
   value,
   delay = 1000,
   enabled = true,
-}: UseAutoSaveOptions) {
+}: UseAutoSaveOptions<T>) {
   const timeoutRef = useRef<NodeJS.Timeout>()
   const valueRef = useRef(value)
   const onSaveRef = useRef(onSave)
