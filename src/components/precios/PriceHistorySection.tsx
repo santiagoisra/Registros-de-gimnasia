@@ -19,7 +19,7 @@ const PriceHistorySection = ({ alumnoId }: PriceHistorySectionProps) => {
   const [formLoading, setFormLoading] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const { alumnos, loading: alumnosLoading } = useAlumnos({ autoFetch: true })
-  const { precios, loading, error, createPrecio, updatePrecio, deletePrecio, fetchPrecios } = useHistorialPrecios({ autoFetch: true, alumnoId })
+  const { precios, loading, error, createPrecio, updatePrecio, deletePrecio } = useHistorialPrecios({ autoFetch: true, alumnoId })
 
   const handleAdd = () => {
     setEditData(null)
@@ -39,8 +39,12 @@ const PriceHistorySection = ({ alumnoId }: PriceHistorySectionProps) => {
     setFormError(null)
     try {
       await deletePrecio(precio.id)
-    } catch (err: any) {
-      setFormError(err.message || 'Error al eliminar el precio')
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'message' in err) {
+        setFormError((err as { message?: string }).message || 'Error al eliminar el precio')
+      } else {
+        setFormError('Error al eliminar el precio')
+      }
     } finally {
       setFormLoading(false)
     }
@@ -50,15 +54,16 @@ const PriceHistorySection = ({ alumnoId }: PriceHistorySectionProps) => {
     setFormLoading(true)
     setFormError(null)
     try {
-      let dataToSend = { ...data }
-      if (alumnoId) {
-        dataToSend.alumnoId = alumnoId
-      }
+      const dataToSend = alumnoId ? { ...data, alumnoId } : { ...data }
       await (editData ? updatePrecio((editData as HistorialPrecio).id, dataToSend) : createPrecio(dataToSend))
       setShowForm(false)
       setEditData(null)
-    } catch (err: any) {
-      setFormError(err.message || 'Error al guardar el precio')
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'message' in err) {
+        setFormError((err as { message?: string }).message || 'Error al guardar el precio')
+      } else {
+        setFormError('Error al guardar el precio')
+      }
     } finally {
       setFormLoading(false)
     }

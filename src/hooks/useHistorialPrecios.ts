@@ -6,8 +6,7 @@ import {
   OrderParams, 
   DateRangeParams,
   handleDatabaseError,
-  validateDateRange,
-  formatDate
+  validateDateRange
 } from '@/utils'
 import type { HistorialPrecio, EstadisticasPrecios } from '@/types'
 import { historialPreciosService } from '@/services/historialPrecios'
@@ -66,7 +65,7 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): U
       }
       setLoading(true)
       setError(null)
-      const { data: precios, totalPages } = await historialPreciosService.getHistorialPrecios({
+      const { data: precios } = await historialPreciosService.getHistorialPrecios({
         page,
         perPage: pageSize,
         orderBy: orderBy as keyof import('@/types/supabase').HistorialPrecios,

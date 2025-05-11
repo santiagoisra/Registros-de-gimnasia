@@ -86,7 +86,12 @@ export default function ReporteGeneral() {
         .gte('periodo_hasta', fechaInicioStr)
 
       const idsAlDia = Array.from(new Set((pagosAlDia || [])
-        .map((p: any) => p.alumno_id)
+        .map((p: unknown) => {
+          if (typeof p === 'object' && p !== null && 'alumno_id' in p) {
+            return (p as { alumno_id: string }).alumno_id
+          }
+          return undefined
+        })
         .filter(Boolean)))
 
       let pagosPendientes = 0

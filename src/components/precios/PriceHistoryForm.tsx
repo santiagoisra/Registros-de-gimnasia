@@ -58,7 +58,7 @@ export default function PriceHistoryForm({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target
-    let newValue: any = value
+    let newValue: string | boolean = value
     if (type === 'checkbox' && e.target instanceof HTMLInputElement) {
       newValue = e.target.checked
     }
@@ -91,8 +91,12 @@ export default function PriceHistoryForm({
     }
     try {
       await onSubmit(form)
-    } catch (err: any) {
-      setFormError(err.message || 'Error al guardar el precio')
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'message' in err) {
+        setFormError((err as { message?: string }).message || 'Error al guardar el precio')
+      } else {
+        setFormError('Error al guardar el precio')
+      }
     }
   }
 

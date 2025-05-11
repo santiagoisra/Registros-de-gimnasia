@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '@/lib/supabase'
-import type { Shift } from '@/types/supabase'
 
 // GET /api/shifts - listar todos los turnos
 export async function GET() {

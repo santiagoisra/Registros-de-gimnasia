@@ -2,25 +2,32 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import '@testing-library/jest-dom'
 import { AsistenciasList } from '../AsistenciasList'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { useAsistencias } from '@/hooks/useAsistencias'
 
 jest.mock('@/components/ui/Spinner', () => ({ Spinner: () => <div data-testid="spinner">Cargando...</div> }))
-jest.mock('@/components/ui/Alert', () => ({ Alert: ({ children }: any) => <div data-testid="alert">{children}</div> }))
+jest.mock('@/components/ui/Alert', () => ({ Alert: ({ children }: { children: React.ReactNode }) => <div data-testid="alert">{children}</div> }))
 
 const baseAsistencias = [
   {
     id: '1',
-    alumno: { nombre: 'Juan', apellido: 'Pérez' },
+    created_at: '2024-05-10T10:00:00Z',
+    updated_at: '2024-05-10T10:00:00Z',
+    alumno_id: 'alumno1',
     fecha: '2024-05-10',
-    estado: 'presente',
-    sede: 'Plaza Arenales',
+    sede: 'Plaza Arenales' as const,
+    estado: 'presente' as const,
+    alumno: { nombre: 'Juan', apellido: 'Pérez', id: 'alumno1', created_at: '', email: '', telefono: '', sede: 'Plaza Arenales' as const, activo: true },
     notas: 'Llegó puntual'
   },
   {
     id: '2',
-    alumno: { nombre: 'Ana', apellido: 'García' },
+    created_at: '2024-05-10T10:00:00Z',
+    updated_at: '2024-05-10T10:00:00Z',
+    alumno_id: 'alumno2',
     fecha: '2024-05-10',
-    estado: 'ausente',
-    sede: 'Plaza Terán',
+    sede: 'Plaza Terán' as const,
+    estado: 'ausente' as const,
+    alumno: { nombre: 'Ana', apellido: 'García', id: 'alumno2', created_at: '', email: '', telefono: '', sede: 'Plaza Terán' as const, activo: true },
     notas: ''
   }
 ]
@@ -28,7 +35,8 @@ const baseAsistencias = [
 jest.mock('@/hooks/useAsistencias', () => ({
   useAsistencias: jest.fn()
 }))
-const { useAsistencias } = require('@/hooks/useAsistencias')
+
+const mockedUseAsistencias = jest.mocked(useAsistencias)
 
 function renderWithQueryClient(ui: React.ReactElement) {
   const queryClient = new QueryClient()
@@ -64,9 +72,10 @@ describe('AsistenciasList', () => {
   })
 
   it('renderiza asistencias y resumen', async () => {
-    useAsistencias.mockReturnValue({
+    mockedUseAsistencias.mockReturnValue({
       asistencias: baseAsistencias,
       totalPages: 1,
+      estadisticas: undefined,
       loading: false,
       error: null,
       actualizarAsistencia: jest.fn(),
@@ -84,22 +93,23 @@ describe('AsistenciasList', () => {
   })
 
   it('muestra loading', () => {
-    useAsistencias.mockReturnValue({ asistencias: [], loading: true, error: null })
+    mockedUseAsistencias.mockReturnValue({ asistencias: [], totalPages: 1, estadisticas: undefined, loading: true, error: null, actualizarAsistencia: jest.fn(), crearAsistencia: jest.fn(), eliminarAsistencia: jest.fn(), obtenerAsistenciasPorPeriodo: jest.fn() })
     renderWithQueryClient(<AsistenciasList />)
     expect(screen.getByTestId('spinner')).toBeInTheDocument()
   })
 
   it('muestra error', () => {
-    useAsistencias.mockReturnValue({ asistencias: [], loading: false, error: { message: 'Error de conexión' } })
+    mockedUseAsistencias.mockReturnValue({ asistencias: [], totalPages: 1, estadisticas: undefined, loading: false, error: { name: 'Error', message: 'Error de conexión' }, actualizarAsistencia: jest.fn(), crearAsistencia: jest.fn(), eliminarAsistencia: jest.fn(), obtenerAsistenciasPorPeriodo: jest.fn() })
     renderWithQueryClient(<AsistenciasList />)
     expect(screen.getByTestId('alert')).toHaveTextContent('Error de conexión')
   })
 
   it('permite alternar estado de asistencia', async () => {
     const actualizarAsistencia = jest.fn()
-    useAsistencias.mockReturnValue({
+    mockedUseAsistencias.mockReturnValue({
       asistencias: [baseAsistencias[0]],
       totalPages: 1,
+      estadisticas: undefined,
       loading: false,
       error: null,
       actualizarAsistencia,

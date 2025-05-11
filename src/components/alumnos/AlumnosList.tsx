@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline'
 import { toast } from 'react-hot-toast'
 import type { Alumno, Shift } from '@/types'
@@ -18,15 +18,7 @@ export default function AlumnosList() {
   const [totalPages, setTotalPages] = useState(1)
   const perPage = 10
 
-  useEffect(() => {
-    cargarAlumnos()
-    fetch('/api/shifts')
-      .then(res => res.json())
-      .then(data => setShifts(data))
-      .catch(() => setShifts([]))
-  }, [shiftFilter, page])
-
-  const cargarAlumnos = async () => {
+  const cargarAlumnos = useCallback(async () => {
     setLoading(true)
     try {
       const { data, totalPages } = await alumnosService.getAlumnos({
@@ -42,7 +34,15 @@ export default function AlumnosList() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [page, perPage, shiftFilter])
+
+  useEffect(() => {
+    cargarAlumnos()
+    fetch('/api/shifts')
+      .then(res => res.json())
+      .then(data => setShifts(data))
+      .catch(() => setShifts([]))
+  }, [shiftFilter, page, cargarAlumnos])
 
   const handleEliminar = async (id: string) => {
     if (!confirm('¿Estás seguro de que deseas eliminar este alumno?')) return
