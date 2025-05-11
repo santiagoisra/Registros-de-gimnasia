@@ -1,9 +1,5 @@
 {
   "/configuracion/turnos/page": "app/configuracion/turnos/page.js",
   "/reportes/page": "app/reportes/page.js",
-  "/api/shifts/route": "app/api/shifts/route.js",
-  "/alumnos/page": "app/alumnos/page.js",
-  "/asistencias/page": "app/asistencias/page.js",
-  "/configuracion/historial-precios/page": "app/configuracion/historial-precios/page.js",
   "/page": "app/page.js"
 }

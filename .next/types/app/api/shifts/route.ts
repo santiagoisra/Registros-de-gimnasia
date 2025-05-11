@@ -1,4 +1,4 @@
-// File: D:\GitHub\Registros-de-gimnasia\src\app\api\shifts\route.ts
+// File: /Users/santiago/Documents/GitHub/Registros-de-gimnasia/src/app/api/shifts/route.ts
 import * as entry from '../../../../../src/app/api/shifts/route.js'
 import type { NextRequest } from 'next/server.js'
 
