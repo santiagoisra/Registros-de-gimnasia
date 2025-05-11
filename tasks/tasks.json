@@ -436,9 +436,65 @@
       "description": "Create and execute comprehensive end-to-end tests for all core functionalities of the student management system with the new data structure, including student management, attendance tracking, payments, grades, and pricing.",
       "details": "This task involves creating automated end-to-end tests that validate the complete workflow of the student management system after the data structure changes. The tests should cover:\n\n1. Student Management:\n   - Creating new student profiles with all required fields\n   - Editing existing student information (contact details, enrollment status, etc.)\n   - Viewing student details and verifying data accuracy\n   - Searching and filtering students by different criteria\n\n2. Attendance Tracking:\n   - Recording new attendance entries\n   - Modifying existing attendance records\n   - Viewing attendance reports and statistics\n   - Testing attendance batch operations if applicable\n\n3. Payment Processing:\n   - Creating new payment records\n   - Editing payment information\n   - Generating payment receipts\n   - Viewing payment history and outstanding balances\n\n4. Grade Management:\n   - Entering new grades for students\n   - Modifying existing grade entries\n   - Calculating averages and final grades\n   - Generating grade reports\n\n5. Pricing System:\n   - Creating and updating price structures\n   - Applying different pricing rules to students\n   - Testing discount mechanisms\n   - Verifying price calculations\n\nEach test should verify both the UI interactions and the correct persistence of data in the backend with the new data structure. Tests should also validate proper error handling and edge cases.",
       "testStrategy": "Implement the testing strategy using the following approach:\n\n1. Setup:\n   - Create a dedicated test environment with the new data structure\n   - Prepare test data sets covering various scenarios\n   - Implement UI automation using a framework like Cypress, Selenium, or Playwright\n\n2. Test Execution Plan:\n   - Create happy path tests for each core functionality\n   - Develop negative test cases to verify proper error handling\n   - Implement cross-functional tests that span multiple modules\n\n3. Specific Test Cases:\n   - Student CRUD: Create a new student → Edit their information → Verify in listing → View details\n   - Attendance Flow: Create student → Record attendance → Edit attendance → View attendance report\n   - Payment Process: Create student → Add payment → Generate receipt → Verify payment history\n   - Grade Management: Create student → Add grades → Calculate averages → Generate report\n   - Pricing Tests: Create price structure → Assign to student → Verify calculations → Test discounts\n\n4. Validation Methods:\n   - Visual verification of UI elements and data presentation\n   - Database queries to confirm data is correctly stored with the new structure\n   - API response validation for backend operations\n   - Cross-reference tests to ensure data consistency across different views\n\n5. Reporting:\n   - Document all test results with screenshots\n   - Create a detailed report highlighting any issues found\n   - Categorize issues by severity and module\n\nAll tests should be automated where possible to allow for regression testing in future updates.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [],
-      "priority": "medium"
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Set Up E2E Testing Framework and Environment",
+          "description": "Configure and set up the end-to-end testing framework (such as Cypress or Playwright) with the necessary environment configurations, test utilities, and helper functions for the student management system.",
+          "dependencies": [],
+          "details": "1. Select and install an appropriate E2E testing framework (Cypress or Playwright recommended)\n2. Configure the testing environment to connect to a test database\n3. Create base test utilities for common operations (login, navigation, etc.)\n4. Set up test data generation helpers for creating test students, courses, etc.\n5. Implement screenshot and logging capabilities for test failures\n6. Create a CI/CD pipeline configuration for automated test execution",
+          "status": "done",
+          "testStrategy": "Verify the testing framework installation by creating a simple smoke test that logs into the system and confirms the dashboard loads correctly."
+        },
+        {
+          "id": 2,
+          "title": "Implement Student Management E2E Tests",
+          "description": "Create comprehensive end-to-end tests for all student management functionality including creating, editing, viewing, and searching for student profiles with the new data structure.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Create tests for student profile creation with all required fields\n2. Implement tests for editing existing student information\n3. Develop tests for viewing student details and verifying data accuracy\n4. Create tests for searching and filtering students by various criteria\n5. Test validation rules and error handling for student data\n6. Verify that all student data is correctly persisted in the database",
+          "status": "done",
+          "testStrategy": "Use data-driven testing to verify multiple student scenarios. Include edge cases such as students with special characters in names, maximum field lengths, and required field validation."
+        },
+        {
+          "id": 3,
+          "title": "Implement Attendance and Grade Management E2E Tests",
+          "description": "Create end-to-end tests for the attendance tracking and grade management modules, verifying all core functionality works correctly with the new data structure.",
+          "dependencies": [
+            2
+          ],
+          "details": "1. Create tests for recording new attendance entries for individual and multiple students\n2. Implement tests for modifying existing attendance records\n3. Test attendance reporting features and statistics calculations\n4. Create tests for entering new grades and assessments\n5. Implement tests for grade calculation, averaging, and final grade generation\n6. Test grade report generation and verify data accuracy\n7. Verify proper error handling for invalid inputs in both modules",
+          "status": "done",
+          "testStrategy": "Use test fixtures to create baseline student data. Test both individual and batch operations. Verify calculations match expected results for different grading scenarios."
+        },
+        {
+          "id": 4,
+          "title": "Implement Payment Processing E2E Tests",
+          "description": "Create end-to-end tests for the payment processing module, including creating payments, editing payment information, generating receipts, and viewing payment history with the new data structure.",
+          "dependencies": [
+            2
+          ],
+          "details": "1. Create tests for recording new payment transactions\n2. Implement tests for editing payment information\n3. Test receipt generation and verify content accuracy\n4. Create tests for viewing payment history and outstanding balance calculations\n5. Test payment validation rules and error handling\n6. Verify payment data is correctly persisted and reflected in student accounts\n7. Test payment search and filtering functionality",
+          "status": "done",
+          "testStrategy": "Use test data with various payment scenarios including full payments, partial payments, and payments with different methods. Verify receipt generation and balance calculations for accuracy."
+        },
+        {
+          "id": 5,
+          "title": "Implement Pricing System E2E Tests and Integration Test Suite",
+          "description": "Create end-to-end tests for the pricing system and develop an integration test suite that tests complete workflows across all modules of the student management system.",
+          "dependencies": [
+            3,
+            4
+          ],
+          "details": "1. Create tests for creating and updating price structures\n2. Implement tests for applying different pricing rules to students\n3. Test discount mechanisms and verify calculations\n4. Create end-to-end workflow tests that cover complete student journeys\n5. Implement tests for cross-module interactions (e.g., how payments affect attendance eligibility)\n6. Create regression test suite that can be run automatically\n7. Document test coverage and results reporting",
+          "status": "done",
+          "testStrategy": "Test complex pricing scenarios with different discount types and student categories. For integration tests, create complete workflows that simulate real user journeys from student creation through attendance, payments, and grade management."
+        }
+      ]
     },
     {
       "id": 15,

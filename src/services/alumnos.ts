@@ -145,7 +145,9 @@ export const alumnosService = {
           activo: data.activo ?? true,
           alertas_activas: data.alertas_activas,
           estado_pago: data.estado_pago,
-          shift_id: data.shift_id
+          shift_id: data.shift_id,
+          fecha_ultima_asistencia: data.fecha_ultima_asistencia,
+          dias_consecutivos_asistencia: data.dias_consecutivos_asistencia
         }])
         .select()
         .single()

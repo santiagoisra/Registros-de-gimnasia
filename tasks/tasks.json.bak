@@ -436,7 +436,7 @@
       "description": "Create and execute comprehensive end-to-end tests for all core functionalities of the student management system with the new data structure, including student management, attendance tracking, payments, grades, and pricing.",
       "details": "This task involves creating automated end-to-end tests that validate the complete workflow of the student management system after the data structure changes. The tests should cover:\n\n1. Student Management:\n   - Creating new student profiles with all required fields\n   - Editing existing student information (contact details, enrollment status, etc.)\n   - Viewing student details and verifying data accuracy\n   - Searching and filtering students by different criteria\n\n2. Attendance Tracking:\n   - Recording new attendance entries\n   - Modifying existing attendance records\n   - Viewing attendance reports and statistics\n   - Testing attendance batch operations if applicable\n\n3. Payment Processing:\n   - Creating new payment records\n   - Editing payment information\n   - Generating payment receipts\n   - Viewing payment history and outstanding balances\n\n4. Grade Management:\n   - Entering new grades for students\n   - Modifying existing grade entries\n   - Calculating averages and final grades\n   - Generating grade reports\n\n5. Pricing System:\n   - Creating and updating price structures\n   - Applying different pricing rules to students\n   - Testing discount mechanisms\n   - Verifying price calculations\n\nEach test should verify both the UI interactions and the correct persistence of data in the backend with the new data structure. Tests should also validate proper error handling and edge cases.",
       "testStrategy": "Implement the testing strategy using the following approach:\n\n1. Setup:\n   - Create a dedicated test environment with the new data structure\n   - Prepare test data sets covering various scenarios\n   - Implement UI automation using a framework like Cypress, Selenium, or Playwright\n\n2. Test Execution Plan:\n   - Create happy path tests for each core functionality\n   - Develop negative test cases to verify proper error handling\n   - Implement cross-functional tests that span multiple modules\n\n3. Specific Test Cases:\n   - Student CRUD: Create a new student → Edit their information → Verify in listing → View details\n   - Attendance Flow: Create student → Record attendance → Edit attendance → View attendance report\n   - Payment Process: Create student → Add payment → Generate receipt → Verify payment history\n   - Grade Management: Create student → Add grades → Calculate averages → Generate report\n   - Pricing Tests: Create price structure → Assign to student → Verify calculations → Test discounts\n\n4. Validation Methods:\n   - Visual verification of UI elements and data presentation\n   - Database queries to confirm data is correctly stored with the new structure\n   - API response validation for backend operations\n   - Cross-reference tests to ensure data consistency across different views\n\n5. Reporting:\n   - Document all test results with screenshots\n   - Create a detailed report highlighting any issues found\n   - Categorize issues by severity and module\n\nAll tests should be automated where possible to allow for regression testing in future updates.",
-      "status": "pending",
+      "status": "in-progress",
       "dependencies": [],
       "priority": "medium"
     },
@@ -843,7 +843,72 @@
       "status": "pending",
       "dependencies": [],
       "priority": "medium",
-      "subtasks": []
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Design and implement database schema for location management",
+          "description": "Create the database schema to support location management functionality, including tables, relationships, and constraints to ensure data integrity with existing shifts and attendance records.",
+          "dependencies": [],
+          "details": "Create a 'locations' table with fields for id, name, address, status (active/inactive), and timestamps. Add foreign key constraints to prevent deletion of locations with associated records. Update existing tables that reference locations to use the new schema. Implement database migrations to safely deploy these changes.",
+          "status": "pending",
+          "testStrategy": "Write unit tests for database migrations. Create test cases for constraint validation to ensure locations with associated records cannot be deleted."
+        },
+        {
+          "id": 2,
+          "title": "Develop RESTful API endpoints for location CRUD operations",
+          "description": "Implement backend API endpoints that allow for creating, reading, updating, and deleting locations with proper validation, error handling, and success responses.",
+          "dependencies": [
+            1
+          ],
+          "details": "Create the following endpoints: GET /api/locations (list), GET /api/locations/:id (detail), POST /api/locations (create), PUT /api/locations/:id (update), and DELETE /api/locations/:id (delete). Implement validation logic to prevent deletion of locations with associated shifts or attendance records. Return appropriate HTTP status codes and error messages. Document API using OpenAPI/Swagger.",
+          "status": "pending",
+          "testStrategy": "Write integration tests for each endpoint covering success and error cases. Test validation rules, especially for delete operations with existing dependencies."
+        },
+        {
+          "id": 3,
+          "title": "Build mobile-first UI components for location management",
+          "description": "Create reusable UI components for the location management interface following the existing design system with a focus on mobile-first design.",
+          "dependencies": [],
+          "details": "Develop the following components: LocationList (with search/filter), LocationForm (for create/edit), LocationDetail, and confirmation dialogs. Ensure responsive design with appropriate layouts for mobile and desktop. Implement loading states, error states, and empty states for all components. Use the existing design system for consistency.",
+          "status": "pending",
+          "testStrategy": "Create component tests for all UI elements. Test responsive behavior across different viewport sizes. Conduct usability testing on mobile devices."
+        },
+        {
+          "id": 4,
+          "title": "Implement location management screens and workflows",
+          "description": "Integrate the UI components into complete screens and implement the user workflows for creating, viewing, editing, and deleting locations.",
+          "dependencies": [
+            2,
+            3
+          ],
+          "details": "Create screens for location listing, detail view, creation form, and edit form. Implement navigation between these screens. Add confirmation dialogs for destructive actions with clear warnings about data dependencies. Implement form validation with helpful error messages. Ensure all actions provide visual feedback (loading indicators, success/error messages).",
+          "status": "pending",
+          "testStrategy": "Write end-to-end tests for complete workflows. Test form validation, error handling, and success paths."
+        },
+        {
+          "id": 5,
+          "title": "Update existing forms and filters to use the location management system",
+          "description": "Modify all existing components that use location data to integrate with the new location management system and reflect changes in real-time.",
+          "dependencies": [
+            4
+          ],
+          "details": "Identify all forms, filters, and dropdowns that use location data. Update these components to fetch data from the new API endpoints. Implement real-time updates using appropriate state management patterns. Ensure consistent UI for location selection across the application. Update any hardcoded location references.",
+          "status": "pending",
+          "testStrategy": "Test integration points between the location system and existing components. Verify real-time updates work correctly when location data changes."
+        },
+        {
+          "id": 6,
+          "title": "Implement access control and create documentation",
+          "description": "Add proper access control to restrict location management to authorized administrators and create comprehensive documentation for the system.",
+          "dependencies": [
+            4,
+            5
+          ],
+          "details": "Implement role-based access control for location management features. Create API documentation detailing endpoints, request/response formats, and error codes. Write user documentation explaining the location management workflow with screenshots. Document validation rules, constraints, and the impact on related system components. Include troubleshooting information for common issues.",
+          "status": "pending",
+          "testStrategy": "Test access control by attempting operations with different user roles. Review documentation for completeness and accuracy with stakeholders."
+        }
+      ]
     }
   ],
   "metadata": {
