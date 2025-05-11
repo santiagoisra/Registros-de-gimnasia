@@ -1,6 +1,6 @@
 # Task ID: 25
 # Title: Task #25: Enhance Attendance Dashboard with Mobile-Optimized Interface and Efficient Marking Features
-# Status: pending
+# Status: done
 # Dependencies: None
 # Priority: high
 # Description: Redesign the attendance dashboard to provide a more efficient user experience with one-touch attendance marking, location/shift filtering, mobile optimization, visual indicators, and multi-student selection capabilities.
@@ -266,4 +266,76 @@ Modified files:
 
 The implementation is now ready for testing and visual feedback review.
 </info added on 2025-05-11T02:49:37.006Z>
+
+## 8. Ronda de revisión y fix de bug crítico: asistencias no visibles por filtros [done]
+### Dependencies: None
+### Description: Revisar y corregir el bug donde no se muestran asistencias en el dashboard aunque existan registros. Incluir:
+- Diagnóstico de los filtros activos y query
+- Fix: pasar correctamente el filtro de estado a useAsistencias y query
+- Mejorar mensaje UX cuando no hay resultados y hay filtros activos
+- Agregar botón para limpiar filtros
+- Loggear filtros activos para debug
+- QA manual sugerido: probar combinaciones de filtros, limpiar filtros, cambiar fecha, validar mensaje contextual.
+### Details:
+- Se detectó que el filtro de estado no se pasaba a la query, lo que podía ocultar asistencias si el usuario seleccionaba "presente" o "ausente".
+- Se agregó el filtro de estado correctamente a useAsistencias y a la query de Supabase.
+- Se mejoró la UX agregando un botón "Limpiar filtros" y un mensaje contextual cuando no hay resultados y hay filtros activos.
+- Se loggean los filtros activos en consola para debug.
+- Se corrigió el tipado en el hook para evitar errores de linter.
+
+QA manual sugerido:
+- Probar con diferentes combinaciones de filtros (fecha, sede, turno, estado).
+- Verificar que al limpiar filtros aparecen asistencias históricas.
+- Si la fecha es hoy y no hay asistencias, probar cambiar la fecha y ver que aparecen registros.
+- Confirmar que el mensaje de ayuda aparece solo cuando hay filtros activos.
+
+La funcionalidad ahora muestra correctamente las asistencias según los filtros y mejora la experiencia de usuario.
+
+## 9. UX: Formulario mobile-first, turno automático y un toque para asistencia [done]
+### Dependencies: None
+### Description: Refactorizar el formulario de asistencias para que:
+- Muestre el turno asignado automáticamente al seleccionar un alumno (solo lectura, no editable)
+- Si el alumno no tiene turno, mostrar mensaje aclaratorio
+- El formulario sea mobile-first
+- Permitir marcar asistencia con un solo toque (botones grandes para presente/ausente, no dropdown)
+- Documentar el cambio y el motivo (UX, velocidad, claridad)
+- QA: probar en mobile y desktop, con y sin turno asignado
+### Details:
+El formulario anterior requería seleccionar estado por dropdown y no mostraba el turno del alumno. Ahora:
+- Se obtiene el turno (shift) del alumno y se muestra automáticamente
+- Si no tiene turno, se informa
+- Se reemplaza el dropdown de estado por dos botones grandes (Presente/Ausente) para UX mobile
+- Se mantiene la validación y feedback visual
+- Se documenta el cambio en Taskmaster y se recomienda QA manual en mobile y desktop
+
+## 10. Fix filtro por estado y UX de resumen en AsistenciasList [done]
+### Dependencies: None
+### Description: Corregir el filtro por estado y el resumen de presentes/ausentes en la lista de asistencias:
+- El resumen solo debe mostrarse si hay asistencias en la lista (coincidencias con el filtro)
+- Si no hay coincidencias, mostrar mensaje contextual claro
+- Revisar que el filtro por estado funcione correctamente y el select aplique el filtro
+- Documentar el fix y el motivo (evitar confusión de usuarios y mostrar datos reales)
+### Details:
+Antes:
+- El resumen de presentes/ausentes se mostraba aunque no hubiera coincidencias, lo que confundía al usuario
+- El mensaje de "No hay asistencias" no era claro si había filtros activos
+Ahora:
+- El resumen solo aparece si hay asistencias en la lista
+- Si no hay coincidencias, se muestra "No hay coincidencias para los filtros aplicados. Prueba cambiando la fecha o limpiando los filtros."
+- El filtro por estado se aplica correctamente y el select funciona bien
+- Documentado en Taskmaster para trazabilidad y QA manual
+
+## 11. Fix filtro por turno y fecha en asistencias (backend y frontend) [done]
+### Dependencies: None
+### Description: Corregir el filtrado por turno y fecha en la consulta de asistencias:
+- En el servicio, asegurar que al filtrar por turno también se filtre por fecha
+- Filtrar asistencias sin alumno en el backend y frontend
+- Validar que el filtro de fecha funcione correctamente y no muestre registros de otras fechas
+- Documentar el fix y el motivo (evitar filas vacías y datos inconsistentes)
+### Details:
+- En `getAsistencias` del servicio, si hay shiftId, también se filtra por fecha
+- Se filtran asistencias sin alumno antes de devolver al frontend
+- En el frontend, solo se renderizan filas con alumno
+- QA: probar combinaciones de fecha y turno, y que nunca aparezcan filas vacías ni registros de fechas incorrectas
+- Motivo: evitar confusión y mostrar solo datos válidos al usuario
 

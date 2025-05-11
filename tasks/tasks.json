@@ -374,7 +374,7 @@
       "description": "Enhance existing forms and components to support new fields including alert activation/deactivation, payment status display, price history management, and notes functionality.",
       "details": "This task involves updating the UI components and their underlying logic to handle several new fields:\n\n1. Alert Management:\n   - Add toggle controls for activating/deactivating alerts\n   - Implement validation logic for alert settings\n   - Ensure alert state is properly persisted to the database\n\n2. Payment Status Display:\n   - Create a visual indicator showing current payment status\n   - Implement color-coding based on status (paid, pending, overdue)\n   - Add tooltips with payment details on hover\n   - NOTE: Payment form testing is dependent on the student creation form being completed first\n\n3. Price History Management:\n   - Develop a collapsible section to display historical prices\n   - Add functionality to add new price points with effective dates\n   - Implement sorting and filtering of price history entries\n\n4. Notes Functionality:\n   - Add rich text editor for notes\n   - Implement auto-save functionality for notes\n   - Add timestamp and user attribution for note entries\n\nEnsure all new fields are properly bound to the data models and that changes are correctly persisted. Update any relevant validation rules and error messages. Maintain responsive design across all device sizes.",
       "testStrategy": "Testing should cover the following areas:\n\n1. Unit Tests:\n   - Verify each new field component renders correctly\n   - Test validation logic for all new input fields\n   - Ensure proper state management for toggles and selectors\n\n2. Integration Tests:\n   - Confirm data is correctly saved to and retrieved from the backend\n   - Test the interaction between related components (e.g., price history affecting payment status)\n   - Verify form submission with various combinations of the new fields\n   - IMPORTANT: Payment form testing must be postponed until the student creation form is completed and at least one student exists in the system\n\n3. UI/UX Testing:\n   - Validate responsive behavior on mobile, tablet, and desktop views\n   - Ensure accessibility standards are met for all new components\n   - Test keyboard navigation through the new form elements\n\n4. Edge Cases:\n   - Test with empty/null values for optional fields\n   - Verify behavior with extremely long text inputs\n   - Test performance with large datasets (especially for price history)\n\n5. Dependencies:\n   - Payment functionality testing is blocked until student creation is implemented\n   - Create test students in the system before attempting to test the payment workflow\n\nManual testing should include verification that all new fields appear correctly in both create and edit modes, and that data persistence works as expected across page refreshes and user sessions.",
-      "status": "in-progress",
+      "status": "done",
       "dependencies": [],
       "priority": "medium",
       "subtasks": [
@@ -682,7 +682,7 @@
       "description": "Redesign the attendance dashboard to provide a more efficient user experience with one-touch attendance marking, location/shift filtering, mobile optimization, visual indicators, and multi-student selection capabilities.",
       "details": "The attendance dashboard enhancement should include the following key components:\n\n1. One-Touch Attendance Marking:\n   - Implement a simple tap/click mechanism to toggle student attendance status\n   - Ensure the action is confirmed visually with minimal latency\n   - Add undo functionality for accidental marks\n\n2. Location and Shift Filtering:\n   - Create dropdown selectors for location (sede) and shift (turno)\n   - Implement real-time filtering of student lists based on selections\n   - Add search functionality to quickly find specific students\n   - Ensure filters persist across sessions for user convenience\n\n3. Mobile Interface Optimization:\n   - Implement responsive design principles for all screen sizes\n   - Optimize touch targets for mobile devices (minimum 44x44px)\n   - Reduce unnecessary UI elements on smaller screens\n   - Implement progressive loading for faster initial rendering\n   - Ensure text is readable without zooming on mobile devices\n\n4. Visual Attendance Status Indicators:\n   - Design clear, accessible color coding for attendance states (present, absent, excused, late)\n   - Add icons alongside colors for better accessibility\n   - Implement status counters/summaries at the top of the dashboard\n   - Consider adding tooltips for additional status information\n\n5. Touch Gestures Implementation:\n   - Add swipe gestures for marking/unmarking attendance on mobile\n   - Implement long-press for additional attendance options (late, excused)\n   - Ensure gestures have visual feedback and are discoverable\n\n6. Multi-Student Selection:\n   - Add checkbox or multi-select mode for batch operations\n   - Implement \"select all\" and \"select by criteria\" options\n   - Create batch actions menu for selected students\n   - Ensure clear visual indication of selected students\n\n7. Date and Shift Navigation:\n   - Implement an intuitive date picker with quick navigation to today\n   - Add previous/next day navigation buttons\n   - Create a calendar view for seeing attendance patterns\n   - Allow quick switching between shifts without reloading the entire page\n\nTechnical Considerations:\n- Use React hooks for state management\n- Implement optimistic UI updates for immediate feedback\n- Consider using virtualized lists for performance with large student counts\n- Ensure all new features work with the existing Supabase backend\n- Maintain accessibility standards throughout the implementation\n- Add appropriate loading states and error handling",
       "testStrategy": "Testing for the enhanced attendance dashboard should follow a comprehensive approach:\n\n1. Unit Testing:\n   - Test individual components (filters, buttons, attendance markers)\n   - Verify state management for attendance status changes\n   - Test filter logic for location and shift combinations\n   - Validate gesture recognition functions in isolation\n\n2. Integration Testing:\n   - Verify that filters correctly update the student list\n   - Test that attendance marking properly updates the database\n   - Ensure multi-select functionality works with batch operations\n   - Validate that navigation between dates preserves other settings\n\n3. Mobile Responsiveness Testing:\n   - Test on multiple device sizes (phone, tablet, desktop)\n   - Verify touch targets are appropriately sized on mobile\n   - Test all gesture interactions on actual mobile devices\n   - Validate that the interface remains usable at all breakpoints\n\n4. Performance Testing:\n   - Measure load times with varying numbers of students\n   - Test response time for attendance marking actions\n   - Verify smooth scrolling with large student lists\n   - Measure and optimize network requests\n\n5. User Acceptance Testing:\n   - Create specific scenarios for testers to complete:\n     * Mark attendance for a specific student\n     * Filter students by location and shift\n     * Mark multiple students as present simultaneously\n     * Navigate between different dates\n   - Collect feedback on intuitiveness and efficiency\n\n6. Accessibility Testing:\n   - Verify color contrast meets WCAG standards\n   - Test keyboard navigation for all features\n   - Ensure screen readers can interpret attendance status changes\n   - Validate that all interactive elements have appropriate ARIA attributes\n\n7. Cross-Browser Testing:\n   - Verify functionality in Chrome, Firefox, Safari, and Edge\n   - Test on both iOS and Android mobile browsers\n\n8. Regression Testing:\n   - Ensure existing functionality continues to work\n   - Verify integration with the student management system\n   - Test compatibility with the shift management system from Task #24\n\nDocumentation for testing should include screenshots of the interface at various stages and detailed steps to reproduce each test scenario.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [],
       "priority": "high",
       "subtasks": [
@@ -762,6 +762,42 @@
           "details": "Integrate a date picker component with custom styling. Add previous/next day navigation buttons. Implement a calendar view showing attendance summary per day. Create shift tabs for quick switching without full page reload. Use React context to manage date/shift state across components. Add visual indicators for days with attendance issues in the calendar view.\n<info added on 2025-05-11T02:49:37.006Z>\nIntegrate a date picker component with custom styling. Add previous/next day navigation buttons. Implement a calendar view showing attendance summary per day. Create shift tabs for quick switching without full page reload. Use React context to manage date/shift state across components. Add visual indicators for days with attendance issues in the calendar view.\n\nImplementation of the date and shift navigation system has been completed with a mobile-first approach:\n\n1. Date Navigation:\n   - Added a date selector component with intuitive controls\n   - Implemented navigation buttons for previous day, next day, and return to current day\n   - Ensured all date controls are fully accessible and mobile-optimized\n   - Date selection is visually consistent with existing UI elements\n\n2. Shift Management:\n   - Created tab interface above the attendance list for quick shift switching\n   - Tabs display only active shifts for the selected date\n   - Implemented state management to maintain selection and filter synchronization when switching shifts\n   - Shift changes occur without requiring full page reloads\n\n3. Data Integration:\n   - Successfully connected date filter to the useAsistencias hook and asistencias service\n   - Implemented filtering logic to display only attendance records for the selected date\n   - Optimized data fetching to minimize unnecessary API calls\n\nModified files:\n- src/components/asistencias/AsistenciasList.tsx\n- src/hooks/useAsistencias.ts\n- src/services/asistencias.ts\n\nThe implementation is now ready for testing and visual feedback review.\n</info added on 2025-05-11T02:49:37.006Z>",
           "status": "done",
           "testStrategy": "Test date navigation for correct data loading. Verify shift switching maintains other filter states. Test calendar view for accurate attendance summaries. Check performance with date range changes."
+        },
+        {
+          "id": 8,
+          "title": "Ronda de revisión y fix de bug crítico: asistencias no visibles por filtros",
+          "description": "Revisar y corregir el bug donde no se muestran asistencias en el dashboard aunque existan registros. Incluir:\n- Diagnóstico de los filtros activos y query\n- Fix: pasar correctamente el filtro de estado a useAsistencias y query\n- Mejorar mensaje UX cuando no hay resultados y hay filtros activos\n- Agregar botón para limpiar filtros\n- Loggear filtros activos para debug\n- QA manual sugerido: probar combinaciones de filtros, limpiar filtros, cambiar fecha, validar mensaje contextual.",
+          "details": "- Se detectó que el filtro de estado no se pasaba a la query, lo que podía ocultar asistencias si el usuario seleccionaba \"presente\" o \"ausente\".\n- Se agregó el filtro de estado correctamente a useAsistencias y a la query de Supabase.\n- Se mejoró la UX agregando un botón \"Limpiar filtros\" y un mensaje contextual cuando no hay resultados y hay filtros activos.\n- Se loggean los filtros activos en consola para debug.\n- Se corrigió el tipado en el hook para evitar errores de linter.\n\nQA manual sugerido:\n- Probar con diferentes combinaciones de filtros (fecha, sede, turno, estado).\n- Verificar que al limpiar filtros aparecen asistencias históricas.\n- Si la fecha es hoy y no hay asistencias, probar cambiar la fecha y ver que aparecen registros.\n- Confirmar que el mensaje de ayuda aparece solo cuando hay filtros activos.\n\nLa funcionalidad ahora muestra correctamente las asistencias según los filtros y mejora la experiencia de usuario.",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 25
+        },
+        {
+          "id": 9,
+          "title": "UX: Formulario mobile-first, turno automático y un toque para asistencia",
+          "description": "Refactorizar el formulario de asistencias para que:\n- Muestre el turno asignado automáticamente al seleccionar un alumno (solo lectura, no editable)\n- Si el alumno no tiene turno, mostrar mensaje aclaratorio\n- El formulario sea mobile-first\n- Permitir marcar asistencia con un solo toque (botones grandes para presente/ausente, no dropdown)\n- Documentar el cambio y el motivo (UX, velocidad, claridad)\n- QA: probar en mobile y desktop, con y sin turno asignado",
+          "details": "El formulario anterior requería seleccionar estado por dropdown y no mostraba el turno del alumno. Ahora:\n- Se obtiene el turno (shift) del alumno y se muestra automáticamente\n- Si no tiene turno, se informa\n- Se reemplaza el dropdown de estado por dos botones grandes (Presente/Ausente) para UX mobile\n- Se mantiene la validación y feedback visual\n- Se documenta el cambio en Taskmaster y se recomienda QA manual en mobile y desktop",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 25
+        },
+        {
+          "id": 10,
+          "title": "Fix filtro por estado y UX de resumen en AsistenciasList",
+          "description": "Corregir el filtro por estado y el resumen de presentes/ausentes en la lista de asistencias:\n- El resumen solo debe mostrarse si hay asistencias en la lista (coincidencias con el filtro)\n- Si no hay coincidencias, mostrar mensaje contextual claro\n- Revisar que el filtro por estado funcione correctamente y el select aplique el filtro\n- Documentar el fix y el motivo (evitar confusión de usuarios y mostrar datos reales)",
+          "details": "Antes:\n- El resumen de presentes/ausentes se mostraba aunque no hubiera coincidencias, lo que confundía al usuario\n- El mensaje de \"No hay asistencias\" no era claro si había filtros activos\nAhora:\n- El resumen solo aparece si hay asistencias en la lista\n- Si no hay coincidencias, se muestra \"No hay coincidencias para los filtros aplicados. Prueba cambiando la fecha o limpiando los filtros.\"\n- El filtro por estado se aplica correctamente y el select funciona bien\n- Documentado en Taskmaster para trazabilidad y QA manual",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 25
+        },
+        {
+          "id": 11,
+          "title": "Fix filtro por turno y fecha en asistencias (backend y frontend)",
+          "description": "Corregir el filtrado por turno y fecha en la consulta de asistencias:\n- En el servicio, asegurar que al filtrar por turno también se filtre por fecha\n- Filtrar asistencias sin alumno en el backend y frontend\n- Validar que el filtro de fecha funcione correctamente y no muestre registros de otras fechas\n- Documentar el fix y el motivo (evitar filas vacías y datos inconsistentes)",
+          "details": "- En `getAsistencias` del servicio, si hay shiftId, también se filtra por fecha\n- Se filtran asistencias sin alumno antes de devolver al frontend\n- En el frontend, solo se renderizan filas con alumno\n- QA: probar combinaciones de fecha y turno, y que nunca aparezcan filas vacías ni registros de fechas incorrectas\n- Motivo: evitar confusión y mostrar solo datos válidos al usuario",
+          "status": "done",
+          "dependencies": [],
+          "parentTaskId": 25
         }
       ]
     },
@@ -797,6 +833,82 @@
       "dependencies": [],
       "priority": "medium",
       "subtasks": []
+    },
+    {
+      "id": 29,
+      "title": "Task #29: Implement Location Management System (CRUD)",
+      "description": "Develop a comprehensive location management system that allows administrators to create, read, update, and delete locations through a user-friendly, mobile-first interface while ensuring data integrity with existing shifts and attendance records.",
+      "details": "The implementation should include:\n\n1. Backend Development:\n   - Create RESTful API endpoints for location CRUD operations\n   - Implement validation logic to prevent deletion of locations with associated shifts or attendance records\n   - Design database schema updates to support location management\n   - Implement proper error handling and success responses\n\n2. Frontend Development:\n   - Build a mobile-first UI within the configuration panel for location management\n   - Create intuitive forms for adding and editing locations with proper validation\n   - Implement confirmation dialogs for deletion attempts with clear warnings\n   - Design and implement visual feedback for all operations (loading states, success/error messages)\n   - Ensure real-time updates of location lists across the application (in forms, filters, dropdowns)\n\n3. Integration Requirements:\n   - Update all existing forms and filters that use location data to reflect changes in real-time\n   - Ensure proper synchronization between the location management module and other system components\n   - Implement proper access control to restrict location management to authorized administrators\n\n4. Documentation:\n   - Document the API endpoints and data structures\n   - Create user documentation explaining the location management workflow\n   - Document the impact on the overall system configuration and dependencies\n   - Include information about validation rules and constraints\n\nThe UI should follow the existing design system while ensuring excellent usability on mobile devices. All error and success messages should be clear, concise, and actionable.",
+      "testStrategy": "Testing should be comprehensive and cover both technical functionality and user experience:\n\n1. Unit Testing:\n   - Test all API endpoints for proper CRUD operations\n   - Verify validation logic prevents deletion of locations with dependencies\n   - Test error handling for all edge cases\n\n2. Integration Testing:\n   - Verify that location updates propagate correctly to all dependent components\n   - Test the integration with shift and attendance modules\n   - Ensure real-time updates work correctly across the application\n\n3. UI/UX Testing:\n   - Verify mobile responsiveness across different device sizes\n   - Test the complete user flow for creating, editing, and deleting locations\n   - Validate that error and success messages are displayed appropriately\n   - Test accessibility compliance\n\n4. Critical Flow Testing:\n   - Create a new location and verify it appears in all relevant dropdowns and filters\n   - Edit an existing location and confirm changes reflect throughout the system\n   - Attempt to delete a location with associated shifts/attendance and verify prevention\n   - Successfully delete an unused location and verify removal from the system\n   - Test location filtering in attendance and shift management interfaces\n\n5. Performance Testing:\n   - Verify that real-time updates don't negatively impact system performance\n   - Test with a large number of locations to ensure scalability\n\n6. User Acceptance Testing:\n   - Have administrators test the complete location management workflow\n   - Collect feedback on the clarity of error/success messages\n   - Verify that the mobile experience meets user expectations\n\nDocument all test results with screenshots and specific test cases for future reference.",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Design and implement database schema for location management",
+          "description": "Create the database schema to support location management functionality, including tables, relationships, and constraints to ensure data integrity with existing shifts and attendance records.",
+          "dependencies": [],
+          "details": "Create a 'locations' table with fields for id, name, address, status (active/inactive), and timestamps. Add foreign key constraints to prevent deletion of locations with associated records. Update existing tables that reference locations to use the new schema. Implement database migrations to safely deploy these changes.",
+          "status": "pending",
+          "testStrategy": "Write unit tests for database migrations. Create test cases for constraint validation to ensure locations with associated records cannot be deleted."
+        },
+        {
+          "id": 2,
+          "title": "Develop RESTful API endpoints for location CRUD operations",
+          "description": "Implement backend API endpoints that allow for creating, reading, updating, and deleting locations with proper validation, error handling, and success responses.",
+          "dependencies": [
+            1
+          ],
+          "details": "Create the following endpoints: GET /api/locations (list), GET /api/locations/:id (detail), POST /api/locations (create), PUT /api/locations/:id (update), and DELETE /api/locations/:id (delete). Implement validation logic to prevent deletion of locations with associated shifts or attendance records. Return appropriate HTTP status codes and error messages. Document API using OpenAPI/Swagger.",
+          "status": "pending",
+          "testStrategy": "Write integration tests for each endpoint covering success and error cases. Test validation rules, especially for delete operations with existing dependencies."
+        },
+        {
+          "id": 3,
+          "title": "Build mobile-first UI components for location management",
+          "description": "Create reusable UI components for the location management interface following the existing design system with a focus on mobile-first design.",
+          "dependencies": [],
+          "details": "Develop the following components: LocationList (with search/filter), LocationForm (for create/edit), LocationDetail, and confirmation dialogs. Ensure responsive design with appropriate layouts for mobile and desktop. Implement loading states, error states, and empty states for all components. Use the existing design system for consistency.",
+          "status": "pending",
+          "testStrategy": "Create component tests for all UI elements. Test responsive behavior across different viewport sizes. Conduct usability testing on mobile devices."
+        },
+        {
+          "id": 4,
+          "title": "Implement location management screens and workflows",
+          "description": "Integrate the UI components into complete screens and implement the user workflows for creating, viewing, editing, and deleting locations.",
+          "dependencies": [
+            2,
+            3
+          ],
+          "details": "Create screens for location listing, detail view, creation form, and edit form. Implement navigation between these screens. Add confirmation dialogs for destructive actions with clear warnings about data dependencies. Implement form validation with helpful error messages. Ensure all actions provide visual feedback (loading indicators, success/error messages).",
+          "status": "pending",
+          "testStrategy": "Write end-to-end tests for complete workflows. Test form validation, error handling, and success paths."
+        },
+        {
+          "id": 5,
+          "title": "Update existing forms and filters to use the location management system",
+          "description": "Modify all existing components that use location data to integrate with the new location management system and reflect changes in real-time.",
+          "dependencies": [
+            4
+          ],
+          "details": "Identify all forms, filters, and dropdowns that use location data. Update these components to fetch data from the new API endpoints. Implement real-time updates using appropriate state management patterns. Ensure consistent UI for location selection across the application. Update any hardcoded location references.",
+          "status": "pending",
+          "testStrategy": "Test integration points between the location system and existing components. Verify real-time updates work correctly when location data changes."
+        },
+        {
+          "id": 6,
+          "title": "Implement access control and create documentation",
+          "description": "Add proper access control to restrict location management to authorized administrators and create comprehensive documentation for the system.",
+          "dependencies": [
+            4,
+            5
+          ],
+          "details": "Implement role-based access control for location management features. Create API documentation detailing endpoints, request/response formats, and error codes. Write user documentation explaining the location management workflow with screenshots. Document validation rules, constraints, and the impact on related system components. Include troubleshooting information for common issues.",
+          "status": "pending",
+          "testStrategy": "Test access control by attempting operations with different user roles. Review documentation for completeness and accuracy with stakeholders."
+        }
+      ]
     }
   ],
   "metadata": {

@@ -14,6 +14,7 @@ export const useAsistencias = (options?: {
   sede?: 'Plaza Arenales' | 'Plaza Terán'
   shiftId?: string
   fecha?: string
+  estado?: 'presente' | 'ausente'
 }) => {
   const queryClient = useQueryClient()
   const { showToast } = useToast()
@@ -25,7 +26,7 @@ export const useAsistencias = (options?: {
     error: asistenciasError,
     isLoading: asistenciasLoading 
   } = useQuery({
-    queryKey: ['asistencias', options?.alumnoId, options?.page, options?.pageSize, options?.sede, options?.shiftId],
+    queryKey: ['asistencias', options?.alumnoId, options?.page, options?.pageSize, options?.sede, options?.shiftId, options?.fecha, options?.estado],
     queryFn: () => asistenciasService.getAsistencias(options),
     enabled: !!options
   })

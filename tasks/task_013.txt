@@ -1,6 +1,6 @@
 # Task ID: 13
 # Title: Update Forms and Components for New Fields Management
-# Status: in-progress
+# Status: done
 # Dependencies: None
 # Priority: medium
 # Description: Enhance existing forms and components to support new fields including alert activation/deactivation, payment status display, price history management, and notes functionality.
