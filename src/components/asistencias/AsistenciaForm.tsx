@@ -31,7 +31,7 @@ export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
 
   useEffect(() => {
     refetch();
-  }, []);
+  }, [refetch]);
 
   const alumnoSeleccionado = useMemo(() => alumnos?.find(a => a.id === alumno_id), [alumno_id, alumnos])
   const shiftAsignado = useMemo(() => shifts.find(s => s.id === alumnoSeleccionado?.shift_id), [alumnoSeleccionado, shifts])

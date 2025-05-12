@@ -1,97 +1,52 @@
 'use client'
 
-import { useState } from 'react'
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from 'chart.js'
-import { Line } from 'react-chartjs-2'
-import { PaymentStatusBadge } from '@/components/ui/PaymentStatusBadge'
-
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-)
-
-// Datos de ejemplo - Esto vendrá de Supabase
-const datosPagos = {
-  ingresosPorMes: {
-    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-    data: [35000, 42000, 45000, 48000, 52000, 55000],
-  },
-  pagosPendientes: [
-    {
-      alumno: 'Juan Pérez',
-      monto: 8000,
-      diasAtraso: 5,
-    },
-    {
-      alumno: 'María García',
-      monto: 8000,
-      diasAtraso: 3,
-    },
-  ],
-}
+import { useEffect, useState } from 'react'
+import { generateReport } from '@/services/reportGenerator'
 
 export default function ReportePagos() {
-  const [datos] = useState(datosPagos)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [rows, setRows] = useState<(string | number)[][]>([])
 
-  const chartData = {
-    labels: datos.ingresosPorMes.labels,
-    datasets: [
-      {
-        label: 'Ingresos Mensuales',
-        data: datos.ingresosPorMes.data,
-        borderColor: 'rgb(14, 165, 233)',
-        backgroundColor: 'rgba(14, 165, 233, 0.5)',
-        tension: 0.4,
-      },
-    ],
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true)
+      setError('')
+      try {
+        const { rows } = await generateReport({ tipo: 'pagos' })
+        setRows(rows)
+      } catch {
+        setError('Error al cargar los datos de pagos')
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
+
+  if (loading) {
+    return <div className="flex items-center justify-center h-32">Cargando...</div>
+  }
+  if (error) {
+    return <div className="text-red-600">{error}</div>
+  }
+  if (!rows.length) {
+    return <div className="text-gray-500">No hay datos de pagos para mostrar</div>
   }
 
-  const chartOptions = {
-    responsive: true,
-    plugins: {
-      legend: {
-        position: 'top' as const,
-      },
-      title: {
-        display: true,
-        text: 'Evolución de Ingresos',
-      },
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: {
-          callback: (value: number | string) => `$${value}`
-        },
-      },
-    },
-  } as const
-
-  const totalPendiente = datos.pagosPendientes.reduce(
-    (sum, pago) => sum + pago.monto,
-    0
-  )
+  // Calcular ingresos mensuales y pagos pendientes si los datos lo permiten
+  // Suponiendo que la columna 2 es el monto y la 5 es el estado
+  const montoIdx = 2
+  const estadoIdx = 5
+  const ingresosTotales = rows.reduce((sum, row) => sum + (Number(row[montoIdx]) || 0), 0)
+  const pagosPendientes = rows.filter(row => row[estadoIdx] === 'pendiente')
+  const totalPendiente = pagosPendientes.reduce((sum, row) => sum + (Number(row[montoIdx]) || 0), 0)
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <h2 className="text-xl font-semibold text-gray-800 mb-6">
         Reporte de Pagos
       </h2>
-
       <div className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-sm font-medium text-gray-600">
@@ -101,38 +56,36 @@ export default function ReportePagos() {
             ${totalPendiente}
           </span>
         </div>
-
         <div className="space-y-4">
-          {datos.pagosPendientes.map((pago, index) => (
-            <div
-              key={index}
-              className="flex justify-between items-center p-3 bg-red-50 rounded-lg"
-            >
-              <div className="flex items-center gap-3">
-                <PaymentStatusBadge
-                  status="atrasado"
-                  tooltipContent={`${pago.diasAtraso} días de atraso`}
-                  size="sm"
-                />
-                <div>
-                  <p className="text-sm font-medium text-gray-900">
-                    {pago.alumno}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {pago.diasAtraso} días de atraso
-                  </p>
+          {pagosPendientes.length > 0 ? (
+            pagosPendientes.map((row, i) => (
+              <div
+                key={i}
+                className="flex justify-between items-center p-3 bg-red-50 rounded-lg"
+              >
+                <div className="flex items-center gap-3">
+                  <div>
+                    <p className="text-sm font-medium text-gray-900">
+                      {row[1]}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Estado: {row[estadoIdx]}
+                    </p>
+                  </div>
                 </div>
+                <span className="text-sm font-medium text-red-600">
+                  ${row[montoIdx]}
+                </span>
               </div>
-              <span className="text-sm font-medium text-red-600">
-                ${pago.monto}
-              </span>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">No hay pagos pendientes</p>
+          )}
         </div>
       </div>
-
-      <div className="h-64">
-        <Line options={chartOptions} data={chartData} />
+      <div className="mb-8">
+        <h3 className="text-sm font-medium text-gray-600 mb-2">Ingresos Totales</h3>
+        <span className="text-lg font-semibold text-green-600">${ingresosTotales}</span>
       </div>
     </div>
   )

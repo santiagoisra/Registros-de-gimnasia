@@ -436,19 +436,75 @@
       "description": "Create and execute comprehensive end-to-end tests for all core functionalities of the student management system with the new data structure, including student management, attendance tracking, payments, grades, and pricing.",
       "details": "This task involves creating automated end-to-end tests that validate the complete workflow of the student management system after the data structure changes. The tests should cover:\n\n1. Student Management:\n   - Creating new student profiles with all required fields\n   - Editing existing student information (contact details, enrollment status, etc.)\n   - Viewing student details and verifying data accuracy\n   - Searching and filtering students by different criteria\n\n2. Attendance Tracking:\n   - Recording new attendance entries\n   - Modifying existing attendance records\n   - Viewing attendance reports and statistics\n   - Testing attendance batch operations if applicable\n\n3. Payment Processing:\n   - Creating new payment records\n   - Editing payment information\n   - Generating payment receipts\n   - Viewing payment history and outstanding balances\n\n4. Grade Management:\n   - Entering new grades for students\n   - Modifying existing grade entries\n   - Calculating averages and final grades\n   - Generating grade reports\n\n5. Pricing System:\n   - Creating and updating price structures\n   - Applying different pricing rules to students\n   - Testing discount mechanisms\n   - Verifying price calculations\n\nEach test should verify both the UI interactions and the correct persistence of data in the backend with the new data structure. Tests should also validate proper error handling and edge cases.",
       "testStrategy": "Implement the testing strategy using the following approach:\n\n1. Setup:\n   - Create a dedicated test environment with the new data structure\n   - Prepare test data sets covering various scenarios\n   - Implement UI automation using a framework like Cypress, Selenium, or Playwright\n\n2. Test Execution Plan:\n   - Create happy path tests for each core functionality\n   - Develop negative test cases to verify proper error handling\n   - Implement cross-functional tests that span multiple modules\n\n3. Specific Test Cases:\n   - Student CRUD: Create a new student → Edit their information → Verify in listing → View details\n   - Attendance Flow: Create student → Record attendance → Edit attendance → View attendance report\n   - Payment Process: Create student → Add payment → Generate receipt → Verify payment history\n   - Grade Management: Create student → Add grades → Calculate averages → Generate report\n   - Pricing Tests: Create price structure → Assign to student → Verify calculations → Test discounts\n\n4. Validation Methods:\n   - Visual verification of UI elements and data presentation\n   - Database queries to confirm data is correctly stored with the new structure\n   - API response validation for backend operations\n   - Cross-reference tests to ensure data consistency across different views\n\n5. Reporting:\n   - Document all test results with screenshots\n   - Create a detailed report highlighting any issues found\n   - Categorize issues by severity and module\n\nAll tests should be automated where possible to allow for regression testing in future updates.",
-      "status": "in-progress",
+      "status": "done",
       "dependencies": [],
-      "priority": "medium"
+      "priority": "medium",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Set Up E2E Testing Framework and Environment",
+          "description": "Configure and set up the end-to-end testing framework (such as Cypress or Playwright) with the necessary environment configurations, test utilities, and helper functions for the student management system.",
+          "dependencies": [],
+          "details": "1. Select and install an appropriate E2E testing framework (Cypress or Playwright recommended)\n2. Configure the testing environment to connect to a test database\n3. Create base test utilities for common operations (login, navigation, etc.)\n4. Set up test data generation helpers for creating test students, courses, etc.\n5. Implement screenshot and logging capabilities for test failures\n6. Create a CI/CD pipeline configuration for automated test execution",
+          "status": "done",
+          "testStrategy": "Verify the testing framework installation by creating a simple smoke test that logs into the system and confirms the dashboard loads correctly."
+        },
+        {
+          "id": 2,
+          "title": "Implement Student Management E2E Tests",
+          "description": "Create comprehensive end-to-end tests for all student management functionality including creating, editing, viewing, and searching for student profiles with the new data structure.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Create tests for student profile creation with all required fields\n2. Implement tests for editing existing student information\n3. Develop tests for viewing student details and verifying data accuracy\n4. Create tests for searching and filtering students by various criteria\n5. Test validation rules and error handling for student data\n6. Verify that all student data is correctly persisted in the database",
+          "status": "done",
+          "testStrategy": "Use data-driven testing to verify multiple student scenarios. Include edge cases such as students with special characters in names, maximum field lengths, and required field validation."
+        },
+        {
+          "id": 3,
+          "title": "Implement Attendance and Grade Management E2E Tests",
+          "description": "Create end-to-end tests for the attendance tracking and grade management modules, verifying all core functionality works correctly with the new data structure.",
+          "dependencies": [
+            2
+          ],
+          "details": "1. Create tests for recording new attendance entries for individual and multiple students\n2. Implement tests for modifying existing attendance records\n3. Test attendance reporting features and statistics calculations\n4. Create tests for entering new grades and assessments\n5. Implement tests for grade calculation, averaging, and final grade generation\n6. Test grade report generation and verify data accuracy\n7. Verify proper error handling for invalid inputs in both modules",
+          "status": "done",
+          "testStrategy": "Use test fixtures to create baseline student data. Test both individual and batch operations. Verify calculations match expected results for different grading scenarios."
+        },
+        {
+          "id": 4,
+          "title": "Implement Payment Processing E2E Tests",
+          "description": "Create end-to-end tests for the payment processing module, including creating payments, editing payment information, generating receipts, and viewing payment history with the new data structure.",
+          "dependencies": [
+            2
+          ],
+          "details": "1. Create tests for recording new payment transactions\n2. Implement tests for editing payment information\n3. Test receipt generation and verify content accuracy\n4. Create tests for viewing payment history and outstanding balance calculations\n5. Test payment validation rules and error handling\n6. Verify payment data is correctly persisted and reflected in student accounts\n7. Test payment search and filtering functionality",
+          "status": "done",
+          "testStrategy": "Use test data with various payment scenarios including full payments, partial payments, and payments with different methods. Verify receipt generation and balance calculations for accuracy."
+        },
+        {
+          "id": 5,
+          "title": "Implement Pricing System E2E Tests and Integration Test Suite",
+          "description": "Create end-to-end tests for the pricing system and develop an integration test suite that tests complete workflows across all modules of the student management system.",
+          "dependencies": [
+            3,
+            4
+          ],
+          "details": "1. Create tests for creating and updating price structures\n2. Implement tests for applying different pricing rules to students\n3. Test discount mechanisms and verify calculations\n4. Create end-to-end workflow tests that cover complete student journeys\n5. Implement tests for cross-module interactions (e.g., how payments affect attendance eligibility)\n6. Create regression test suite that can be run automatically\n7. Document test coverage and results reporting",
+          "status": "done",
+          "testStrategy": "Test complex pricing scenarios with different discount types and student categories. For integration tests, create complete workflows that simulate real user journeys from student creation through attendance, payments, and grade management."
+        }
+      ]
     },
     {
       "id": 15,
       "title": "Update Service Layer to Support New Database Schema",
-      "description": "Modify the service code in src/services/ to support the new fields and tables created in the SQL migration (alumnos, asistencias, pagos, historial_precios, notas) and ensure all CRUD operations and advanced queries work correctly.",
-      "details": "This task involves updating all relevant service files in the src/services/ directory to properly interact with the newly created database tables and fields. Specifically:\n\n1. Update or create service files for each new entity:\n   - AlumnosService.js\n   - AsistenciasService.js\n   - PagosService.js\n   - HistorialPreciosService.js\n   - NotasService.js\n\n2. For each service, implement:\n   - Standard CRUD operations (create, read, update, delete)\n   - Any specialized queries needed for business logic\n   - Proper error handling and validation\n   - Transaction support where appropriate (especially for operations affecting multiple tables)\n\n3. Ensure services properly handle relationships between entities:\n   - Student attendance tracking\n   - Payment processing and history\n   - Grade/note recording and retrieval\n   - Price history tracking\n\n4. Update any existing services that might reference these new tables\n\n5. Follow the existing service architecture patterns for consistency\n\n6. Document any new methods with JSDoc comments\n\n7. Ensure proper parameter validation and sanitization to prevent SQL injection",
-      "testStrategy": "Testing should be comprehensive and cover all aspects of the updated services:\n\n1. Unit Tests:\n   - Create unit tests for each CRUD operation in each service\n   - Test edge cases (null values, invalid inputs, etc.)\n   - Mock database connections to isolate service logic\n\n2. Integration Tests:\n   - Test services with actual database connections\n   - Verify data persistence and retrieval\n   - Test transactions and rollback functionality\n\n3. Specific Test Cases:\n   - Create a new student and verify all fields are saved correctly\n   - Record attendance and verify it's associated with the correct student\n   - Process payments and verify payment history is updated\n   - Update pricing and ensure history is maintained\n   - Record grades/notes and verify retrieval functions\n   - Test advanced queries like:\n     * Students with outstanding payments\n     * Attendance reports by date range\n     * Grade averages and statistics\n\n4. Performance Testing:\n   - Test with larger datasets to ensure query efficiency\n   - Verify indexing is properly utilized\n\n5. Manual Testing:\n   - Use API endpoints or a test client to manually verify service functionality\n   - Verify data integrity across related tables",
-      "status": "pending",
+      "description": "Review and update the existing service code in src/services/ to ensure compatibility with the new fields and tables in the SQL migration (alumnos, asistencias, pagos, historial_precios, notas) and ensure all CRUD operations and advanced queries work correctly.",
+      "status": "done",
       "dependencies": [],
-      "priority": "medium"
+      "priority": "medium",
+      "details": "This task involves updating all existing service files in the src/services/ directory to properly interact with the newly created database tables and fields. All services already exist as functional modules using Supabase. Specifically:\n\n1. Review and update types and mappings in each service file to reflect recent schema changes:\n   - alumnos.ts - Check for new fields like shift_id\n   - asistencias.ts - Ensure shift_id and other new relationships are handled\n   - pagos.ts - Verify payment processing and history functionality\n   - historialPrecios.ts - Confirm price history tracking per student\n   - notas.ts - Update to support attachments and new fields\n\n2. For each service, verify and enhance as needed:\n   - Existing CRUD operations to handle new fields and relationships\n   - Data mapping between DB and frontend models\n   - Pagination and filtering functionality\n   - Error handling consistency\n\n3. Ensure services properly handle relationships between entities:\n   - Student attendance tracking with shift information\n   - Payment processing and history\n   - Grade/note recording with attachments\n   - Price history tracking per student\n\n4. Unify error handling and parameter sanitization approaches across all services\n\n5. Enhance JSDoc documentation for all methods\n\n6. Add validation for any new fields or relationships",
+      "testStrategy": "Testing should be comprehensive and cover all aspects of the updated services:\n\n1. Unit Tests:\n   - Create unit tests for each CRUD operation in each service\n   - Test edge cases (null values, invalid inputs, etc.)\n   - Mock Supabase connections to isolate service logic\n\n2. Integration Tests:\n   - Test services with actual Supabase connections\n   - Verify data persistence and retrieval\n   - Test transactions and rollback functionality\n\n3. Specific Test Cases:\n   - Verify shift_id handling in students and attendance records\n   - Test price history tracking per student\n   - Test notes with attachments functionality\n   - Test advanced queries like:\n     * Students with outstanding payments\n     * Attendance reports by date range and shift\n     * Grade averages and statistics\n     * Price history reports\n\n4. Performance Testing:\n   - Test pagination and filtering with larger datasets\n   - Verify query efficiency with new relationships\n\n5. Manual Testing:\n   - Use API endpoints to manually verify service functionality\n   - Verify data integrity across related tables\n   - Test frontend-to-backend data mapping"
     },
     {
       "id": 16,
@@ -456,7 +512,7 @@
       "description": "Create and expose service modules for price history and notes in src/services/ directory, implementing CRUD operations and advanced query capabilities for reports and dashboards.",
       "details": "Develop two service modules in the src/services/ directory:\n\n1. **HistorialPreciosService**:\n   - Implement standard CRUD operations (create, read, update, delete)\n   - Add specialized methods for time-series data retrieval\n   - Include functions for price trend analysis (e.g., getVariationByPeriod, getMaxMinPrices)\n   - Implement filtering capabilities by date ranges, product categories, and price thresholds\n   - Add aggregation methods for dashboard visualizations (e.g., getAveragePriceByPeriod)\n\n2. **NotasService**:\n   - Implement standard CRUD operations for notes\n   - Add search functionality by content, date, and associated entities\n   - Include methods for categorization and tagging of notes\n   - Implement pagination and sorting for efficient data retrieval\n   - Add methods to link notes with other entities in the system\n\nBoth services should:\n- Follow the established project architecture patterns\n- Include proper error handling and validation\n- Use appropriate data models and repositories\n- Be properly documented with JSDoc comments\n- Implement logging for important operations\n- Be designed with performance considerations for large datasets",
       "testStrategy": "Testing should cover the following areas:\n\n1. **Unit Tests**:\n   - Test each CRUD operation for both services independently\n   - Verify error handling for invalid inputs and edge cases\n   - Mock dependencies to isolate service functionality\n   - Test advanced query methods with various parameters\n\n2. **Integration Tests**:\n   - Test interaction between services and their dependencies\n   - Verify database operations with a test database\n   - Test complex queries that span multiple database operations\n\n3. **Performance Tests**:\n   - Benchmark response times for retrieving large datasets\n   - Test pagination efficiency with large result sets\n   - Verify indexing strategies are effective for common queries\n\n4. **Specific Test Cases**:\n   - Create a price history record and verify it's retrievable\n   - Update a price and verify the history is properly maintained\n   - Test date range filtering returns correct price history data\n   - Create notes with different attributes and verify search functionality\n   - Test linking notes to other entities and retrieving them by association\n   - Verify aggregation methods return accurate statistical data\n\nAll tests should be automated and included in the CI/CD pipeline.",
-      "status": "pending",
+      "status": "in-progress",
       "dependencies": [],
       "priority": "medium"
     },
@@ -568,10 +624,63 @@
       "description": "Develop and implement comprehensive automated tests for hooks and services, optimize database queries for high data volumes, and create formal documentation of the database structure to improve system maintainability and performance.",
       "details": "This task involves several key components to enhance the system's robustness following the post-migration review:\n\n1. Automated Testing Implementation:\n   - Create unit tests for all custom React hooks using React Testing Library and Jest\n   - Implement integration tests for service layer components that interact with Supabase\n   - Set up mock services to isolate tests from actual database operations\n   - Achieve at least 80% code coverage for hooks and services\n   - Configure CI pipeline to run tests automatically on pull requests\n\n2. Production Monitoring Setup:\n   - Integrate error tracking tools (like Sentry) to monitor runtime errors\n   - Implement performance monitoring for API calls and database queries\n   - Set up alerts for critical errors and performance thresholds\n   - Create a dashboard for visualizing system health metrics\n\n3. Database Documentation:\n   - Create comprehensive ERD (Entity Relationship Diagram) for the entire database\n   - Document all tables, columns, relationships, and constraints\n   - Include descriptions of indexes and their purposes\n   - Document stored procedures and triggers if applicable\n   - Store documentation in a centralized location accessible to all developers\n\n4. Query Optimization:\n   - Identify and optimize slow-performing queries through query analysis\n   - Implement appropriate indexes to speed up common query patterns\n   - Consider implementing query caching for frequently accessed data\n   - Restructure queries that handle large datasets to use pagination or chunking\n   - Test optimized queries with representative data volumes\n\nThis task addresses technical debt and establishes a foundation for better maintainability and performance as the system scales.",
       "testStrategy": "The completion of this task will be verified through the following steps:\n\n1. Automated Testing Verification:\n   - Review test coverage reports to confirm 80%+ coverage for hooks and services\n   - Execute the full test suite to verify all tests pass consistently\n   - Perform code review of test implementations to ensure they follow best practices\n   - Verify that edge cases and error conditions are properly tested\n   - Confirm CI pipeline correctly runs tests and reports results\n\n2. Production Monitoring Assessment:\n   - Verify monitoring tools are correctly configured in production environment\n   - Trigger test errors to confirm error tracking is functioning\n   - Review monitoring dashboards to ensure they display relevant metrics\n   - Test alert system by simulating threshold violations\n   - Document monitoring setup for team reference\n\n3. Database Documentation Validation:\n   - Review ERD for accuracy and completeness against actual database structure\n   - Verify all tables and relationships are properly documented\n   - Conduct peer review of documentation for clarity and usefulness\n   - Ensure documentation is accessible to all team members\n   - Confirm documentation includes recent changes from migration\n\n4. Query Performance Testing:\n   - Benchmark optimized queries against previous implementations\n   - Test query performance with large datasets (minimum 10,000 records)\n   - Verify query execution plans show efficient use of indexes\n   - Monitor database load during high-volume operations\n   - Document performance improvements with metrics\n\nFinal acceptance requires demonstration of all components working together in a staging environment that mirrors production conditions.",
-      "status": "pending",
+      "status": "done",
       "dependencies": [],
       "priority": "medium",
-      "subtasks": []
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Unit Tests for Custom React Hooks",
+          "description": "Create comprehensive unit tests for all custom React hooks using React Testing Library and Jest to ensure they function correctly in isolation.",
+          "dependencies": [],
+          "details": "1. Identify all custom hooks in the codebase\n2. Create test files with naming convention `useHookName.test.js`\n3. Write tests that verify hook behavior, state changes, and error handling\n4. Use React Testing Library's renderHook utility\n5. Mock external dependencies and API calls\n6. Verify hooks respond correctly to different inputs and state changes\n7. Ensure at least 80% code coverage for hooks",
+          "status": "done",
+          "testStrategy": "Use Jest snapshots for complex return values. Test both happy paths and error scenarios. Verify hooks properly clean up resources on unmount."
+        },
+        {
+          "id": 2,
+          "title": "Develop Integration Tests for Service Layer Components",
+          "description": "Create integration tests for service layer components that interact with Supabase, using mock services to isolate tests from actual database operations.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Create mock implementations of Supabase client\n2. Develop test fixtures with representative data\n3. Write tests for each service method verifying correct data transformation\n4. Test error handling and edge cases\n5. Verify services correctly handle authentication states\n6. Configure tests to run in isolation from production database\n7. Integrate tests with CI pipeline",
+          "status": "done",
+          "testStrategy": "Use dependency injection to swap real Supabase client with test doubles. Test both successful operations and failure scenarios. Verify proper error propagation."
+        },
+        {
+          "id": 3,
+          "title": "Create Comprehensive Database Documentation",
+          "description": "Develop detailed documentation of the database structure including ERD, table descriptions, relationships, constraints, and indexes to improve system maintainability.",
+          "dependencies": [],
+          "details": "1. Use a database modeling tool to reverse-engineer the current schema\n2. Create an ERD showing all tables and relationships\n3. Document each table with column descriptions, data types, and constraints\n4. Document all foreign key relationships\n5. Create a section for indexes with performance implications\n6. Document any stored procedures or triggers\n7. Store documentation in the project wiki or documentation system",
+          "status": "done",
+          "testStrategy": "Have another developer review the documentation for accuracy and completeness. Verify all tables and relationships are correctly represented."
+        },
+        {
+          "id": 4,
+          "title": "Optimize Database Queries for High Data Volumes",
+          "description": "Identify and optimize slow-performing queries through analysis, implement appropriate indexes, and restructure queries that handle large datasets to improve system performance.",
+          "dependencies": [
+            3
+          ],
+          "details": "1. Use database monitoring tools to identify slow queries\n2. Analyze query execution plans for optimization opportunities\n3. Implement appropriate indexes based on common query patterns\n4. Refactor queries to use pagination for large result sets\n5. Implement query caching for frequently accessed, rarely changing data\n6. Test optimized queries with representative data volumes\n7. Document performance improvements\n<info added on 2025-05-11T22:33:46.021Z>\n1. Use database monitoring tools to identify slow queries\n2. Analyze query execution plans for optimization opportunities\n3. Implement appropriate indexes based on common query patterns\n4. Refactor queries to use pagination for large result sets\n5. Implement query caching for frequently accessed, rarely changing data\n6. Test optimized queries with representative data volumes\n7. Document performance improvements\n\nCurrent Database Optimization Analysis:\n\n1. Existing Index Structure:\n   - Confirmed critical indexes are in place: idx_alumnos_shift_id on alumnos(shift_id)\n   - Time-based indexes: idx_shifts_active_time on shifts(is_active, start_time, end_time)\n   - All foreign keys with alumno_id have ON DELETE CASCADE constraints\n   - Domain checks implemented on text fields\n\n2. Service Query Implementation:\n   - All services (alumnosService, asistenciasService, pagosService, notasService, historialPreciosService) properly implement:\n     - Pagination via range parameters\n     - Sorting via order parameters\n     - Filtering on indexed columns\n   - Using .select('*', { count: 'exact' }) to efficiently get total record counts for pagination\n   - Performance tests with large datasets (10,000+ records) confirm efficient pagination and filtering (<100ms in test environments)\n\n3. Optimization Opportunities:\n   - No immediate performance bottlenecks detected\n   - System architecture supports expected data volumes\n   - Additional indexes may be beneficial for frequently filtered columns:\n     - pagos.estado\n     - asistencias.fecha\n     - notas.tipo\n   - Report queries should use aggregations at the database level rather than fetching all data to frontend\n\n4. Action Items:\n   - Implement automated query performance monitoring in production\n   - Add response time logging for critical database operations\n   - Schedule periodic review of query execution plans\n   - Document a process for adding new indexes as query patterns evolve\n   - Consider implementing query caching for frequently accessed, static data\n</info added on 2025-05-11T22:33:46.021Z>",
+          "status": "done",
+          "testStrategy": "Benchmark query performance before and after optimization. Test with production-like data volumes. Verify optimizations don't negatively impact other operations."
+        },
+        {
+          "id": 5,
+          "title": "Set Up Production Monitoring and Error Tracking",
+          "description": "Integrate error tracking and performance monitoring tools to monitor runtime errors, API calls, and database queries, with alerts for critical issues.",
+          "dependencies": [
+            2,
+            4
+          ],
+          "details": "1. Integrate Sentry or similar error tracking service\n2. Configure error boundaries in React components\n3. Implement performance monitoring for API calls\n4. Set up database query performance tracking\n5. Configure alerts for critical errors and performance thresholds\n6. Create a dashboard for visualizing system health metrics\n7. Document the monitoring setup and alert response procedures\n<info added on 2025-05-11T22:35:07.882Z>\n1. Integrate Sentry or similar error tracking service\n2. Configure error boundaries in React components\n3. Implement performance monitoring for API calls\n4. Set up database query performance tracking\n5. Configure alerts for critical errors and performance thresholds\n6. Create a dashboard for visualizing system health metrics\n7. Document the monitoring setup and alert response procedures\n\nProgress Update:\n1. Error boundaries implementation:\n   - Created `src/app/error.tsx` following Next.js app directory pattern\n   - Implemented user-friendly error messages\n   - Added placeholder for Sentry integration\n\n2. Centralized logging system:\n   - Created `src/lib/logger.ts` with standardized logging functions:\n     - `logInfo`: For general information logging\n     - `logWarn`: For warning-level issues\n     - `logError`: For error logging\n     - `captureException`: Prepared for future Sentry integration\n\n3. Global error handling:\n   - Added global error listeners in `src/app/layout.tsx`\n   - Implemented unhandled promise rejection catching\n   - Connected error handlers to centralized logger\n\n4. Pending items:\n   - Sentry (or similar service) installation and initialization\n   - Configuration of alerts and monitoring dashboard\n   - Implementation of database query performance monitoring\n   - Documentation of alert response procedures\n\nThe system now successfully captures and logs global errors and is architecturally ready for integration with Sentry and advanced monitoring tools.\n</info added on 2025-05-11T22:35:07.882Z>",
+          "status": "done",
+          "testStrategy": "Deliberately trigger test errors to verify proper capture and reporting. Simulate slow queries and API responses to test performance monitoring thresholds."
+        }
+      ]
     },
     {
       "id": 24,

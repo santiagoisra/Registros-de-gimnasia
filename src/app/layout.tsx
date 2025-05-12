@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import ClientProviders from '@/components/ClientProviders'
 import Sidebar from '@/components/Sidebar'
+import { logError } from '@/lib/logger'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -16,6 +17,16 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Manejo global de errores a nivel layout (solo client-side)
+  if (typeof window !== 'undefined') {
+    window.addEventListener('error', (event) => {
+      logError('Global error', event.error)
+    })
+    window.addEventListener('unhandledrejection', (event) => {
+      logError('Unhandled promise rejection', event.reason)
+    })
+  }
+
   return (
     <html lang="es">
       <body className={inter.className}>
