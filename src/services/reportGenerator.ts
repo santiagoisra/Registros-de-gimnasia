@@ -24,6 +24,10 @@ export interface ReportParams {
   metricas?: string[]
 }
 
+function emptyReport(): { columns: string[]; rows: (string | number)[][] } {
+  return { columns: [], rows: [] }
+}
+
 export async function generateReport(params: ReportParams): Promise<{ columns: string[]; rows: Array<Array<string | number>> }> {
   switch (params.tipo) {
     case 'alumnos': {
@@ -44,7 +48,7 @@ export async function generateReport(params: ReportParams): Promise<{ columns: s
       const { data } = await asistenciasService.getAsistencias({ fecha: undefined, ...params.filtros })
       return {
         columns: ['ID', 'Alumno', 'Fecha', 'Estado', 'Sede'],
-        rows: data.map(a => [a.id ?? '', a.alumnoId ?? '', a.fecha ?? '', a.estado ?? '', a.sede ?? ''])
+        rows: (data as Array<{id?: string|number, alumnoId?: string|number, fecha?: string, estado?: string, sede?: string}>).map(a => [a.id ?? '', a.alumnoId ?? '', a.fecha ?? '', a.estado ?? '', a.sede ?? ''])
       }
     }
     case 'notas': {
@@ -62,7 +66,7 @@ export async function generateReport(params: ReportParams): Promise<{ columns: s
       }
     }
     default:
-      return { columns: [], rows: [] }
+      return emptyReport()
   }
 }
 
