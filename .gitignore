@@ -27,3 +27,9 @@ node_modules/
 *.local
 .env.example
 .env.local
+# Tests
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+coverage/

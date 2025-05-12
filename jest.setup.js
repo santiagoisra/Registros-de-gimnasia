@@ -1,3 +1,7 @@
+/* global jest */
+/**
+ * @jest-environment jsdom
+ */
 import '@testing-library/jest-dom'
 
 // Mock de next/navigation

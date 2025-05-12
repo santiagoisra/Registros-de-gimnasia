@@ -1,3 +1,5 @@
+// ⚠️ Este archivo debe usar CommonJS (require/module.exports) porque Tailwind solo soporta configuración en este formato.
+// No migrar a import/export. Ver: https://tailwindcss.com/docs/configuration
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -14,6 +16,7 @@ module.exports = {
     },
   },
   plugins: [
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     require('@tailwindcss/typography'),
   ],
 } 
