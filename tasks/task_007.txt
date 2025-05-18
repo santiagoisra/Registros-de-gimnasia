@@ -1,6 +1,6 @@
 # Task ID: 7
 # Title: Implement Automatic Alerts System
-# Status: pending
+# Status: done
 # Dependencies: 1, 4
 # Priority: medium
 # Description: Create alerts for extended absences and overdue payments

@@ -1,112 +1,112 @@
-'use client'
-
 import { useCallback, useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useToast } from './useToast'
 import { handleDatabaseError } from '@/utils/errorHandling'
 import { asistenciasService } from '@/services/asistencias'
 import type { Asistencia } from '@/types/supabase'
+import { PostgrestError } from '@supabase/supabase-js'
 
-export const useAsistencias = (options?: { 
+/**
+ * Hook para gestión de asistencias: listado, creación, edición y borrado.
+ * Usa React Query para queries y mutaciones, soporta paginación y filtrado.
+ *
+ * @example
+ * const {
+ *   asistencias, totalPages, isLoading, isError, error,
+ *   crearAsistencia, actualizarAsistencia, eliminarAsistencia,
+ *   isCreating, isUpdating, isDeleting, refetch
+ * } = useAsistencias({ page: 1, pageSize: 10, alumnoId: '123' })
+ */
+
+interface UseAsistenciasOptions {
+  page?: number
+  perPage?: number
+  orderBy?: keyof Asistencia
+  orderDirection?: 'asc' | 'desc'
   alumnoId?: string
-  page?: number 
-  pageSize?: number
-  sede?: 'Plaza Arenales' | 'Plaza Terán'
-  shiftId?: string
+  estado?: string
   fecha?: string
-  estado?: 'presente' | 'ausente'
-}) => {
+  sede?: string
+  shiftId?: string
+}
+
+export function useAsistencias(options: UseAsistenciasOptions = {}) {
   const queryClient = useQueryClient()
   const { showToast } = useToast()
-  const [loading, setLoading] = useState(false)
 
-  // Query para obtener asistencias
-  const { 
-    data: asistenciasData,
-    error: asistenciasError,
-    isLoading: asistenciasLoading 
-  } = useQuery({
-    queryKey: ['asistencias', options?.alumnoId, options?.page, options?.pageSize, options?.sede, options?.shiftId, options?.fecha, options?.estado],
-    queryFn: () => asistenciasService.getAsistencias(options),
-    enabled: !!options
-  })
-
-  // Query para estadísticas
+  // Query para obtener lista de asistencias
   const {
-    data: estadisticas,
-    error: estadisticasError,
-    isLoading: estadisticasLoading
+    data: asistenciasData,
+    isLoading,
+    isError,
+    error,
+    refetch
   } = useQuery({
-    queryKey: ['estadisticas', options?.alumnoId],
-    queryFn: () => options?.alumnoId ? asistenciasService.getEstadisticasAsistencia(options.alumnoId!) : Promise.resolve(undefined),
-    enabled: !!options?.alumnoId
+    queryKey: ['asistencias', options],
+    queryFn: () => asistenciasService.getAsistencias(options),
+    keepPreviousData: true
   })
 
-  // Mutation para crear asistencia
-  const { mutate: crearAsistencia } = useMutation({
+  // Mutación para crear asistencia
+  const {
+    mutateAsync: crearAsistencia,
+    isPending: isCreating
+  } = useMutation({
     mutationFn: asistenciasService.createAsistencia,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['asistencias'] })
       showToast('Asistencia registrada correctamente', 'success')
     },
     onError: (error) => {
-      const err = handleDatabaseError(error, 'crear asistencia')
+      const err = handleDatabaseError(error as Error | PostgrestError, 'crear asistencia')
       showToast(err.message, 'error')
-      console.error(err)
     }
   })
 
-  // Mutation para actualizar asistencia
-  const { mutate: actualizarAsistencia } = useMutation({
-    mutationFn: (args: { id: string, data: Partial<Asistencia> }) => asistenciasService.updateAsistencia(args.id, args.data),
+  // Mutación para actualizar asistencia
+  const {
+    mutateAsync: actualizarAsistencia,
+    isPending: isUpdating
+  } = useMutation({
+    mutationFn: ({ id, data }: { id: string, data: Partial<Asistencia> }) => asistenciasService.updateAsistencia(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['asistencias'] })
       showToast('Asistencia actualizada correctamente', 'success')
     },
     onError: (error) => {
-      const err = handleDatabaseError(error, 'actualizar asistencia')
+      const err = handleDatabaseError(error as Error | PostgrestError, 'actualizar asistencia')
       showToast(err.message, 'error')
-      console.error(err)
     }
   })
 
-  // Mutation para eliminar asistencia
-  const { mutate: eliminarAsistencia } = useMutation({
+  // Mutación para eliminar asistencia
+  const {
+    mutateAsync: eliminarAsistencia,
+    isPending: isDeleting
+  } = useMutation({
     mutationFn: (id: string) => asistenciasService.deleteAsistencia(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['asistencias'] })
       showToast('Asistencia eliminada correctamente', 'success')
     },
     onError: (error) => {
-      const err = handleDatabaseError(error, 'eliminar asistencia')
+      const err = handleDatabaseError(error as Error | PostgrestError, 'eliminar asistencia')
       showToast(err.message, 'error')
-      console.error(err)
     }
   })
-
-  const obtenerAsistenciasPorPeriodo = useCallback(async (periodo: { desde: string; hasta: string }) => {
-    try {
-      setLoading(true)
-      const data = await asistenciasService.getAsistencias({ ...options, ...periodo })
-      return data
-    } catch (error) {
-      showToast('Error al obtener las asistencias del periodo', 'error')
-      console.error(error)
-      return []
-    } finally {
-      setLoading(false)
-    }
-  }, [showToast, options])
 
   return {
     asistencias: asistenciasData?.data || [],
     totalPages: asistenciasData?.totalPages || 1,
-    estadisticas,
-    loading: loading || asistenciasLoading || estadisticasLoading,
-    error: asistenciasError || estadisticasError,
+    isLoading,
+    isError,
+    error,
+    refetch,
     crearAsistencia,
     actualizarAsistencia,
     eliminarAsistencia,
-    obtenerAsistenciasPorPeriodo
+    isCreating,
+    isUpdating,
+    isDeleting
   }
 } 

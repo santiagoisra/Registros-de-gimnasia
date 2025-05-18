@@ -1,5 +1,3 @@
-'use client'
-
 import { useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useToast } from './useToast'
@@ -12,20 +10,34 @@ import {
   validateNumericRange
 } from '@/utils'
 import { PostgrestError } from '@supabase/supabase-js'
+import { notasService } from '@/services/notas'
 
 interface UseNotasOptions {
+  page?: number
+  perPage?: number
+  orderBy?: keyof Nota
+  orderDirection?: 'asc' | 'desc'
   alumnoId?: string
-  tipo?: NotaDB['tipo']
-  categoria?: Nota['categoria']
+  tipo?: string
+  categoria?: string
   visibleEnReporte?: boolean
   calificacionMin?: number
   calificacionMax?: number
-  page?: number
-  pageSize?: number
   fechaDesde?: string
   fechaHasta?: string
 }
 
+/**
+ * Hook para gestión de notas: listado, creación, edición y borrado.
+ * Usa React Query para queries y mutaciones, soporta paginación y filtrado.
+ *
+ * @example
+ * const {
+ *   notas, totalPages, isLoading, isError, error,
+ *   createNota, updateNota, deleteNota,
+ *   isCreating, isUpdating, isDeleting, refetch
+ * } = useNotas({ page: 1, pageSize: 10, alumnoId: '123' })
+ */
 export function useNotas(options: UseNotasOptions = {}) {
   const queryClient = useQueryClient()
   const { showToast } = useToast()
@@ -35,11 +47,17 @@ export function useNotas(options: UseNotasOptions = {}) {
     validateDateRange(options.fechaDesde, options.fechaHasta)
   }
 
-  // Query principal para obtener notas
-  const notasQuery = useQuery({
+  // Query para obtener lista de notas
+  const {
+    data: notasData,
+    isLoading,
+    isError,
+    error,
+    refetch
+  } = useQuery({
     queryKey: ['notas', options],
-    queryFn: () => Promise.resolve({ data: [], totalPages: 1 }),
-    enabled: !!(options.alumnoId || options.tipo || options.visibleEnReporte)
+    queryFn: () => notasService.getNotas(options),
+    keepPreviousData: true
   })
 
   // Query para estadísticas
@@ -57,112 +75,67 @@ export function useNotas(options: UseNotasOptions = {}) {
   })
 
   // Mutación para crear nota
-  const createNotaMutation = useMutation({
-    mutationFn: async () => undefined,
+  const {
+    mutateAsync: createNota,
+    isPending: isCreating
+  } = useMutation({
+    mutationFn: notasService.createNota,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notas'] })
-      showToast('Nota creada exitosamente', 'success')
+      showToast('Nota creada correctamente', 'success')
     },
     onError: (error) => {
       const err = handleDatabaseError(error as Error | PostgrestError, 'crear nota')
       showToast(err.message, 'error')
-      console.error(err)
     }
   })
 
   // Mutación para actualizar nota
-  const updateNotaMutation = useMutation({
-    mutationFn: async () => undefined,
+  const {
+    mutateAsync: updateNota,
+    isPending: isUpdating
+  } = useMutation({
+    mutationFn: ({ id, data }: { id: string, data: Partial<Nota> }) => notasService.updateNota(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notas'] })
-      showToast('Nota actualizada exitosamente', 'success')
+      showToast('Nota actualizada correctamente', 'success')
     },
     onError: (error) => {
       const err = handleDatabaseError(error as Error | PostgrestError, 'actualizar nota')
       showToast(err.message, 'error')
-      console.error(err)
     }
   })
 
   // Mutación para eliminar nota
-  const deleteNotaMutation = useMutation({
-    mutationFn: async () => undefined,
+  const {
+    mutateAsync: deleteNota,
+    isPending: isDeleting
+  } = useMutation({
+    mutationFn: (id: string) => notasService.deleteNota(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notas'] })
-      showToast('Nota eliminada exitosamente', 'success')
+      showToast('Nota eliminada correctamente', 'success')
     },
     onError: (error) => {
       const err = handleDatabaseError(error as Error | PostgrestError, 'eliminar nota')
       showToast(err.message, 'error')
-      console.error(err)
     }
   })
 
-  // Función para crear nota con validación
-  const handleCreateNota = useCallback(async (data: Partial<Nota>) => {
-    try {
-      validateRequired(data.alumnoId, 'alumnoId')
-      validateRequired(data.fecha, 'fecha')
-      validateRequired(data.tipo, 'tipo')
-      
-      if (data.calificacion !== undefined) {
-        validateNumericRange(data.calificacion, 1, 10, 'calificación')
-      }
-
-      await createNotaMutation.mutateAsync()
-    } catch (error) {
-      const err = handleDatabaseError(error as Error | PostgrestError, 'crear nota')
-      showToast(err.message, 'error')
-      throw err
-    }
-  }, [createNotaMutation, showToast])
-
-  // Función para actualizar nota con validación
-  const handleUpdateNota = useCallback(async (data: Partial<Nota>) => {
-    try {
-      if (data.calificacion !== undefined) {
-        validateNumericRange(data.calificacion, 1, 10, 'calificación')
-      }
-
-      await updateNotaMutation.mutateAsync()
-    } catch (error) {
-      const err = handleDatabaseError(error as Error | PostgrestError, 'actualizar nota')
-      showToast(err.message, 'error')
-      throw err
-    }
-  }, [updateNotaMutation, showToast])
-
-  // Función para eliminar nota
-  const handleDeleteNota = useCallback(async () => {
-    try {
-      await deleteNotaMutation.mutateAsync()
-    } catch (error) {
-      const err = handleDatabaseError(error as Error | PostgrestError, 'eliminar nota')
-      showToast(err.message, 'error')
-      throw err
-    }
-  }, [deleteNotaMutation, showToast])
-
   return {
-    // Queries
-    notas: notasQuery.data?.data || [],
-    totalPages: notasQuery.data?.totalPages || 1,
+    notas: notasData?.data || [],
+    totalPages: notasData?.totalPages || 1,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    createNota,
+    updateNota,
+    deleteNota,
+    isCreating,
+    isUpdating,
+    isDeleting,
     estadisticas: estadisticasQuery.data,
-    notasPorPeriodo: notasPorPeriodoQuery.data,
-    
-    // Estados de carga y error
-    isLoading: notasQuery.isLoading || estadisticasQuery.isLoading || notasPorPeriodoQuery.isLoading,
-    isError: notasQuery.isError || estadisticasQuery.isError || notasPorPeriodoQuery.isError,
-    error: notasQuery.error || estadisticasQuery.error || notasPorPeriodoQuery.error,
-
-    // Mutaciones
-    createNota: handleCreateNota,
-    updateNota: handleUpdateNota,
-    deleteNota: handleDeleteNota,
-    
-    // Estados de las mutaciones
-    isCreating: createNotaMutation.isPending,
-    isUpdating: updateNotaMutation.isPending,
-    isDeleting: deleteNotaMutation.isPending
+    notasPorPeriodo: notasPorPeriodoQuery.data
   }
 }

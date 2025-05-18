@@ -1,199 +1,100 @@
-'use client'
-
-import { useState, useCallback, useEffect } from 'react'
-import { 
-  PaginationParams, 
-  OrderParams, 
-  DateRangeParams,
-  handleDatabaseError,
-  validateDateRange
-} from '@/utils'
-import type { HistorialPrecio, EstadisticasPrecios } from '@/types'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { historialPreciosService } from '@/services/historialPrecios'
+import type { HistorialPrecio } from '@/types'
+import { useToast } from './useToast'
+import { handleDatabaseError } from '@/utils/errorHandling'
+import { PostgrestError } from '@supabase/supabase-js'
 
-interface UseHistorialPreciosOptions extends PaginationParams, OrderParams, DateRangeParams {
+interface UseHistorialPreciosOptions {
+  page?: number
+  perPage?: number
+  orderBy?: keyof HistorialPrecio
+  orderDirection?: 'asc' | 'desc'
   servicio?: string
-  tipoServicio?: HistorialPrecio['tipoServicio']
-  moneda?: HistorialPrecio['moneda']
-  conDescuento?: boolean
-  autoFetch?: boolean
+  tipoServicio?: string
+  moneda?: string
   alumnoId?: string
+  fechaDesde?: string
+  fechaHasta?: string
 }
 
-interface UseHistorialPreciosReturn {
-  precios: HistorialPrecio[]
-  precioVigente: HistorialPrecio | null
-  estadisticas: EstadisticasPrecios | null
-  incrementosPendientes: HistorialPrecio[]
-  loading: boolean
-  error: Error | null
-  fetchPrecios: () => Promise<void>
-  fetchPrecioVigente: () => Promise<void>
-  fetchEstadisticas: () => Promise<void>
-  verificarIncrementos: () => Promise<void>
-  createPrecio: (precio: Omit<HistorialPrecio, 'id'>) => Promise<HistorialPrecio>
-  updatePrecio: (id: string, precio: Partial<Omit<HistorialPrecio, 'id'>>) => Promise<HistorialPrecio>
-  deletePrecio: (id: string) => Promise<boolean>
-}
+export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}) {
+  const queryClient = useQueryClient()
+  const { showToast } = useToast()
 
-export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}): UseHistorialPreciosReturn {
+  // Query para obtener lista de precios
   const {
-    page,
-    pageSize,
-    orderBy,
-    orderDirection,
-    fechaDesde,
-    fechaHasta,
-    servicio,
-    tipoServicio,
-    moneda,
-    autoFetch,
-    alumnoId
-  } = options
+    data: preciosData,
+    isLoading,
+    isError,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['historialPrecios', options],
+    queryFn: () => historialPreciosService.getHistorialPrecios(options),
+    keepPreviousData: true
+  })
 
-  const [precios, setPrecios] = useState<HistorialPrecio[]>([])
-  const [precioVigente, setPrecioVigente] = useState<HistorialPrecio | null>(null)
-  const [estadisticas, setEstadisticas] = useState<EstadisticasPrecios | null>(null)
-  const [incrementosPendientes, setIncrementosPendientes] = useState<HistorialPrecio[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
-
-  const fetchPrecios = useCallback(async () => {
-    try {
-      if (fechaDesde && fechaHasta) {
-        validateDateRange(fechaDesde, fechaHasta)
-      }
-      setLoading(true)
-      setError(null)
-      const { data: precios } = await historialPreciosService.getHistorialPrecios({
-        page,
-        perPage: pageSize,
-        orderBy: orderBy as keyof import('@/types/supabase').HistorialPrecios,
-        orderDirection,
-        fechaDesde,
-        fechaHasta,
-        servicio: servicio as import('@/types/supabase').HistorialPrecios['servicio'],
-        tipoServicio: tipoServicio as import('@/types/supabase').HistorialPrecios['tipo_servicio'],
-        moneda: moneda as import('@/types/supabase').HistorialPrecios['moneda'],
-        alumnoId
-      })
-      setPrecios(precios)
-      // TODO: setEstadisticas si el servicio lo devuelve
-      // Eliminar lógica de incrementosPendientes si no existe en el tipo
-    } catch (err) {
-      setError(handleDatabaseError(err as Error, 'fetchPrecios'))
-    } finally {
-      setLoading(false)
+  // Mutación para crear precio
+  const {
+    mutateAsync: createPrecio,
+    isPending: isCreating
+  } = useMutation({
+    mutationFn: historialPreciosService.createHistorialPrecio,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['historialPrecios'] })
+      showToast('Precio creado correctamente', 'success')
+    },
+    onError: (error) => {
+      const err = handleDatabaseError(error as Error | PostgrestError, 'crear precio')
+      showToast(err.message, 'error')
     }
-  }, [page, pageSize, orderBy, orderDirection, fechaDesde, fechaHasta, servicio, tipoServicio, moneda, alumnoId])
+  })
 
-  const fetchPrecioVigente = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      // TODO: Implementar o importar correctamente getPrecioVigente
-      // const precio = await historialPreciosService.getPrecioVigente(servicio, fecha)
-      const precio = null
-      setPrecioVigente(precio)
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Error al obtener precio vigente'))
-    } finally {
-      setLoading(false)
+  // Mutación para actualizar precio
+  const {
+    mutateAsync: updatePrecio,
+    isPending: isUpdating
+  } = useMutation({
+    mutationFn: ({ id, data }: { id: string, data: Partial<HistorialPrecio> }) => historialPreciosService.updateHistorialPrecio(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['historialPrecios'] })
+      showToast('Precio actualizado correctamente', 'success')
+    },
+    onError: (error) => {
+      const err = handleDatabaseError(error as Error | PostgrestError, 'actualizar precio')
+      showToast(err.message, 'error')
     }
-  }, [])
+  })
 
-  const fetchEstadisticas = useCallback(async () => {
-    if (!servicio) {
-      setError(new Error('Se requiere especificar un servicio para obtener estadísticas'))
-      return
+  // Mutación para eliminar precio
+  const {
+    mutateAsync: deletePrecio,
+    isPending: isDeleting
+  } = useMutation({
+    mutationFn: (id: string) => historialPreciosService.deleteHistorialPrecio(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['historialPrecios'] })
+      showToast('Precio eliminado correctamente', 'success')
+    },
+    onError: (error) => {
+      const err = handleDatabaseError(error as Error | PostgrestError, 'eliminar precio')
+      showToast(err.message, 'error')
     }
-
-    try {
-      setLoading(true)
-      setError(null)
-      // TODO: Implementar o importar correctamente getPreciosTendencia
-      const stats = null
-      setEstadisticas(stats)
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Error al obtener estadísticas'))
-    } finally {
-      setLoading(false)
-    }
-  }, [servicio])
-
-  const verificarIncrementos = useCallback(async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      // TODO: Implementar o importar correctamente verificarIncrementosProgramados
-      // const precios = await historialPreciosService.verificarIncrementosProgramados()
-      const precios: HistorialPrecio[] = []
-      setIncrementosPendientes(precios)
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Error al verificar incrementos'))
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    if (autoFetch) {
-      fetchPrecios()
-    }
-  }, [autoFetch, fetchPrecios])
+  })
 
   return {
-    precios,
-    precioVigente,
-    estadisticas,
-    incrementosPendientes,
-    loading,
+    precios: preciosData?.data || [],
+    totalPages: preciosData?.totalPages || 1,
+    isLoading,
+    isError,
     error,
-    fetchPrecios,
-    fetchPrecioVigente,
-    fetchEstadisticas,
-    verificarIncrementos,
-    createPrecio: async (precio) => {
-      setLoading(true)
-      setError(null)
-      try {
-        const nuevo = await historialPreciosService.createHistorialPrecio(precio)
-        await fetchPrecios()
-        return nuevo
-      } catch (err) {
-        setError(handleDatabaseError(err as Error, 'createPrecio'))
-        throw err
-      } finally {
-        setLoading(false)
-      }
-    },
-    updatePrecio: async (id, precio) => {
-      setLoading(true)
-      setError(null)
-      try {
-        const actualizado = await historialPreciosService.updateHistorialPrecio(id, precio)
-        await fetchPrecios()
-        return actualizado
-      } catch (err) {
-        setError(handleDatabaseError(err as Error, 'updatePrecio'))
-        throw err
-      } finally {
-        setLoading(false)
-      }
-    },
-    deletePrecio: async (id) => {
-      setLoading(true)
-      setError(null)
-      try {
-        await historialPreciosService.deleteHistorialPrecio(id)
-        await fetchPrecios()
-        return true
-      } catch (err) {
-        setError(handleDatabaseError(err as Error, 'deletePrecio'))
-        return false
-      } finally {
-        setLoading(false)
-      }
-    }
+    refetch,
+    createPrecio,
+    updatePrecio,
+    deletePrecio,
+    isCreating,
+    isUpdating,
+    isDeleting
   }
 } 

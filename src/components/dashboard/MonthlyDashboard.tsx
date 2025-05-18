@@ -5,6 +5,7 @@ import { getDashboardMetrics, getAttendanceTrends, getIncomeTrends } from '@/ser
 import { Spinner } from '@/components/ui/Spinner'
 import { UsersIcon, CalendarIcon, BanknotesIcon, ExclamationTriangleIcon, ArrowRightIcon, Cog6ToothIcon } from '@heroicons/react/24/outline'
 import Link from 'next/link'
+import { AlertasContainer } from '../alertas'
 
 const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre']
 const anioActual = new Date().getFullYear()
@@ -52,6 +53,9 @@ export function MonthlyDashboard() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-12">
       <div className="max-w-6xl mx-auto px-4 pt-8">
         <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
+        <section className="mb-8">
+          <AlertasContainer />
+        </section>
         {/* Accesos rápidos */}
         <div className="flex flex-wrap gap-3 mb-8">
           {quickLinks.map(({ label, href, icon: Icon, color }) => (
@@ -71,6 +75,7 @@ export function MonthlyDashboard() {
                 className="border rounded px-2 py-1 ml-2 focus:ring-2 focus:ring-blue-200"
                 value={mes}
                 onChange={e => setMes(Number(e.target.value))}
+                title="Seleccionar mes"
               >
                 {meses.map((m, i) => (
                   <option key={m} value={i}>{m}</option>
@@ -84,6 +89,7 @@ export function MonthlyDashboard() {
                 className="border rounded px-2 py-1 ml-2 focus:ring-2 focus:ring-blue-200"
                 value={anio}
                 onChange={e => setAnio(Number(e.target.value))}
+                title="Seleccionar año"
               >
                 {[anioActual - 1, anioActual, anioActual + 1].map(a => (
                   <option key={a} value={a}>{a}</option>

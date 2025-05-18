@@ -2,7 +2,7 @@
 /**
  * @jest-environment jsdom
  */
-import '@testing-library/jest-dom'
+require('@testing-library/jest-dom')
 
 // Mock de next/navigation
 jest.mock('next/navigation', () => ({

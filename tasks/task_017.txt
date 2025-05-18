@@ -1,16 +1,17 @@
 # Task ID: 17
 # Title: Create and Update React Hooks for Data Management
-# Status: pending
+# Status: done
 # Dependencies: None
 # Priority: medium
 # Description: Develop and enhance React hooks in src/hooks/ directory for students, attendance, payments, price history, and grades to enable efficient queries and mutations with the new data structure.
 # Details:
-This task involves creating or updating custom React hooks in the src/hooks/ directory for the following data entities:
+This task involves creating or updating custom React hooks in the src/hooks/ directory for the following data entities, with a unified API approach:
 
 1. Students (alumnos): 
-   - Create useStudents hook with functions for fetching all students, getting a single student by ID, creating, updating, and deleting student records
-   - Implement proper caching and state management
-   - Handle pagination and filtering if applicable
+   - Refactor useAlumnos hook to add missing CRUD operations (create, update, delete)
+   - Implement proper caching and state management with React Query
+   - Add pagination and filtering functionality
+   - Focus on this hook first as it's currently the weakest implementation
 
 2. Attendance (asistencias):
    - Develop useAttendance hook with functions to record, retrieve, and modify attendance data
@@ -23,22 +24,24 @@ This task involves creating or updating custom React hooks in the src/hooks/ dir
    - Handle different payment statuses and types
 
 4. Price History (historialPrecios):
-   - Implement usePriceHistory hook to track and retrieve historical pricing data
+   - Migrate existing usePriceHistory hook to React Query
+   - Complete missing methods to track and retrieve historical pricing data
    - Include methods for analyzing price trends and changes over time
    - Support filtering by date ranges and service types
 
 5. Grades (notas):
-   - Develop useGrades hook with functions to record, retrieve, and modify student grades
+   - Implement real queries and mutations in useNotas hook
    - Include methods for calculating averages, generating reports, and tracking progress
 
-Each hook should:
-- Follow a consistent pattern and API design
-- Utilize React Query or a similar library for efficient data fetching and caching
-- Include proper error handling and loading states
-- Be fully typed with TypeScript
-- Support the new data structure requirements
+Each hook should follow a unified API approach:
+- Use React Query consistently for all queries and mutations
+- Follow a consistent pattern and API design across all hooks
 - Implement optimistic updates where appropriate
-- Include documentation with JSDoc comments
+- Include unified error handling using useToast and handleDatabaseError
+- Expose proper loading, error, and mutation states
+- Be fully typed with TypeScript
+- Include comprehensive JSDoc documentation
+- Support the new data structure requirements
 
 # Test Strategy:
 Testing should be comprehensive and cover all aspects of the hooks:
@@ -65,10 +68,11 @@ Testing should be comprehensive and cover all aspects of the hooks:
    - Test with large datasets to ensure performance
 
 Specific Test Cases:
-- Verify that useStudents.getAll() returns the correct list of students
+- Verify that useAlumnos.getAll() returns the correct list of students with pagination
 - Test that useAttendance.markPresent() correctly updates attendance records
 - Confirm usePayments.processPayment() handles both successful and failed payments
 - Verify usePriceHistory.getPriceAtDate() returns the correct historical price
-- Test that useGrades.calculateAverage() produces accurate results
+- Test that useNotas.calculateAverage() produces accurate results
+- Verify error handling with useToast and handleDatabaseError works consistently
 
 All tests should pass before considering this task complete.

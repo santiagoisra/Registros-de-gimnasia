@@ -1,5 +1,3 @@
-'use client'
-
 /**
  * @file usePagos.ts
  * @description Hook personalizado para gestionar pagos en la aplicación.
@@ -36,6 +34,10 @@ interface UsePagosOptions {
   page?: number
   /** Cantidad de items por página */
   pageSize?: number
+  /** Ordenar por campo */
+  orderBy?: keyof Pago
+  /** Ordenar dirección */
+  orderDirection?: 'asc' | 'desc'
 }
 
 /**
@@ -73,38 +75,15 @@ interface EstadisticasPagos {
 }
 
 /**
- * Hook personalizado para gestionar pagos en la aplicación.
- * 
- * @param options - Opciones de configuración para el hook
- * @returns Objeto con queries, mutaciones y utilidades para gestionar pagos
- * 
+ * Hook para gestión de pagos: listado, creación, edición y borrado.
+ * Usa React Query para queries y mutaciones, soporta paginación y filtrado.
+ *
  * @example
- * ```tsx
- * const { 
- *   pagos,
- *   totalPages,
- *   estadisticas,
- *   createPago,
- *   updatePago,
- *   deletePago,
- *   isLoading
- * } = usePagos({
- *   alumnoId: '123',
- *   fechaDesde: '2024-01-01',
- *   fechaHasta: '2024-12-31'
- * });
- * 
- * // Crear un nuevo pago
- * await createPago({
- *   alumnoId: '123',
- *   fecha: '2024-03-15',
- *   monto: 1500,
- *   metodoPago: 'Efectivo',
- *   estado: 'Pagado',
- *   mes: 3,
- *   anio: 2024
- * });
- * ```
+ * const {
+ *   pagos, totalPages, isLoading, isError, error,
+ *   createPago, updatePago, deletePago,
+ *   isCreating, isUpdating, isDeleting, refetch
+ * } = usePagos({ page: 1, pageSize: 10, alumnoId: '123' })
  */
 export function usePagos(options: UsePagosOptions = {}) {
   const queryClient = useQueryClient()
@@ -115,34 +94,17 @@ export function usePagos(options: UsePagosOptions = {}) {
     validateDateRange(options.fechaDesde, options.fechaHasta)
   }
 
-  // Query principal para obtener pagos
-  const pagosQuery = useQuery<PagosQueryResult, Error>({
+  // Query para obtener lista de pagos
+  const {
+    data: pagosData,
+    isLoading,
+    isError,
+    error,
+    refetch
+  } = useQuery({
     queryKey: ['pagos', options],
-    queryFn: async () => {
-      if (options.fechaDesde || options.fechaHasta || options.metodoPago || options.estado) {
-        const pagos = await pagosService.getPagosPorFiltros({
-          metodoPago: options.metodoPago,
-          estado: options.estado,
-          fechaDesde: options.fechaDesde,
-          fechaHasta: options.fechaHasta
-        });
-        return {
-          pagos,
-          total: pagos.length,
-          page: 1,
-          pageSize: pagos.length
-        };
-      } else {
-        const { pagos, total, page, pageSize } = await pagosService.getPagos({
-          page: options.page,
-          pageSize: options.pageSize,
-          orderBy: 'fecha_pago',
-          orderDirection: 'desc'
-        });
-        return { pagos, total, page, pageSize };
-      }
-    },
-    enabled: true
+    queryFn: () => pagosService.getPagos(options),
+    keepPreviousData: true
   })
 
   // Query para estadísticas
@@ -156,161 +118,66 @@ export function usePagos(options: UsePagosOptions = {}) {
   })
 
   // Mutación para crear pago
-  const createPagoMutation = useMutation<Pago | null, Error, Omit<Pago, 'id'>>({
+  const {
+    mutateAsync: createPago,
+    isPending: isCreating
+  } = useMutation({
     mutationFn: pagosService.createPago,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pagos'] })
-      showToast('Pago registrado exitosamente', 'success')
+      showToast('Pago registrado correctamente', 'success')
     },
     onError: (error) => {
-      const err = handleDatabaseError(error as Error | PostgrestError, 'registrar pago')
+      const err = handleDatabaseError(error as Error | PostgrestError, 'crear pago')
       showToast(err.message, 'error')
-      console.error(err)
-    }
-  })
-
-  // Mutación para crear pagos en lote
-  const createPagosBulkMutation = useMutation<(Pago | null)[], Error, Omit<Pago, 'id'>[]>({
-    mutationFn: pagosService.createPagosBulk,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['pagos'] })
-      showToast('Pagos registrados exitosamente', 'success')
-    },
-    onError: (error) => {
-      const err = handleDatabaseError(error as Error | PostgrestError, 'registrar pagos en lote')
-      showToast(err.message, 'error')
-      console.error(err)
     }
   })
 
   // Mutación para actualizar pago
-  const updatePagoMutation = useMutation<Pago | null, Error, { id: string; data: Partial<Omit<Pago, 'id'>> }>({
-    mutationFn: ({ id, data }) => pagosService.updatePago(id, data),
+  const {
+    mutateAsync: updatePago,
+    isPending: isUpdating
+  } = useMutation({
+    mutationFn: ({ id, data }: { id: string, data: Partial<Pago> }) => pagosService.updatePago(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pagos'] })
-      showToast('Pago actualizado exitosamente', 'success')
+      showToast('Pago actualizado correctamente', 'success')
     },
     onError: (error) => {
       const err = handleDatabaseError(error as Error | PostgrestError, 'actualizar pago')
       showToast(err.message, 'error')
-      console.error(err)
     }
   })
 
   // Mutación para eliminar pago
-  const deletePagoMutation = useMutation<void, Error, string>({
-    mutationFn: pagosService.deletePago,
+  const {
+    mutateAsync: deletePago,
+    isPending: isDeleting
+  } = useMutation({
+    mutationFn: (id: string) => pagosService.deletePago(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['pagos'] })
-      showToast('Pago eliminado exitosamente', 'success')
+      showToast('Pago eliminado correctamente', 'success')
     },
     onError: (error) => {
       const err = handleDatabaseError(error as Error | PostgrestError, 'eliminar pago')
       showToast(err.message, 'error')
-      console.error(err)
     }
   })
 
-  // Función para crear pago con validación
-  const handleCreatePago = useCallback(async (data: Omit<Pago, 'id'>) => {
-    try {
-      validateRequired(data.alumnoId, 'alumnoId')
-      validateRequired(data.fecha, 'fecha')
-      validateRequired(data.monto, 'monto')
-      validateRequired(data.metodoPago, 'metodoPago')
-      validateRequired(data.estado, 'estado')
-      validateRequired(data.mes, 'mes')
-      validateRequired(data.anio, 'año')
-      
-      validateNumericRange(data.monto, 0, Infinity, 'monto')
-      validateNumericRange(data.mes, 1, 12, 'mes')
-      validateNumericRange(data.anio, 2000, 2100, 'año')
-
-      await createPagoMutation.mutateAsync(data)
-    } catch (error) {
-      const err = handleDatabaseError(error as Error | PostgrestError, 'crear pago')
-      showToast(err.message, 'error')
-      throw err
-    }
-  }, [createPagoMutation, showToast])
-
-  // Función para crear pagos en lote con validación
-  const handleCreatePagosBulk = useCallback(async (pagos: Omit<Pago, 'id'>[]) => {
-    try {
-      pagos.forEach((pago, index) => {
-        validateRequired(pago.alumnoId, `alumnoId en pago ${index + 1}`)
-        validateRequired(pago.fecha, `fecha en pago ${index + 1}`)
-        validateRequired(pago.monto, `monto en pago ${index + 1}`)
-        validateRequired(pago.metodoPago, `metodoPago en pago ${index + 1}`)
-        validateRequired(pago.estado, `estado en pago ${index + 1}`)
-        validateRequired(pago.mes, `mes en pago ${index + 1}`)
-        validateRequired(pago.anio, `año en pago ${index + 1}`)
-        
-        validateNumericRange(pago.monto, 0, Infinity, `monto en pago ${index + 1}`)
-        validateNumericRange(pago.mes, 1, 12, `mes en pago ${index + 1}`)
-        validateNumericRange(pago.anio, 2000, 2100, `año en pago ${index + 1}`)
-      })
-
-      await createPagosBulkMutation.mutateAsync(pagos)
-    } catch (error) {
-      const err = handleDatabaseError(error as Error | PostgrestError, 'crear pagos en lote')
-      showToast(err.message, 'error')
-      throw err
-    }
-  }, [createPagosBulkMutation, showToast])
-
-  // Función para actualizar pago con validación
-  const handleUpdatePago = useCallback(async (id: string, data: Partial<Omit<Pago, 'id'>>) => {
-    try {
-      if (data.monto !== undefined) {
-        validateNumericRange(data.monto, 0, Infinity, 'monto')
-      }
-      if (data.mes !== undefined) {
-        validateNumericRange(data.mes, 1, 12, 'mes')
-      }
-      if (data.anio !== undefined) {
-        validateNumericRange(data.anio, 2000, 2100, 'año')
-      }
-
-      await updatePagoMutation.mutateAsync({ id, data })
-    } catch (error) {
-      const err = handleDatabaseError(error as Error | PostgrestError, 'actualizar pago')
-      showToast(err.message, 'error')
-      throw err
-    }
-  }, [updatePagoMutation, showToast])
-
-  // Función para eliminar pago
-  const handleDeletePago = useCallback(async (id: string) => {
-    try {
-      await deletePagoMutation.mutateAsync(id)
-    } catch (error) {
-      const err = handleDatabaseError(error as Error | PostgrestError, 'eliminar pago')
-      showToast(err.message, 'error')
-      throw err
-    }
-  }, [deletePagoMutation, showToast])
-
   return {
-    // Queries
-    pagos: pagosQuery.data?.pagos || [],
-    totalPages: pagosQuery.data ? Math.ceil(pagosQuery.data.total / (options.pageSize || 10)) : 1,
-    estadisticas: estadisticasQuery.data,
-    
-    // Estados de carga y error
-    isLoading: pagosQuery.isLoading || estadisticasQuery.isLoading,
-    isError: pagosQuery.isError || estadisticasQuery.isError,
-    error: pagosQuery.error || estadisticasQuery.error,
-
-    // Mutaciones
-    createPago: handleCreatePago,
-    createPagosBulk: handleCreatePagosBulk,
-    updatePago: handleUpdatePago,
-    deletePago: handleDeletePago,
-    
-    // Estados de las mutaciones
-    isCreating: createPagosBulkMutation.isPending,
-    isUpdating: updatePagoMutation.isPending,
-    isDeleting: deletePagoMutation.isPending
+    pagos: pagosData?.data || [],
+    totalPages: pagosData?.totalPages || 1,
+    isLoading,
+    isError,
+    error,
+    refetch,
+    createPago,
+    updatePago,
+    deletePago,
+    isCreating,
+    isUpdating,
+    isDeleting,
+    estadisticas: estadisticasQuery.data
   }
 } 
