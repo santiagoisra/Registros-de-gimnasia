@@ -25,7 +25,8 @@ const navigation = [
 
 const configMenu = [
   { name: 'Historial de precios', href: '/configuracion/historial-precios' },
-  { name: 'Alertas', href: '/configuracion/alertas' }
+  { name: 'Alertas', href: '/configuracion/alertas' },
+  { name: 'Usar con Agente IA', href: '/configuracion/agente-ia' },
 ]
 
 export default function Sidebar() {

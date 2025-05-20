@@ -87,3 +87,22 @@ The testing strategy for the appointment management system should include:
    - Notifications are sent reliably for all appointment events
    - The system maintains performance with 1000+ appointments and 500+ concurrent users
    - All appointment data is correctly synchronized with the student management system
+
+# Subtasks:
+## 1. Agregar botón en la barra lateral para acceder a un panel 'Usar con Agente IA' e instalar Google Agent SDK [pending]
+### Dependencies: None
+### Description: Crear un botón en la barra lateral que lleve a un nuevo panel llamado 'Usar con Agente IA'. En ese panel, instalar y configurar el Google Agent SDK (ADK) siguiendo la documentación oficial. El objetivo es preparar la integración de un agente IA que permita SUDO de usuarios (por ahora, gestionado en un archivo JSON local en la carpeta del proyecto).
+### Details:
+- Leer toda la documentación interna del proyecto para entender el contexto y las funcionalidades existentes.
+- Agregar un botón en la barra lateral que redirija a un panel 'Usar con Agente IA'.
+- En ese panel, instalar y dejar listo el Google Agent SDK (ADK) según https://google.github.io/adk-docs/get-started/quickstart/.
+- Preparar la estructura para que el agente pueda hacer SUDO de usuarios, gestionando los permisos en un archivo JSON local (no en Supabase por ahora).
+- El agente debe estar preparado para responder a:
+  - CRUD de alumnos
+  - CRUD de pagos de cada alumno
+  - Notas para cada alumno
+  - Asistencias para cada alumno
+  - Resúmenes naturales (ej: 'dame un resumen de pagos de Juan Perez')
+  - Alertas urgentes al saludar (ej: alumnos que no vinieron o deben abonar)
+- Todo debe estar desacoplado de la lógica actual de Supabase, usando solo el JSON local para SUDO.
+

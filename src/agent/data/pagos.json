@@ -1,0 +1,32 @@
+[
+  {
+    "id": "p1",
+    "alumno_id": "a1",
+    "monto": 5000,
+    "fecha_pago": "2024-07-01",
+    "mes": 7,
+    "año": 2024,
+    "metodo_pago": "Efectivo",
+    "estado": "Pagado"
+  },
+  {
+    "id": "p2",
+    "alumno_id": "a2",
+    "monto": 5000,
+    "fecha_pago": "2024-06-15",
+    "mes": 6,
+    "año": 2024,
+    "metodo_pago": "Transferencia",
+    "estado": "Pagado"
+  },
+   {
+    "id": "p3",
+    "alumno_id": "a3",
+    "monto": 5000,
+    "fecha_pago": "2024-07-05",
+    "mes": 7,
+    "año": 2024,
+    "metodo_pago": "Mercado Pago",
+    "estado": "Pendiente"
+  }
+] 

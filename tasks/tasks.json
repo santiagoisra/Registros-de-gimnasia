@@ -1033,7 +1033,17 @@
       "status": "pending",
       "dependencies": [],
       "priority": "medium",
-      "subtasks": []
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Agregar botón en la barra lateral para acceder a un panel 'Usar con Agente IA' e instalar Google Agent SDK",
+          "description": "Crear un botón en la barra lateral que lleve a un nuevo panel llamado 'Usar con Agente IA'. En ese panel, instalar y configurar el Google Agent SDK (ADK) siguiendo la documentación oficial. El objetivo es preparar la integración de un agente IA que permita SUDO de usuarios (por ahora, gestionado en un archivo JSON local en la carpeta del proyecto).",
+          "details": "- Leer toda la documentación interna del proyecto para entender el contexto y las funcionalidades existentes.\n- Agregar un botón en la barra lateral que redirija a un panel 'Usar con Agente IA'.\n- En ese panel, instalar y dejar listo el Google Agent SDK (ADK) según https://google.github.io/adk-docs/get-started/quickstart/.\n- Preparar la estructura para que el agente pueda hacer SUDO de usuarios, gestionando los permisos en un archivo JSON local (no en Supabase por ahora).\n- El agente debe estar preparado para responder a:\n  - CRUD de alumnos\n  - CRUD de pagos de cada alumno\n  - Notas para cada alumno\n  - Asistencias para cada alumno\n  - Resúmenes naturales (ej: 'dame un resumen de pagos de Juan Perez')\n  - Alertas urgentes al saludar (ej: alumnos que no vinieron o deben abonar)\n- Todo debe estar desacoplado de la lógica actual de Supabase, usando solo el JSON local para SUDO.",
+          "status": "pending",
+          "dependencies": [],
+          "parentTaskId": 26
+        }
+      ]
     },
     {
       "id": 27,

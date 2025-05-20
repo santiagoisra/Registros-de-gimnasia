@@ -1,0 +1,26 @@
+[
+  {
+    "id": "as1",
+    "alumno_id": "a1",
+    "fecha": "2024-07-23",
+    "sede": "Plaza Arenales"
+  },
+  {
+    "id": "as2",
+    "alumno_id": "a1",
+    "fecha": "2024-07-24",
+    "sede": "Plaza Arenales"
+  },
+    {
+    "id": "as3",
+    "alumno_id": "a1",
+    "fecha": "2024-07-25",
+    "sede": "Plaza Arenales"
+  },
+    {
+    "id": "as4",
+    "alumno_id": "a3",
+    "fecha": "2024-07-26",
+    "sede": "Plaza Arenales"
+  }
+] 
