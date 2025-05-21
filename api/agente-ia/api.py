@@ -13,6 +13,7 @@ async def read_test():
 
 # Eliminamos el montaje del agente temporalmente
 # app.mount("/", gym_agent)
+
 # Eliminamos la ruta raíz temporalmente
 # @app.get("/")
 # async def read_root():
