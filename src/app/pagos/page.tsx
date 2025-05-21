@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import PagoForm from '@/components/pagos/PagoForm'
 import PagosList from '@/components/pagos/PagosList'
-import PagoFormBulk from '@/components/pagos/PagoFormBulk'
+import { PagoFormBulk } from '@/components/pagos/PagoFormBulk'
 
 export default function PagosPage() {
   const [tab, setTab] = useState<'individual' | 'lote'>('individual')

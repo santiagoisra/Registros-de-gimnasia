@@ -14,7 +14,7 @@ interface PagoFormProps {
 
 const metodosPago: MetodoPago[] = ['Efectivo', 'Transferencia', 'Mercado Pago']
 
-export default function PagoForm({ onSuccess }: PagoFormProps) {
+export default function PagoForm({ onSuccess }: PagoFormProps): JSX.Element {
   const [formData, setFormData] = useState({
     alumnoId: '',
     fecha: new Date(),

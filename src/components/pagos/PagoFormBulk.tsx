@@ -1,15 +1,17 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { toast } from 'react-hot-toast'
+import { useState } from 'react'
+//import { toast } from 'react-hot-toast' // Comentamos toast ya que no se usa en la lógica actual
 import DatePicker from 'react-datepicker'
 import "react-datepicker/dist/react-datepicker.css"
 import type { MetodoPago } from '@/types'
 import { usePagos } from '@/hooks/usePagos'
 import { useAlumnos } from '@/hooks/useAlumnos'
 import { useToast } from '@/hooks/useToast'
-import { Spinner } from '@/components/ui/Spinner'
-import { Input } from '@/components/ui/Input'
+//import { Spinner } from '@/components/ui/Spinner'
+//import { Input } from '@/components/ui/Input'
+//import { classNames } from '@/utils/classNames'
+//import { classNames } from '@/utils/classNames'
 
 interface PagoFormBulkProps {
   onSuccess?: () => void
@@ -17,8 +19,8 @@ interface PagoFormBulkProps {
 
 const metodosPago: MetodoPago[] = ['Efectivo', 'Transferencia', 'Mercado Pago']
 
-export function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
-  const [fecha] = useState<Date>(new Date())
+export function PagoFormBulk(_: PagoFormBulkProps) {
+  const [fecha, setFecha] = useState<Date>(new Date())
   const [metodoPago, setMetodoPago] = useState<MetodoPago>('Efectivo')
   const { showToast } = useToast()
   const [periodoDesde, setPeriodoDesde] = useState<Date>(new Date())
@@ -26,7 +28,7 @@ export function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
   const [notas, setNotas] = useState<string>('')
   const { alumnos, isLoading: loadingAlumnos } = useAlumnos()
   const [alumnosSeleccionados, setAlumnosSeleccionados] = useState<string[]>([])
-  const [montos, setMontos] = useState<Record<string, string>>({})
+  // const [montos, setMontos] = useState<Record<string, string>>({}) // Comentamos montos ya que no se usa en la lógica actual
   const { isCreating: loadingPagos } = usePagos()
   const [mes, setMes] = useState<number>(new Date().getMonth() + 1)
   const [anio, setAnio] = useState<number>(new Date().getFullYear())
@@ -51,6 +53,8 @@ export function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
       return
     }
 
+    // La lógica de mapeo de alumnos a pagos y validación de montos está comentada temporalmente
+    /*
     const pagos = alumnosSeleccionados.map(alumnoId => {
       const monto = parseFloat(montos[alumnoId] || '0')
       if (isNaN(monto) || monto <= 0) {
@@ -81,19 +85,9 @@ export function PagoFormBulk({ onSuccess }: PagoFormBulkProps) {
       // Esto no debería pasar si ya validamos, pero es un safety check
       return
     }
+    */
 
     // TODO: Implementar funcionalidad de creación masiva de pagos
-    /*
-    try {
-      await createPago(pagos as any) // Error de tipo aquí, createPago espera un solo pago
-      setAlumnosSeleccionados([])
-      setMontos({})
-      toast.success('Pagos generados correctamente')
-    } catch (error) {
-      console.error('Error al generar pagos masivos:', error)
-      toast.error('Error al generar pagos masivos')
-    }
-    */
     showToast('Funcionalidad de creación masiva pendiente de implementar.', 'success')
   }
 
