@@ -80,66 +80,38 @@ export async function POST(request: Request) {
     console.log('Respuesta completa del agente Python (/run):', agentData)
 
     // --- Paso 3: Procesar la respuesta del agente ---
-    let responseContent = 'Respuesta del agente no reconocida o vacía.';
+    let responseContent = 'El agente no proporcionó una respuesta de texto.'; // Mensaje por defecto
 
-    // El endpoint /run devuelve una lista de eventos. Buscamos el último evento de rol 'model' con contenido de texto.
     if (Array.isArray(agentData) && agentData.length > 0) {
-        // Buscamos el último evento que contiene la respuesta del modelo
-        const lastModelEvent = agentData.reverse().find(event =>
-            event.author === AGENT_APP_NAME && // Asegurarse que es un evento del agente
-            event.content &&
-            Array.isArray(event.content.parts) &&
-            event.content.parts.some(part => part.text)
-        );
-
-        if (lastModelEvent && lastModelEvent.content && Array.isArray(lastModelEvent.content.parts)) {
-            // Concatenar todo el texto de las partes
-            responseContent = lastModelEvent.content.parts
-                .filter(part => part.text)
-                .map(part => part.text)
-                .join(' ') // Unir partes de texto con un espacio
-                .trim();
-
-            // Si la respuesta principal es solo texto, la usamos.
-            if (responseContent) {
-                 console.log('Respuesta de texto extraída:', responseContent);
-            } else {
-                 // Si no hay texto directo, intentamos extraer info de tool_code_response si existe
-                 const toolCodeEvent = agentData.find(event => event.tool_code_response); // Buscar evento con respuesta de herramienta
-                 if(toolCodeEvent && toolCodeEvent.tool_code_response && toolCodeEvent.tool_code_response.response) {
-                     const toolResponse = toolCodeEvent.tool_code_response.response;
-                      if (toolResponse.alerta) {
-                         responseContent = toolResponse.alerta;
-                     } else if (toolResponse.resumen) {
-                         responseContent = toolResponse.resumen;
-                     } else if (toolResponse.message) {
-                          responseContent = toolResponse.message + (toolResponse.data ? ': ' + JSON.stringify(toolResponse.data, null, 2) : '');
-                     } else if (toolResponse.data) {
-                          responseContent = JSON.stringify(toolResponse.data, null, 2);
-                     } else {
-                         responseContent = JSON.stringify(toolResponse, null, 2); // Fallback
-                     }
-                      console.log('Respuesta de herramienta extraída:', responseContent);
-                 } else { // Si no hay texto ni tool_code_response clara, mostramos la respuesta completa para depurar
-                     console.warn('No se pudo extraer respuesta de texto o herramienta. Mostrando respuesta completa.');
-                     responseContent = JSON.stringify(agentData, null, 2);
-                 }
-            }
-
-        } else { // Si no se encontró un evento de modelo con texto
-            console.warn('No se encontró un evento de modelo con contenido de texto en la respuesta. Mostrando respuesta completa.');
-            responseContent = JSON.stringify(agentData, null, 2);
+      // Buscar el último evento que contenga texto en content.parts
+      // Iteramos desde el final para encontrar el mensaje más reciente
+      for (let i = agentData.length - 1; i >= 0; i--) {
+        const event: { content?: { parts?: { text?: string }[] } } = agentData[i]; // Tipo más específico
+        if (event.content && Array.isArray(event.content.parts)) {
+          const textParts = event.content.parts.filter((part): part is { text: string } => typeof part.text === 'string' && part.text.length > 0); // Usar type predicate
+          if (textParts.length > 0) {
+            // Concatenar todo el texto de las partes encontradas en este evento
+            responseContent = textParts.map((part) => part.text).join('').trim(); // Eliminar any innecesario
+            console.log('Texto extraído (último evento con texto):', responseContent);
+            break; // Encontramos el mensaje principal, salimos
+          }
         }
+      }
 
-    } else { // Si agentData no es un array o está vacío
-       console.warn('La respuesta del agente no es un array o está vacía. Mostrando respuesta completa.');
-       responseContent = JSON.stringify(agentData, null, 2);
+      // Si después de buscar cualquier evento con texto, responseContent sigue siendo el mensaje por defecto,
+      // podríamos intentar la lógica original o loggear la respuesta completa para depurar.
+       if (responseContent === 'El agente no proporcionó una respuesta de texto.') {
+           console.warn('No se encontró ningún evento con contenido de texto en la respuesta. Respuesta completa:', JSON.stringify(agentData, null, 2));
+           // Opcional: Podrías añadir aquí una lógica de respaldo para buscar específicamente por role === 'model'
+           // aunque la búsqueda general debería capturar el caso principal.
+       }
+
+    } else {
+       console.warn('La respuesta del agente no es un array o está vacía. Respuesta completa:', JSON.stringify(agentData, null, 2));
+       // responseContent ya tiene el mensaje por defecto adecuado.
     }
 
-    // Si la respuesta extraída es vacía, usamos un mensaje por defecto.
-    if (!responseContent || responseContent.trim() === '') {
-         responseContent = 'El agente no proporcionó una respuesta de texto.';
-    }
+    // responseContent ya tiene el mensaje final o el mensaje por defecto
 
     return NextResponse.json({ response: responseContent });
 

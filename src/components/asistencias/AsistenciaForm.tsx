@@ -6,6 +6,7 @@ import { useAlumnos } from '@/hooks/useAlumnos'
 import { Alert } from '@/components/ui/Alert'
 import { Spinner } from '@/components/ui/Spinner'
 import type { Alumno, Shift } from '@/types'
+import type { RefetchOptions, QueryObserverResult } from '@tanstack/react-query'
 
 interface AsistenciaFormProps {
   onSuccess?: () => void
@@ -19,8 +20,8 @@ export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
   const [error, setError] = useState<string | null>(null)
   const [shifts, setShifts] = useState<Shift[]>([])
 
-  const { crearAsistencia, loading } = useAsistencias()
-  const { alumnos, refetch } = useAlumnos()
+  const { crearAsistencia, isLoading } = useAsistencias()
+  const { alumnos, refetch }: { alumnos: Alumno[], refetch: (options?: RefetchOptions | undefined) => Promise<QueryObserverResult<{ data: Alumno[]; totalPages: number; }, Error>> } = useAlumnos()
 
   useEffect(() => {
     fetch('/api/shifts')
@@ -61,7 +62,7 @@ export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
     }
   }
 
-  if (loading) {
+  if (isLoading) {
     return <Spinner size="lg" className="mx-auto" />
   }
 
@@ -148,10 +149,10 @@ export function AsistenciaForm({ onSuccess }: AsistenciaFormProps) {
       <div className="flex justify-end">
         <button
           type="submit"
-          disabled={loading || !alumno_id}
+          disabled={isLoading || !alumno_id}
           className="inline-flex justify-center py-3 px-4 sm:py-2 sm:px-4 border border-transparent shadow-sm text-base sm:text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] min-w-[44px]"
         >
-          {loading ? 'Guardando...' : 'Guardar'}
+          {isLoading ? 'Guardando...' : 'Guardar'}
         </button>
       </div>
     </form>

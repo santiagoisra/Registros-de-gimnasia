@@ -27,7 +27,7 @@
     "estado_pago": "pendiente",
     "shift_id": "s2"
   },
-    {
+  {
     "id": "a3",
     "nombre": "Carlos",
     "apellido": "Lopez",
@@ -40,5 +40,15 @@
     "dias_consecutivos_asistencia": 1,
     "estado_pago": "atrasado",
     "shift_id": "s1"
+  },
+  {
+    "apellido": "Potamo",
+    "nombre": "Pepe",
+    "id": "f53b839a-7008-4bf2-b5e5-9e1a3f5684cd"
+  },
+  {
+    "nombre": "Lula",
+    "apellido": "Rueda",
+    "id": "8b6c4bfc-399c-4414-b88e-dec0cd40aa95"
   }
-] 
+]

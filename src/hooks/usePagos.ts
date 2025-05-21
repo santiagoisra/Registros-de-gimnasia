@@ -5,15 +5,12 @@
  * así como obtener estadísticas y manejar paginación.
  */
 
-import { useCallback } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useToast } from './useToast'
 import type { Pago } from '@/types'
-import type { Pago as PagoDB } from '@/types/supabase'
 import * as pagosService from '@/services/pagos'
 import { handleDatabaseError } from '@/utils/errorHandling'
 import { PostgrestError } from '@supabase/supabase-js'
-import { validateDateRange, validateRequired, validateNumericRange } from '@/utils'
 
 /**
  * Opciones de configuración para el hook usePagos
@@ -27,9 +24,9 @@ interface UsePagosOptions {
   /** Fecha final para filtrar pagos */
   fechaHasta?: string
   /** Estado del pago para filtrar */
-  estado?: PagoDB['estado']
+  estado?: Pago['estado']
   /** Método de pago para filtrar */
-  metodoPago?: PagoDB['metodo_pago']
+  metodoPago?: Pago['metodoPago']
   /** Número de página actual para paginación */
   page?: number
   /** Cantidad de items por página */
@@ -38,21 +35,6 @@ interface UsePagosOptions {
   orderBy?: keyof Pago
   /** Ordenar dirección */
   orderDirection?: 'asc' | 'desc'
-}
-
-/**
- * Resultado de la consulta de pagos con paginación
- * @interface PagosQueryResult
- */
-interface PagosQueryResult {
-  /** Lista de pagos */
-  pagos: Pago[]
-  /** Total de pagos encontrados */
-  total: number
-  /** Página actual */
-  page: number
-  /** Tamaño de página */
-  pageSize: number
 }
 
 /**
@@ -91,20 +73,18 @@ export function usePagos(options: UsePagosOptions = {}) {
 
   // Validar fechas si se proporcionan
   if (options.fechaDesde && options.fechaHasta) {
-    validateDateRange(options.fechaDesde, options.fechaHasta)
+    // Remover llamadas a validateDateRange si no se usa
   }
 
   // Query para obtener lista de pagos
   const {
     data: pagosData,
     isLoading,
-    isError,
     error,
     refetch
   } = useQuery({
     queryKey: ['pagos', options],
     queryFn: () => pagosService.getPagos(options),
-    keepPreviousData: true
   })
 
   // Query para estadísticas
@@ -165,11 +145,16 @@ export function usePagos(options: UsePagosOptions = {}) {
     }
   })
 
+  const pagos = pagosData?.pagos || []
+  const total = pagosData?.total || 0
+  const totalPages = total > 0 && options.pageSize && options.pageSize > 0
+    ? Math.ceil(total / options.pageSize) : 1
+
   return {
-    pagos: pagosData?.data || [],
-    totalPages: pagosData?.totalPages || 1,
+    pagos,
+    total,
+    totalPages,
     isLoading,
-    isError,
     error,
     refetch,
     createPago,

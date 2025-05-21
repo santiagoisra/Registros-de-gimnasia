@@ -11,6 +11,20 @@ A task management system for AI-driven development with Claude, designed to work
 - Anthropic SDK version 0.39.0 or higher
 - OpenAI SDK (for Perplexity API integration, optional)
 
+## Running the ADK Agent API Server (Local Development)
+
+For the Next.js application to communicate with the Google ADK agent, you need to run the ADK API server in the background. This server exposes your agent code via an HTTP interface, typically on `localhost:8000`.
+
+To start the server, open a terminal in the project root directory and run the following command:
+
+```bash
+/Users/santiago/Library/Python/3.9/bin/adk api_server src/agent
+```
+
+**Note:** The exact path to the `adk` executable (`/Users/santiago/Library/Python/3.9/bin/adk`) might vary depending on your Python installation and environment.
+
+Keep this terminal open and the server running while you are developing the Next.js application.
+
 ## Configuration
 
 The script can be configured through environment variables in a `.env` file at the root of the project:

@@ -42,38 +42,46 @@ export default function AgenteIAPage() {
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-4">
-      <h1 className="text-2xl font-bold mb-4">Usar con Agente IA</h1>
-      <p className="mb-6 text-gray-700">
+      <h1 className="text-3xl font-bold mb-4 text-gray-900">Usar con Agente IA</h1>
+      <p className="mb-6 text-gray-700 leading-relaxed">
         Este panel te permite interactuar con un agente inteligente para gestionar alumnos, pagos, asistencias y recibir alertas automáticas usando lenguaje natural. Pronto vas a poder hacer SUDO de usuarios y operar sobre los datos del sistema desde aquí.
       </p>
 
       {/* Interfaz de Chat */}
-      <div className="flex flex-col h-[400px] border rounded-lg overflow-hidden bg-gray-50">
+      <div className="flex flex-col h-[500px] border border-gray-200 rounded-xl shadow-lg overflow-hidden bg-white">
         {/* Área de Mensajes */}
-        <div className="flex-1 p-4 overflow-y-auto">
+        <div className="flex-1 p-4 overflow-y-auto space-y-4">
           {messages.map((msg, index) => (
-            <div key={index} className={`mb-2 ${msg.sender === 'user' ? 'text-right' : 'text-left'}`}>
-              <span className={`inline-block px-4 py-2 rounded-lg ${msg.sender === 'user' ? 'bg-primary text-white' : 'bg-gray-300 text-gray-800'}`}>
+            <div key={index} className={`flex items-start ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`inline-block px-4 py-2 rounded-xl max-w-[80%] break-words ${msg.sender === 'user' ? 'bg-primary text-white rounded-br-sm' : 'bg-gray-200 text-gray-800 rounded-bl-sm'}`}>
                 {msg.text}
-              </span>
+              </div>
             </div>
           ))}
+          {/* Indicador de carga del agente */}
+          {isLoading && (
+            <div className="flex items-start justify-start">
+              <div className="inline-block px-4 py-2 rounded-xl bg-gray-200 text-gray-800 rounded-bl-sm animate-pulse">
+                Escribiendo...
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Input y Botón de Enviar */}
-        <form onSubmit={handleSendMessage} className="flex p-4 border-t bg-white">
+        <form onSubmit={handleSendMessage} className="flex p-4 border-t border-gray-200 bg-gray-50 gap-2">
           <input
             type="text"
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
-            className="flex-1 rounded-l-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50"
+            className="flex-1 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-50 px-4 py-2"
             placeholder="Escribe tu mensaje aquí..."
             disabled={isLoading}
           />
           <button
             type="submit"
-            className="px-6 py-2 bg-primary text-white font-semibold rounded-r-lg hover:bg-primary/80 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50"
-            disabled={isLoading}
+            className="px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            disabled={!inputMessage.trim() || isLoading}
           >
             {isLoading ? 'Enviando...' : 'Enviar'}
           </button>

@@ -1,7 +1,12 @@
-import { alumnosService } from './alumnos'
-import { asistenciasService } from './asistencias'
-import { pagosService } from './pagos'
-import type { Alumno, AlertConfig, AlertType } from '@/types'
+// Imports necesarios para el servicio de alertas
+import { alumnosService } from './alumnos';
+//import { asistenciasService } from './asistencias';
+//import * as pagosService from './pagos'; // O `import { pagosService } from './pagos';` si se exporta así
+//import { supabase } from '@/lib/supabase';
+//import type { Alumno, AlertConfig, AlertType, Alerta } from '@/types'; // <--- ASEGURATE DE QUE ESTA LÍNEA ESTÉ ASÍ
+//import { handleDatabaseError } from '@/utils/errorHandling';
+// Elimina la siguiente línea COMPLETA si existe:
+// import { PostgrestError } from '@supabase/supabase-js';
 
 export interface Alerta {
   id: string

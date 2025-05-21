@@ -15,10 +15,10 @@ interface AlumnoDetailsProps {
 }
 
 export function AlumnoDetails({ alumnoId, onEdit }: AlumnoDetailsProps) {
-  const { alumnos, loading, error } = useAlumnos({ autoFetch: true })
+  const { alumnos, isLoading, error }: { alumnos: Alumno[], isLoading: boolean, error: Error | null } = useAlumnos({})
   const alumno = alumnos.find(a => a.id === alumnoId)
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-32">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>

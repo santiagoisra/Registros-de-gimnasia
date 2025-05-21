@@ -46,7 +46,7 @@ export default function PagoForm({ onSuccess }: PagoFormProps) {
   const cargarAlumnos = async () => {
     try {
       const { data } = await alumnosService.getAlumnos()
-      setAlumnos(data.filter(alumno => alumno.activo))
+      setAlumnos(data.filter((alumno: Alumno) => alumno.activo))
     } catch {
       toast.error('Error al cargar los alumnos')
     } finally {

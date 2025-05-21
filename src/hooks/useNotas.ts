@@ -1,16 +1,10 @@
-import { useCallback } from 'react'
+// import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { notasService } from '@/services/notas'
 import { useToast } from './useToast'
 import type { Nota } from '@/types'
-import type { Nota as NotaDB } from '@/types/supabase'
-import { 
-  handleDatabaseError,
-  validateDateRange,
-  validateRequired,
-  validateNumericRange
-} from '@/utils'
+import { handleDatabaseError, validateDateRange } from '@/utils'
 import { PostgrestError } from '@supabase/supabase-js'
-import { notasService } from '@/services/notas'
 
 interface UseNotasOptions {
   page?: number
@@ -18,8 +12,8 @@ interface UseNotasOptions {
   orderBy?: keyof Nota
   orderDirection?: 'asc' | 'desc'
   alumnoId?: string
-  tipo?: string
-  categoria?: string
+  tipo?: Nota['tipo']
+  categoria?: Nota['categoria']
   visibleEnReporte?: boolean
   calificacionMin?: number
   calificacionMax?: number
@@ -51,13 +45,11 @@ export function useNotas(options: UseNotasOptions = {}) {
   const {
     data: notasData,
     isLoading,
-    isError,
     error,
     refetch
   } = useQuery({
     queryKey: ['notas', options],
-    queryFn: () => notasService.getNotas(options),
-    keepPreviousData: true
+    queryFn: () => notasService.getNotas(options as UseNotasOptions),
   })
 
   // Query para estadísticas
@@ -122,11 +114,13 @@ export function useNotas(options: UseNotasOptions = {}) {
     }
   })
 
+  const notas = notasData?.data || []
+  const totalPages = notasData?.totalPages || 0
+
   return {
-    notas: notasData?.data || [],
-    totalPages: notasData?.totalPages || 1,
+    notas,
+    totalPages,
     isLoading,
-    isError,
     error,
     refetch,
     createNota,

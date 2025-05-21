@@ -109,8 +109,8 @@ export function NotasSection({ alumnoId }: NotasSectionProps) {
                       content={nota.contenido as string}
                       onChange={async (content: string) => {
                         await updateNota({
-                          ...nota,
-                          contenido: content,
+                          id: nota.id,
+                          data: { contenido: content },
                         })
                       }}
                       readOnly

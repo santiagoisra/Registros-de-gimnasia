@@ -4,7 +4,6 @@ import {
   BanknotesIcon,
   ExclamationTriangleIcon,
 } from '@heroicons/react/24/outline'
-import { AlertasContainer } from './alertas'
 
 // Datos de ejemplo - Esto vendrá de Supabase
 const stats = [

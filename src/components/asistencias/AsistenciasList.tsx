@@ -6,16 +6,9 @@ import { Spinner } from '@/components/ui/Spinner'
 import { Alert } from '@/components/ui/Alert'
 import { format } from 'date-fns'
 import { es } from 'date-fns/locale'
-import type { Shift } from '@/types/supabase'
+import type { Shift, Asistencia } from '@/types/supabase'
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/solid'
 import { useSwipeable } from 'react-swipeable'
-
-// Definir tipo mínimo para asistencia
-interface Asistencia {
-  id: string
-  estado: 'presente' | 'ausente'
-  // agregar más campos si se usan en el archivo
-}
 
 export function AsistenciasList() {
   const [page, setPage] = useState(1)
@@ -64,16 +57,16 @@ export function AsistenciasList() {
     })
   }, [page, perPage, filterSede, filterShift, filterDate, filterEstado])
 
-  const { asistencias, loading, error, totalPages } = useAsistencias({
+  const { asistencias, isLoading, error, totalPages }: { asistencias: Asistencia[], isLoading: boolean, error: Error | null, totalPages: number } = useAsistencias({
     page,
-    pageSize: perPage,
+    perPage: perPage,
     sede: filterSede === 'todas' ? undefined : filterSede,
     shiftId: filterShift || undefined,
     fecha: filterDate || undefined,
     estado: filterEstado === 'todos' ? undefined : filterEstado
   })
 
-  if (loading && !asistencias?.length) {
+  if (isLoading && !asistencias?.length) {
     return <Spinner size="lg" className="mx-auto" />
   }
 

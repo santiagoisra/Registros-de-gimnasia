@@ -13,10 +13,12 @@ import {
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
   Cog6ToothIcon,
+  ChatBubbleLeftRightIcon,
 } from '@heroicons/react/24/outline'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: HomeIcon },
+  { name: 'Usar con Agente IA', href: '/configuracion/agente-ia', icon: ChatBubbleLeftRightIcon },
   { name: 'Alumnos', href: '/alumnos', icon: UserGroupIcon },
   { name: 'Asistencias', href: '/asistencias', icon: CalendarIcon },
   { name: 'Pagos', href: '/pagos', icon: CurrencyDollarIcon },
@@ -26,7 +28,6 @@ const navigation = [
 const configMenu = [
   { name: 'Historial de precios', href: '/configuracion/historial-precios' },
   { name: 'Alertas', href: '/configuracion/alertas' },
-  { name: 'Usar con Agente IA', href: '/configuracion/agente-ia' },
 ]
 
 export default function Sidebar() {
@@ -73,12 +74,12 @@ export default function Sidebar() {
         <li>
           <button
             type="button"
-            className={`flex items-center w-full p-2 rounded-lg group transition-colors duration-150 outline-none focus:ring-2 focus:ring-primary focus:bg-primary/20 ${pathname.startsWith('/configuracion') ? 'bg-primary/10 text-primary font-semibold' : 'text-gray-600 hover:bg-gray-100'} ${collapsed ? 'justify-center' : ''}`}
+            className={`flex items-center w-full p-2 rounded-lg group transition-colors duration-150 outline-none focus:ring-2 focus:ring-primary focus:bg-primary/20 ${(pathname.startsWith('/configuracion') && pathname !== '/configuracion/agente-ia') ? 'bg-primary/10 text-primary font-semibold' : 'text-gray-600 hover:bg-gray-100'} ${collapsed ? 'justify-center' : ''}`}
             onClick={() => setConfigOpen((o) => !o)}
             aria-expanded={configOpen ? 'true' : 'false'}
             aria-controls="config-menu"
           >
-            <Cog6ToothIcon className={`w-6 h-6 mr-3 ${pathname.startsWith('/configuracion') ? 'text-primary' : 'text-gray-500 group-hover:text-primary'} ${collapsed ? 'mr-0' : ''}`} aria-hidden="true" />
+            <Cog6ToothIcon className={`w-6 h-6 mr-3 ${(pathname.startsWith('/configuracion') && pathname !== '/configuracion/agente-ia') ? 'text-primary' : 'text-gray-500 group-hover:text-primary'} ${collapsed ? 'mr-0' : ''}`} aria-hidden="true" />
             {!collapsed && 'Configuración'}
             {!collapsed && (
               <span className="ml-auto">
@@ -159,12 +160,12 @@ export default function Sidebar() {
               <li>
                 <button
                   type="button"
-                  className={`flex items-center w-full p-2 rounded-lg group transition-colors duration-150 outline-none focus:ring-2 focus:ring-primary focus:bg-primary/20 ${pathname.startsWith('/configuracion') ? 'bg-primary/10 text-primary font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}
+                  className={`flex items-center w-full p-2 rounded-lg group transition-colors duration-150 outline-none focus:ring-2 focus:ring-primary focus:bg-primary/20 ${(pathname.startsWith('/configuracion') && pathname !== '/configuracion/agente-ia') ? 'bg-primary/10 text-primary font-semibold' : 'text-gray-600 hover:bg-gray-100'}`}
                   onClick={() => setConfigOpen((o) => !o)}
                   aria-expanded={configOpen ? 'true' : 'false'}
                   aria-controls="config-menu"
                 >
-                  <Cog6ToothIcon className={`w-6 h-6 mr-3 ${pathname.startsWith('/configuracion') ? 'text-primary' : 'text-gray-500 group-hover:text-primary'}`} aria-hidden="true" />
+                  <Cog6ToothIcon className={`w-6 h-6 mr-3 ${(pathname.startsWith('/configuracion') && pathname !== '/configuracion/agente-ia') ? 'text-primary' : 'text-gray-500 group-hover:text-primary'} ${collapsed ? 'mr-0' : ''}`} aria-hidden="true" />
                   {!collapsed && 'Configuración'}
                   {!collapsed && (
                     <span className="ml-auto">

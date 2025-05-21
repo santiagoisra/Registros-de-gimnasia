@@ -19,7 +19,7 @@
     "metodo_pago": "Transferencia",
     "estado": "Pagado"
   },
-   {
+  {
     "id": "p3",
     "alumno_id": "a3",
     "monto": 5000,
@@ -28,5 +28,19 @@
     "año": 2024,
     "metodo_pago": "Mercado Pago",
     "estado": "Pendiente"
+  },
+  {
+    "alumno": "Pepe Potamo",
+    "alumno_id": "f53b839a-7008-4bf2-b5e5-9e1a3f5684cd",
+    "mes": "mayo",
+    "monto": 30000,
+    "fecha_pago": "2024-05-31",
+    "id": "0eff213c-e6e8-461b-bd4e-362a66a6a474"
+  },
+  {
+    "id": "f0f53afe-3954-46ef-8df1-9e8776d5aac1",
+    "alumno_id": "97611024-09e8-4d90-a94a-4bb81b7c7c9e",
+    "fecha": "2024-06-07",
+    "monto": 123000
   }
-] 
+]

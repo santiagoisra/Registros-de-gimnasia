@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { alumnosService } from '@/services/alumnos'
 import type { Alumno } from '@/types'
+import type { Alumno as AlumnoDB } from '@/types/supabase'
 import { useToast } from './useToast'
 import { handleDatabaseError } from '@/utils/errorHandling'
 import { PostgrestError } from '@supabase/supabase-js'
@@ -10,9 +11,9 @@ interface UseAlumnosOptions {
   perPage?: number
   orderBy?: keyof Alumno
   orderDirection?: 'asc' | 'desc'
-  sede?: string
+  sede?: AlumnoDB['sede']
   activo?: boolean
-  estadoPago?: string
+  estadoPago?: AlumnoDB['estado_pago']
   shift_id?: string
 }
 
@@ -38,10 +39,9 @@ export function useAlumnos(options: UseAlumnosOptions = {}) {
     isError,
     error,
     refetch
-  } = useQuery({
+  } = useQuery<{ data: Alumno[], totalPages: number }, Error>({
     queryKey: ['alumnos', options],
     queryFn: () => alumnosService.getAlumnos(options),
-    keepPreviousData: true
   })
 
   // Mutación para crear alumno
