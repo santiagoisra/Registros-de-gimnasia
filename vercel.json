@@ -12,7 +12,7 @@
   "functions": {
     "api/agente-ia/index.py": {
       "memory": 1024,
-      "excludeFiles": ".git/**,.vscode/**,node_modules/**,.next/**,cypress/**,docs/**,test/**,__tests__/**,coverage/**,*.map,*.log,*.tsbuildinfo"
+      "excludeFiles": ".git/**,.vscode/**,node_modules/**,.next/**,cypress/**,docs/**,test/**,__tests__/**,coverage/**"
     }
   }
 } 
