@@ -1,0 +1,17 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/agente-ia",
+      "destination": "/api/agente-ia"
+    },
+    {
+      "source": "/api/agente-ia/(.*)",
+      "destination": "/api/agente-ia/$1"
+    }
+  ],
+  "functions": {
+    "src/agent/agent/agent.py": {
+      "runtime": "python3.12"
+    }
+  }
+} 
