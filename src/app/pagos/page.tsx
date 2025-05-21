@@ -31,7 +31,7 @@ export default function PagosPage() {
         {tab === 'individual' ? (
           <PagoForm onSuccess={() => {}} />
         ) : (
-          <PagoFormBulk onSuccess={() => {}} />
+          <PagoFormBulk />
         )}
       </div>
       <PagosList />

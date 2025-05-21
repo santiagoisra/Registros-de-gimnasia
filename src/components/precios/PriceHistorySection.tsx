@@ -18,8 +18,8 @@ const PriceHistorySection = ({ alumnoId }: PriceHistorySectionProps) => {
   const [editData, setEditData] = useState<HistorialPrecio | null>(null)
   const [formLoading, setFormLoading] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
-  const { alumnos, loading: alumnosLoading } = useAlumnos({ autoFetch: true })
-  const { precios, loading, error, createPrecio, updatePrecio, deletePrecio } = useHistorialPrecios({ autoFetch: true, alumnoId })
+  const { alumnos, isLoading: alumnosLoading } = useAlumnos({})
+  const { precios, isLoading, error, createPrecio, updatePrecio, deletePrecio } = useHistorialPrecios({ alumnoId })
 
   const handleAdd = () => {
     setEditData(null)
@@ -55,7 +55,7 @@ const PriceHistorySection = ({ alumnoId }: PriceHistorySectionProps) => {
     setFormError(null)
     try {
       const dataToSend = alumnoId ? { ...data, alumnoId } : { ...data }
-      await (editData ? updatePrecio((editData as HistorialPrecio).id, dataToSend) : createPrecio(dataToSend))
+      await (editData ? updatePrecio({ id: (editData as HistorialPrecio).id, data: dataToSend }) : createPrecio(dataToSend))
       setShowForm(false)
       setEditData(null)
     } catch (err: unknown) {
@@ -69,7 +69,7 @@ const PriceHistorySection = ({ alumnoId }: PriceHistorySectionProps) => {
     }
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-32">
         <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
@@ -123,7 +123,7 @@ const PriceHistorySection = ({ alumnoId }: PriceHistorySectionProps) => {
               No hay historial de precios registrado
             </div>
           ) : (
-            precios.map((precio, index) => (
+            precios.map((precio: HistorialPrecio, index: number) => (
               <div
                 key={precio.id}
                 className={`p-4 rounded-lg flex flex-col gap-2 md:flex-row md:items-center md:justify-between ${

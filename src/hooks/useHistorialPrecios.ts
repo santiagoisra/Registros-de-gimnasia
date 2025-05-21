@@ -10,9 +10,9 @@ interface UseHistorialPreciosOptions {
   perPage?: number
   orderBy?: keyof HistorialPrecio
   orderDirection?: 'asc' | 'desc'
-  servicio?: string
-  tipoServicio?: string
-  moneda?: string
+  servicio?: "Clases" | "Competencia" | "Equipamiento" | "Otro"
+  tipoServicio?: "Otro" | "Individual" | "Grupal" | "Personalizado" | "Evento" | "Material"
+  moneda?: "ARS" | "USD" | "EUR"
   alumnoId?: string
   fechaDesde?: string
   fechaHasta?: string
@@ -32,7 +32,6 @@ export function useHistorialPrecios(options: UseHistorialPreciosOptions = {}) {
   } = useQuery({
     queryKey: ['historialPrecios', options],
     queryFn: () => historialPreciosService.getHistorialPrecios(options),
-    keepPreviousData: true
   })
 
   // Mutación para crear precio

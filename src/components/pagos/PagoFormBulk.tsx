@@ -13,12 +13,6 @@ import { useToast } from '@/hooks/useToast'
 //import { classNames } from '@/utils/classNames'
 //import { classNames } from '@/utils/classNames'
 
-interface PagoFormBulkProps {
-  onSuccess?: () => void
-}
-
-const metodosPago: MetodoPago[] = ['Efectivo', 'Transferencia', 'Mercado Pago']
-
 export function PagoFormBulk() {
   const [fecha, setFecha] = useState<Date>(new Date())
   const [metodoPago, setMetodoPago] = useState<MetodoPago>('Efectivo')
@@ -135,11 +129,11 @@ export function PagoFormBulk() {
             className="w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary"
             aria-labelledby="metodo-pago-label"
           >
-            {metodosPago.map((metodo) => (
+            {/* {metodosPago.map((metodo) => (
               <option key={metodo} value={metodo}>
                 {metodo}
               </option>
-            ))}
+            ))} */}
           </select>
         </div>
       </div>
