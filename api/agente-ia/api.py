@@ -17,4 +17,4 @@ async def read_test():
 # Eliminamos la ruta raíz temporalmente
 # @app.get("/")
 # async def read_root():
-#     return {"message": "FastAPI running with GymManagementAgent mounted at /"} 
+#     return {"message": "FastAPI running with GymManagementAgent mounted at /"}
