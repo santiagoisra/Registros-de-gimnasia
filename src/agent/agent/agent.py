@@ -73,7 +73,7 @@ def saludo_alerta() -> Dict[str, str]:
 
 # Funciones CRUD para Alumnos
 
-def crud_alumnos(action: str, data: Union[Dict[str, Any], None]) -> Dict[str, Any]:
+def crud_alumnos(action: str, data: Dict[str, Any]) -> Dict[str, Any]:
     """Realiza operaciones CRUD en los datos de alumnos.
 
     Puede 'create', 'read', 'update', o 'delete' alumnos.
@@ -97,6 +97,9 @@ def crud_alumnos(action: str, data: Union[Dict[str, Any], None]) -> Dict[str, An
     }
 
     if action == 'create' and isinstance(data, dict):
+        if not data or 'nombre' not in data or 'apellido' not in data:
+             result['message'] = 'Faltan nombre o apellido para crear el alumno.'
+             return result
         data['id'] = str(uuid.uuid4()) # Generar ID único
         alumnos.append(data)
         write_json_file(ALUMNOS_PATH, alumnos)
@@ -120,7 +123,7 @@ def crud_alumnos(action: str, data: Union[Dict[str, Any], None]) -> Dict[str, An
             result['data'] = alumno
          else:
             result['message'] = 'Alumno no encontrado por nombre.'
-    elif action == 'read' and data is None: # Leer todos si data es None
+    elif action == 'read' and (data is None or (isinstance(data, dict) and not data)): # Leer todos si data es None o diccionario vacío
         result['status'] = 'success'
         result['message'] = 'Listado de alumnos.'
         result['data'] = alumnos
@@ -147,7 +150,7 @@ def crud_alumnos(action: str, data: Union[Dict[str, Any], None]) -> Dict[str, An
     return result
 
 # Funciones CRUD para Pagos
-def crud_pagos(action: str, data: Union[Dict[str, Any], None]) -> Dict[str, Any]:
+def crud_pagos(action: str, data: Dict[str, Any]) -> Dict[str, Any]:
     """Realiza operaciones CRUD sobre los datos de pagos.
 
     Puede 'create', 'read', 'update', o 'delete' pagos.
@@ -167,7 +170,7 @@ def crud_pagos(action: str, data: Union[Dict[str, Any], None]) -> Dict[str, Any]
 
     if action == 'create' and isinstance(data, dict):
         if not data or 'alumno_id' not in data or 'fecha' not in data or 'monto' not in data:
-            return {"status": "error", "message": "Faltan datos para crear el pago.", "data": None}
+            return {"status": "error", "message": "Faltan datos requeridos ('alumno_id', 'fecha', 'monto') para crear el pago.", "data": None}
         new_pago = {
             'id': str(uuid.uuid4()),
             'alumno_id': data['alumno_id'],
@@ -180,18 +183,21 @@ def crud_pagos(action: str, data: Union[Dict[str, Any], None]) -> Dict[str, Any]
 
     elif action == 'read':
         if isinstance(data, dict) and data.get('id'): # Leer un pago específico por ID
-            pago_encontrado = next((p for p in pagos if p['id'] == data['id']), None)
+            pago_encontrado = next((p for p in pagos if isinstance(p, dict) and p.get('id') == data['id']), None)
             if pago_encontrado:
                 return {"status": "success", "message": "Pago encontrado.", "data": pago_encontrado}
             else:
                 return {"status": "error", "message": "Pago no encontrado.", "data": None}
+        elif data is None or (isinstance(data, dict) and 'alumno_id' not in data):
+             return {"status": "success", "message": "Lista de todos los pagos.", "data": pagos}
         elif isinstance(data, dict) and data.get('alumno_id'): # Leer todos los pagos de un alumno por alumno_id
             alumno_id_a_buscar = data['alumno_id']
             # Modificación: Asegurar que 'alumno_id' existe antes de comparar
-            pagos_alumno = [p for p in pagos if 'alumno_id' in p and p['alumno_id'] == alumno_id_a_buscar]
+            pagos_alumno = [p for p in pagos if isinstance(p, dict) and 'alumno_id' in p and p['alumno_id'] == alumno_id_a_buscar]
             # Opcional: ordenar por fecha si existe el campo 'fecha' y es comparable
             try:
                 # Aseguramos que 'fecha' existe antes de intentar acceder a ella para ordenar
+                # Usamos .get() de forma segura y proporcionamos un valor por defecto que funcione con comparación
                 pagos_alumno_ordenados = sorted(pagos_alumno, key=lambda p: p.get('fecha', '0000-00-00'), reverse=True) # Ordenar descendente para último pago
                 # Devolvemos la lista completa de pagos encontrados para el alumno, ordenada
                 return {"status": "success", "message": f"Pagos encontrados para el alumno {alumno_id_a_buscar}.", "data": pagos_alumno_ordenados}
@@ -199,8 +205,6 @@ def crud_pagos(action: str, data: Union[Dict[str, Any], None]) -> Dict[str, Any]
                  # Si las fechas no son comparables o faltan, devolvemos sin ordenar pero con advertencia
                  print(f"Advertencia: No se pudieron ordenar los pagos por fecha para el alumno {alumno_id_a_buscar}. Datos devueltos sin ordenar.")
                  return {"status": "success", "message": f"Pagos encontrados para el alumno {alumno_id_a_buscar} (sin ordenar por fecha).", "data": pagos_alumno}
-        elif data is None: # Leer todos los pagos si no se especifica ID ni alumno_id, y data es None
-             return {"status": "success", "message": "Lista de todos los pagos.", "data": pagos}
         else:
              return {"status": "error", "message": "Datos de lectura de pagos inválidos.", "data": None}
 
@@ -208,7 +212,7 @@ def crud_pagos(action: str, data: Union[Dict[str, Any], None]) -> Dict[str, Any]
         if not data or 'id' not in data:
             return {"status": "error", "message": "Se requiere el ID del pago para actualizar.", "data": None}
         pago_id = data['id']
-        pago_encontrado = next((p for p in pagos if p['id'] == pago_id), None)
+        pago_encontrado = next((p for p in pagos if isinstance(p, dict) and p.get('id') == pago_id), None)
         if not pago_encontrado:
             return {"status": "error", "message": "Pago no encontrado para actualizar.", "data": None}
 
@@ -224,7 +228,7 @@ def crud_pagos(action: str, data: Union[Dict[str, Any], None]) -> Dict[str, Any]
         if not data or 'id' not in data:
             return {"status": "error", "message": "Se requiere el ID del pago para eliminar.", "data": None}
         pago_id = data['id']
-        pagos_actualizados = [p for p in pagos if p['id'] != pago_id]
+        pagos_actualizados = [p for p in pagos if isinstance(p, dict) and p.get('id') != pago_id]
         if len(pagos_actualizados) == len(pagos):
             return {"status": "error", "message": "Pago no encontrado para eliminar.", "data": None}
         write_json_file(PAGOS_PATH, pagos_actualizados)
@@ -234,7 +238,7 @@ def crud_pagos(action: str, data: Union[Dict[str, Any], None]) -> Dict[str, Any]
         return {"status": "error", "message": "Acción no reconocida para pagos.", "data": None}
 
 # Funciones CRUD para Notas
-def crud_notas(action: str, data: Union[Dict[str, Any], None]) -> Dict[str, Any]:
+def crud_notas(action: str, data: Dict[str, Any]) -> Dict[str, Any]:
     """Realiza operaciones CRUD en los datos de notas."""
     print(f"Ejecutando tool: crud_notas con acción {action} y data {data}")
     notas = read_json_file(NOTAS_PATH)
@@ -245,53 +249,62 @@ def crud_notas(action: str, data: Union[Dict[str, Any], None]) -> Dict[str, Any]
     }
 
     if action == 'create' and isinstance(data, dict):
+        if not data or 'alumno_id' not in data or 'fecha' not in data or 'contenido' not in data:
+             result['message'] = "Faltan datos requeridos ('alumno_id', 'fecha', 'contenido') para crear la nota."
+             return result
         data['id'] = str(uuid.uuid4()) # Generar ID único
         notas.append(data)
         write_json_file(NOTAS_PATH, notas)
-        result['status'] = 'success'
-        result['message'] = 'Nota registrada con éxito.'
+        result['status'] = 'success';
+        result['message'] = 'Nota creada con éxito.';
         result['data'] = data
     elif action == 'read' and isinstance(data, dict) and data.get('id'):
-        nota = next((n for n in notas if n['id'] == data['id']), None)
+        nota = next((n for n in notas if isinstance(n, dict) and n.get('id') == data['id']), None)
         if nota:
-            result['status'] = 'success'
-            result['message'] = 'Nota encontrada.'
+            result['status'] = 'success';
+            result['message'] = 'Nota encontrada.';
             result['data'] = nota
         else:
-            result['message'] = 'Nota no encontrada.'
-    elif action == 'read' and isinstance(data, dict) and data.get('alumno_id'): # Buscar notas de un alumno
-         notas_alumno = [n for n in notas if n['alumno_id'] == data['alumno_id']]
-         result['status'] = 'success'
-         result['message'] = f'Notas encontradas para el alumno {data["alumno_id"]}.'
-         result['data'] = notas_alumno
-    elif action == 'read' and data is None: # Leer todos si data es None
-        result['status'] = 'success'
-        result['message'] = 'Listado de notas.'
+            result['message'] = 'Nota no encontrada.';
+    elif action == 'read' and isinstance(data, dict) and data.get('alumno_id'):
+        alumno_id_a_buscar = data['alumno_id']
+        notas_alumno = [n for n in notas if isinstance(n, dict) and 'alumno_id' in n and n['alumno_id'] == alumno_id_a_buscar]
+        result['status'] = 'success';
+        result['message'] = f'Notas encontradas para el alumno {alumno_id_a_buscar}.';
+        result['data'] = notas_alumno
+    elif action == 'read' and (data is None or (isinstance(data, dict) and not data)): # Leer todas si data es None o diccionario vacío
+        result['status'] = 'success';
+        result['message'] = 'Lista de todas las notas.';
         result['data'] = notas
     elif action == 'update' and isinstance(data, dict) and data.get('id'):
-        nota_index = next((i for i, n in enumerate(notas) if n['id'] == data['id']), -1)
-        if nota_index != -1:
-            notas[nota_index].update(data) # Actualizar campos
-            write_json_file(NOTAS_PATH, notas)
-            result['status'] = 'success'
-            result['message'] = 'Nota actualizada con éxito.'
-            result['data'] = notas[nota_index]
-        else:
-            result['message'] = 'Nota a actualizar no encontrado.'
+        nota_id = data['id']
+        nota_encontrada = next((n for n in notas if isinstance(n, dict) and n.get('id') == nota_id), None)
+        if not nota_encontrada:
+            result['message'] = 'Nota no encontrada para actualizar.';
+            return result
+        if 'fecha' in data: nota_encontrada['fecha'] = data['fecha']
+        if 'contenido' in data: nota_encontrada['contenido'] = data['contenido']
+        write_json_file(NOTAS_PATH, notas)
+        result['status'] = 'success';
+        result['message'] = 'Nota actualizada con éxito.';
+        result['data'] = nota_encontrada
     elif action == 'delete' and isinstance(data, dict) and data.get('id'):
+        nota_id = data['id']
         original_count = len(notas)
-        notas = [n for n in notas if n['id'] != data['id']]
-        if len(notas) < original_count:
-            write_json_file(NOTAS_PATH, notas)
-            result['status'] = 'success'
-            result['message'] = 'Nota eliminada con éxito.'
-        else:
-            result['message'] = 'Nota a eliminar no encontrado.'
-            
+        notas_actualizadas = [n for n in notas if isinstance(n, dict) and n.get('id') != nota_id]
+        if len(notas_actualizadas) == original_count:
+            result['message'] = 'Nota no encontrada para eliminar.';
+            return result
+        write_json_file(NOTAS_PATH, notas_actualizadas)
+        result['status'] = 'success';
+        result['message'] = 'Nota eliminada con éxito.';
+        result['data'] = {'id': nota_id}
+    else:
+        result['message'] = 'Acción no reconocida para notas.';
     return result
 
 # Funciones CRUD para Asistencias
-def crud_asistencias(action: str, data: Union[Dict[str, Any], None]) -> Dict[str, Any]:
+def crud_asistencias(action: str, data: Dict[str, Any]) -> Dict[str, Any]:
     """Realiza operaciones CRUD en los datos de asistencias."""
     print(f"Ejecutando tool: crud_asistencias con acción {action} y data {data}")
     asistencias = read_json_file(ASISTENCIAS_PATH)
@@ -302,49 +315,58 @@ def crud_asistencias(action: str, data: Union[Dict[str, Any], None]) -> Dict[str
     }
 
     if action == 'create' and isinstance(data, dict):
-        data['id'] = str(uuid.uuid4()) # Generar ID único
-        asistencias.append(data)
-        write_json_file(ASISTENCIAS_PATH, asistencias)
-        result['status'] = 'success'
-        result['message'] = 'Asistencia registrada con éxito.'
-        result['data'] = data
+         if not data or 'alumno_id' not in data or 'fecha' not in data or 'estado' not in data:
+             result['message'] = "Faltan datos requeridos ('alumno_id', 'fecha', 'estado') para registrar la asistencia."
+             return result
+         data['id'] = str(uuid.uuid4())
+         asistencias.append(data)
+         write_json_file(ASISTENCIAS_PATH, asistencias)
+         result['status'] = 'success';
+         result['message'] = 'Asistencia registrada con éxito.';
+         result['data'] = data
     elif action == 'read' and isinstance(data, dict) and data.get('id'):
-        asistencia = next((a for a in asistencias if a['id'] == data['id']), None)
+        asistencia = next((a for a in asistencias if isinstance(a, dict) and a.get('id') == data['id']), None)
         if asistencia:
-            result['status'] = 'success'
-            result['message'] = 'Asistencia encontrada.'
+            result['status'] = 'success';
+            result['message'] = 'Asistencia encontrada.';
             result['data'] = asistencia
         else:
-            result['message'] = 'Asistencia no encontrada.'
-    elif action == 'read' and isinstance(data, dict) and data.get('alumno_id'): # Buscar asistencias de un alumno
-         asistencias_alumno = [a for a in asistencias if a['alumno_id'] == data['alumno_id']]
-         result['status'] = 'success'
-         result['message'] = f'Asistencias encontradas para el alumno {data["alumno_id"]}.'
-         result['data'] = asistencias_alumno
-    elif action == 'read' and data is None: # Leer todos si data es None
-        result['status'] = 'success'
-        result['message'] = 'Listado de asistencias.'
+            result['message'] = 'Asistencia no encontrada.';
+    elif action == 'read' and isinstance(data, dict) and data.get('alumno_id'):
+        alumno_id_a_buscar = data['alumno_id']
+        asistencias_alumno = [a for a in asistencias if isinstance(a, dict) and 'alumno_id' in a and a['alumno_id'] == alumno_id_a_buscar]
+        result['status'] = 'success';
+        result['message'] = f'Asistencias encontradas para el alumno {alumno_id_a_buscar}.';
+        result['data'] = asistencias_alumno
+    elif action == 'read' and (data is None or (isinstance(data, dict) and not data)): # Leer todas si data es None o diccionario vacío
+        result['status'] = 'success';
+        result['message'] = 'Lista de todas las asistencias.';
         result['data'] = asistencias
     elif action == 'update' and isinstance(data, dict) and data.get('id'):
-        asistencia_index = next((i for i, a in enumerate(asistencias) if a['id'] == data['id']), -1)
-        if asistencia_index != -1:
-            asistencias[asistencia_index].update(data) # Actualizar campos
-            write_json_file(ASISTENCIAS_PATH, asistencias)
-            result['status'] = 'success'
-            result['message'] = 'Asistencia actualizada con éxito.'
-            result['data'] = asistencias[asistencia_index]
-        else:
-            result['message'] = 'Asistencia a actualizar no encontrada.'
+        asistencia_id = data['id']
+        asistencia_encontrada = next((a for a in asistencias if isinstance(a, dict) and a.get('id') == asistencia_id), None)
+        if not asistencia_encontrada:
+            result['message'] = 'Asistencia no encontrada para actualizar.';
+            return result
+        if 'fecha' in data: asistencia_encontrada['fecha'] = data['fecha']
+        if 'estado' in data: asistencia_encontrada['estado'] = data['estado']
+        write_json_file(ASISTENCIAS_PATH, asistencias)
+        result['status'] = 'success';
+        result['message'] = 'Asistencia actualizada con éxito.';
+        result['data'] = asistencia_encontrada
     elif action == 'delete' and isinstance(data, dict) and data.get('id'):
+        asistencia_id = data['id']
         original_count = len(asistencias)
-        asistencias = [a for a in asistencias if a['id'] != data['id']]
-        if len(asistencias) < original_count:
-            write_json_file(ASISTENCIAS_PATH, asistencias)
-            result['status'] = 'success'
-            result['message'] = 'Asistencia eliminada con éxito.'
-        else:
-            result['message'] = 'Asistencia a eliminar no encontrado.'
-            
+        asistencias_actualizadas = [a for a in asistencias if isinstance(a, dict) and a.get('id') != asistencia_id]
+        if len(asistencias_actualizadas) == original_count:
+            result['message'] = 'Asistencia no encontrada para eliminar.';
+            return result
+        write_json_file(ASISTENCIAS_PATH, asistencias_actualizadas)
+        result['status'] = 'success';
+        result['message'] = 'Asistencia eliminada con éxito.';
+        result['data'] = {'id': asistencia_id}
+    else:
+        result['message'] = 'Acción no reconocida para asistencias.';
     return result
 
 # Función para resumen
@@ -395,68 +417,39 @@ Asistencias:
 
 # Nueva función tool para encontrar el último pago de un alumno por nombre
 def ultimo_pago_alumno(nombre: str, apellido: str) -> Dict[str, Any]:
-    """Busca el último pago de un alumno dado su nombre y apellido."""
+    """Obtiene la información del último pago registrado para un alumno específico.
+
+    Primero usa `crud_alumnos` para encontrar el `alumno_id` basado en el nombre y apellido.
+    Luego usa `crud_pagos` para leer todos los pagos de ese `alumno_id` y encuentra el último.
+    """
     print(f"Ejecutando tool: ultimo_pago_alumno para {nombre} {apellido}")
 
-    # Paso 1: Encontrar al alumno por nombre/apellido para obtener su ID
-    alumnos = read_json_file(ALUMNOS_PATH)
-    alumno = next((a for a in alumnos if a.get('nombre', '').lower() == nombre.lower() and a.get('apellido', '').lower() == apellido.lower()), None)
+    # 1. Encontrar alumno_id usando crud_alumnos
+    alumno_data_search = crud_alumnos(action='read', data={'nombre': nombre, 'apellido': apellido})
+    if alumno_data_search['status'] != 'success' or not alumno_data_search['data']:
+        return {"status": "error", "message": f"Alumno {nombre} {apellido} no encontrado para verificar el último pago.", "data": None}
 
-    if not alumno:
-        return {
-            "status": "error",
-            "message": f"Alumno '{nombre} {apellido}' no encontrado.",
-            "ultimo_pago": None
-        }
-
+    alumno = alumno_data_search['data']
     alumno_id = alumno.get('id')
+
     if not alumno_id:
-         return {
-            "status": "error",
-            "message": f"No se pudo obtener el ID para el alumno '{nombre} {apellido}'.",
-            "ultimo_pago": None
-        }
+         return {"status": "error", "message": f"No se pudo obtener el ID del alumno {nombre} {apellido}.", "data": None}
 
+    # 2. Obtener todos los pagos de ese alumno_id usando crud_pagos
+    # Modificación: Llamar a crud_pagos con data={'alumno_id': alumno_id}
+    pagos_data_search = crud_pagos(action='read', data={'alumno_id': alumno_id})
 
-    # Paso 2: Obtener todos los pagos de este alumno usando crud_pagos
-    # Reutilizamos la funcionalidad de crud_pagos para leer por alumno_id
-    pagos_result = crud_pagos(action='read', data={'alumno_id': alumno_id})
+    if pagos_data_search['status'] != 'success' or not pagos_data_search['data']:
+        return {"status": "success", "message": f"No se encontraron pagos para el alumno {nombre} {apellido}.", "data": None} # Estado success pero sin datos si no hay pagos
 
-    if pagos_result['status'] == 'error' or not pagos_result['data']:
-        return {
-            "status": "success", # Es éxito si encontramos el alumno pero no pagos
-            "message": f"No se encontraron pagos para el alumno '{nombre} {apellido}'.",
-            "ultimo_pago": None
-        }
+    pagos_alumno = pagos_data_search['data']
 
-    pagos_alumno = pagos_result['data']
-
-    # Paso 3: Encontrar el último pago por fecha (asumiendo formato YYYY-MM-DD)
-    # Ordenar pagos por fecha descendente
-    pagos_alumno.sort(key=lambda p: p.get('fecha_pago', p.get('fecha', '0000-00-00')), reverse=True)
-
-    ultimo_pago = pagos_alumno[0] if pagos_alumno else None
-
-    if ultimo_pago:
-        # Paso 4: Formatear la respuesta con los detalles del último pago
-        pago_info = {
-             "monto": ultimo_pago.get('monto'),
-             "fecha_pago": ultimo_pago.get('fecha_pago', ultimo_pago.get('fecha')), # Adaptado a posibles campos
-             "mes": ultimo_pago.get('mes'), # Asumiendo que estos campos existen o pueden ser None
-             "año": ultimo_pago.get('año'),
-             "estado": ultimo_pago.get('estado')
-        }
-        return {
-            "status": "success",
-            "message": f"Último pago encontrado para {nombre} {apellido}.",
-            "ultimo_pago": pago_info
-        }
+    # 3. Encontrar el último pago (ordenado por fecha descendente en crud_pagos read by alumno_id)
+    if pagos_alumno:
+        ultimo_pago = pagos_alumno[0] # El primer elemento es el último pago por la modificación en crud_pagos read
+        return {"status": "success", "message": f"Último pago encontrado para {nombre} {apellido}.", "data": ultimo_pago}
     else:
-         return {
-            "status": "success", # Éxito porque buscamos, pero no hay pagos
-            "message": f"No se encontraron pagos para el alumno '{nombre} {apellido}'.",
-            "ultimo_pago": None
-        }
+        return {"status": "success", "message": f"No se encontraron pagos para el alumno {nombre} {apellido}.", "data": None} # Estado success pero sin datos si no hay pagos
 
 # Definición del Agente principal
 root_agent = Agent(

@@ -15,13 +15,11 @@ A task management system for AI-driven development with Claude, designed to work
 
 For the Next.js application to communicate with the Google ADK agent, you need to run the ADK API server in the background. This server exposes your agent code via an HTTP interface, typically on `localhost:8000`.
 
-To start the server, open a terminal in the project root directory and run the following command:
+To start the server, open a terminal in the project root directory, activate the Python virtual environment, and run the following command:
 
 ```bash
-/Users/santiago/Library/Python/3.9/bin/adk api_server src/agent
+source .venv/bin/activate && adk api_server src/agent
 ```
-
-**Note:** The exact path to the `adk` executable (`/Users/santiago/Library/Python/3.9/bin/adk`) might vary depending on your Python installation and environment.
 
 Keep this terminal open and the server running while you are developing the Next.js application.
 
