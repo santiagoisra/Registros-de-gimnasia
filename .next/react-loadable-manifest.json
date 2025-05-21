@@ -1,0 +1,29 @@
+{
+  "../node_modules/@tanstack/query-devtools/build/index.js -> ./DevtoolsComponent/C2Q2AJ2U.js": {
+    "id": null,
+    "files": []
+  },
+  "../node_modules/@tanstack/query-devtools/build/index.js -> ./DevtoolsPanelComponent/CTUG6TWM.js": {
+    "id": null,
+    "files": []
+  },
+  "../node_modules/jspdf/dist/jspdf.es.min.js -> canvg": {
+    "id": 12396,
+    "files": [
+      "static/chunks/bc98253f.b0d35dafa74f318f.js",
+      "static/chunks/243.9a5db0844d692cfc.js"
+    ]
+  },
+  "../node_modules/jspdf/dist/jspdf.es.min.js -> dompurify": {
+    "id": 11411,
+    "files": [
+      "static/chunks/411.497271701669eada.js"
+    ]
+  },
+  "../node_modules/jspdf/dist/jspdf.es.min.js -> html2canvas": {
+    "id": 24457,
+    "files": [
+      "static/chunks/ad2866b8.d16d5df33d15d005.js"
+    ]
+  }
+}
