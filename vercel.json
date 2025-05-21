@@ -11,7 +11,8 @@
   ],
   "functions": {
     "api/agente-ia/index.py": {
-      "memory": 1024
+      "memory": 1024,
+      "excludeFiles": ".git/**,.vscode/**,node_modules/**,.next/**,cypress/**,docs/**,test/**,__tests__/**,*.log,*.map,.env,.env.local,.eslintrc.js,.eslintrc.json,.gitignore,.roomodes,.taskmasterconfig,.windsurfrules,cypress.config.ts,global.d.ts,jest.config.js,jest.hooks.config.js,jest.setup.js,next-env.d.ts,package-lock.json,package.json,postcss.config.js,README-task-master.md,sudo-users.json,tailwind.config.js,tsconfig.json,tsconfig.tsbuildinfo,vercel.json"
     }
   }
 } 
