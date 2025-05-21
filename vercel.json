@@ -10,7 +10,7 @@
     }
   ],
   "functions": {
-    "src/agent/api.py": {
+    "src/agent/agent/agent.py": {
       "memory": 1024
     }
   }
