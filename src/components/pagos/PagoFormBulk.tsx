@@ -19,7 +19,7 @@ interface PagoFormBulkProps {
 
 const metodosPago: MetodoPago[] = ['Efectivo', 'Transferencia', 'Mercado Pago']
 
-export function PagoFormBulk(_: PagoFormBulkProps) {
+export function PagoFormBulk() {
   const [fecha, setFecha] = useState<Date>(new Date())
   const [metodoPago, setMetodoPago] = useState<MetodoPago>('Efectivo')
   const { showToast } = useToast()
