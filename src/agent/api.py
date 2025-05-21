@@ -1,21 +1,20 @@
 from fastapi import FastAPI
-from google.adk.agents import Agent
+# Eliminamos las importaciones y lógica del agente temporalmente
+# from google.adk.agents import Agent
+# from .agent.agent import GymManagementAgent
 
-# Importamos nuestro agente
-from .agent.agent import GymManagementAgent
-
-# Creamos una instancia de FastAPI
+# Creamos una instancia de FastAPI - Esto es lo mínimo que Vercel debería reconocer
 app = FastAPI()
 
-# Creamos una instancia de nuestro agente
-gym_agent = GymManagementAgent()
+# Ruta de prueba simple
+@app.get("/test")
+async def read_test():
+    return {"message": "FastAPI test endpoint working"}
 
-# Exponemos el agente a través de la aplicación FastAPI
-# El ADK Agent se monta como una sub-aplicación ASGI
-# La ruta base '/agent' es la convención por defecto para el ADK Agent API Server
-app.mount("/", gym_agent)
+# Eliminamos el montaje del agente temporalmente
+# app.mount("/", gym_agent)
 
-# Opcional: Ruta raíz simple para verificar que FastAPI está funcionando
-@app.get("/")
-async def read_root():
-    return {"message": "FastAPI running with GymManagementAgent mounted at /"} 
+# Eliminamos la ruta raíz temporalmente
+# @app.get("/")
+# async def read_root():
+#     return {"message": "FastAPI running with GymManagementAgent mounted at /"} 
