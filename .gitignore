@@ -40,3 +40,10 @@ playwright-report
 cypress
 *.log
 
+.next
+.venv
+node_modules
+playwright-report
+cypress
+*.log
+.env*
