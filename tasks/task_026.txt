@@ -89,7 +89,7 @@ The testing strategy for the appointment management system should include:
    - All appointment data is correctly synchronized with the student management system
 
 # Subtasks:
-## 1. Agregar botón en la barra lateral para acceder a un panel 'Usar con Agente IA' e instalar Google Agent SDK [pending]
+## 1. Agregar botón en la barra lateral para acceder a un panel 'Usar con Agente IA' e instalar Google Agent SDK [done]
 ### Dependencies: None
 ### Description: Crear un botón en la barra lateral que lleve a un nuevo panel llamado 'Usar con Agente IA'. En ese panel, instalar y configurar el Google Agent SDK (ADK) siguiendo la documentación oficial. El objetivo es preparar la integración de un agente IA que permita SUDO de usuarios (por ahora, gestionado en un archivo JSON local en la carpeta del proyecto).
 ### Details:

@@ -1,0 +1,16 @@
+# Ignorar cache de Next.js (reduce tamaño del deploy)
+.next/cache
+
+# Ignorar archivos de entorno y locales
+.env
+.env.*
+
+# Ignorar carpetas de desarrollo
+node_modules
+.venv
+coverage
+.DS_Store
+
+# Ignorar archivos de test y configuración local
+*.test.*
+*.spec.* 
