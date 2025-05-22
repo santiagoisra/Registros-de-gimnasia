@@ -1,0 +1,59 @@
+[
+  {
+    "id": "a1",
+    "nombre": "Juan",
+    "apellido": "Perez",
+    "email": "juan.perez@example.com",
+    "telefono": "1122334455",
+    "sede": "Plaza Arenales",
+    "activo": true,
+    "alertas_activas": true,
+    "fecha_ultima_asistencia": "2024-07-25",
+    "dias_consecutivos_asistencia": 3,
+    "estado_pago": "al_dia",
+    "shift_id": "s1"
+  },
+  {
+    "id": "a2",
+    "nombre": "Maria",
+    "apellido": "Gonzalez",
+    "email": "maria.gonzalez@example.com",
+    "telefono": "9988776655",
+    "sede": "Plaza Terán",
+    "activo": false,
+    "alertas_activas": false,
+    "fecha_ultima_asistencia": "2024-07-10",
+    "dias_consecutivos_asistencia": 0,
+    "estado_pago": "pendiente",
+    "shift_id": "s2"
+  },
+  {
+    "id": "a3",
+    "nombre": "Carlos",
+    "apellido": "Lopez",
+    "email": "carlos.lopez@example.com",
+    "telefono": "3344556677",
+    "sede": "Plaza Arenales",
+    "activo": true,
+    "alertas_activas": true,
+    "fecha_ultima_asistencia": "2024-07-26",
+    "dias_consecutivos_asistencia": 1,
+    "estado_pago": "atrasado",
+    "shift_id": "s1"
+  },
+  {
+    "apellido": "Potamo",
+    "nombre": "Pepe",
+    "id": "f53b839a-7008-4bf2-b5e5-9e1a3f5684cd"
+  },
+  {
+    "nombre": "Lula",
+    "apellido": "Rueda",
+    "id": "8b6c4bfc-399c-4414-b88e-dec0cd40aa95"
+  },
+  {
+    "nombre": "Nancy",
+    "apellido": "Rodriguez",
+    "id": "4f149c02-be54-4114-a5f1-28c0844e3205"
+  }
+]

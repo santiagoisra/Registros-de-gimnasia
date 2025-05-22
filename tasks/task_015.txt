@@ -1,0 +1,65 @@
+# Task ID: 15
+# Title: Update Service Layer to Support New Database Schema
+# Status: done
+# Dependencies: None
+# Priority: medium
+# Description: Review and update the existing service code in src/services/ to ensure compatibility with the new fields and tables in the SQL migration (alumnos, asistencias, pagos, historial_precios, notas) and ensure all CRUD operations and advanced queries work correctly.
+# Details:
+This task involves updating all existing service files in the src/services/ directory to properly interact with the newly created database tables and fields. All services already exist as functional modules using Supabase. Specifically:
+
+1. Review and update types and mappings in each service file to reflect recent schema changes:
+   - alumnos.ts - Check for new fields like shift_id
+   - asistencias.ts - Ensure shift_id and other new relationships are handled
+   - pagos.ts - Verify payment processing and history functionality
+   - historialPrecios.ts - Confirm price history tracking per student
+   - notas.ts - Update to support attachments and new fields
+
+2. For each service, verify and enhance as needed:
+   - Existing CRUD operations to handle new fields and relationships
+   - Data mapping between DB and frontend models
+   - Pagination and filtering functionality
+   - Error handling consistency
+
+3. Ensure services properly handle relationships between entities:
+   - Student attendance tracking with shift information
+   - Payment processing and history
+   - Grade/note recording with attachments
+   - Price history tracking per student
+
+4. Unify error handling and parameter sanitization approaches across all services
+
+5. Enhance JSDoc documentation for all methods
+
+6. Add validation for any new fields or relationships
+
+# Test Strategy:
+Testing should be comprehensive and cover all aspects of the updated services:
+
+1. Unit Tests:
+   - Create unit tests for each CRUD operation in each service
+   - Test edge cases (null values, invalid inputs, etc.)
+   - Mock Supabase connections to isolate service logic
+
+2. Integration Tests:
+   - Test services with actual Supabase connections
+   - Verify data persistence and retrieval
+   - Test transactions and rollback functionality
+
+3. Specific Test Cases:
+   - Verify shift_id handling in students and attendance records
+   - Test price history tracking per student
+   - Test notes with attachments functionality
+   - Test advanced queries like:
+     * Students with outstanding payments
+     * Attendance reports by date range and shift
+     * Grade averages and statistics
+     * Price history reports
+
+4. Performance Testing:
+   - Test pagination and filtering with larger datasets
+   - Verify query efficiency with new relationships
+
+5. Manual Testing:
+   - Use API endpoints to manually verify service functionality
+   - Verify data integrity across related tables
+   - Test frontend-to-backend data mapping

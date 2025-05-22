@@ -1,0 +1,80 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Botones Accesibles
+
+## Botones con Íconos
+
+Los botones que solo contienen íconos deben tener un atributo `title` o `aria-label` para proporcionar un texto descriptivo a los lectores de pantalla.
+
+### ✅ Correcto
+
+```tsx
+// Botón de edición con título descriptivo
+<button
+  onClick={() => setAlumnoEditar(alumno)}
+  className="text-primary hover:text-primary/80 mr-3"
+  title="Editar alumno"
+>
+  <PencilIcon className="h-5 w-5" />
+</button>
+
+// Botón de eliminación con aria-label
+<button
+  onClick={() => handleEliminar(alumno.id)}
+  className="text-red-600 hover:text-red-800"
+  aria-label="Eliminar alumno"
+>
+  <TrashIcon className="h-5 w-5" />
+</button>
+```
+
+### ❌ Incorrecto
+
+```tsx
+// Botón sin texto descriptivo
+<button
+  onClick={() => setAlumnoEditar(alumno)}
+  className="text-primary hover:text-primary/80 mr-3"
+>
+  <PencilIcon className="h-5 w-5" />
+</button>
+```
+
+## Razones para esta regla
+
+1. **Accesibilidad**: Los lectores de pantalla necesitan texto descriptivo para anunciar la función del botón.
+2. **UX**: Los usuarios que usan tecnologías asistivas deben poder entender la función de cada botón.
+3. **Cumplimiento**: Cumple con las pautas WCAG 2.1 para accesibilidad web.
+
+## Implementación
+
+- Usar `title` cuando el texto descriptivo también deba mostrarse como tooltip al pasar el mouse.
+- Usar `aria-label` cuando solo se necesite el texto para lectores de pantalla.
+- El texto debe ser claro y descriptivo, indicando la acción que realiza el botón.
+
+## Ejemplos de uso común
+
+```tsx
+// Botones de acción en tablas
+<button title="Editar [nombre del item]">
+  <PencilIcon />
+</button>
+
+// Botones de cierre en modales
+<button aria-label="Cerrar modal">
+  <XMarkIcon />
+</button>
+
+// Botones de toggle
+<button title="Mostrar menú">
+  <MenuIcon />
+</button>
+```
+
+## Referencias
+
+- [WCAG 2.1 - Text Alternatives](https://www.w3.org/WAI/WCAG21/Understanding/text-alternatives)
+- [Accessible Icon Buttons](https://www.sarasoueidan.com/blog/accessible-icon-buttons/)

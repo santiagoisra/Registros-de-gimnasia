@@ -1,0 +1,18 @@
+[
+  {
+    "id": "n1",
+    "alumno_id": "a1",
+    "fecha": "2024-07-20",
+    "contenido": "Alumno muy participativo en la clase.",
+    "tipo": "General",
+    "visible_en_reporte": false
+  },
+  {
+    "id": "n2",
+    "alumno_id": "a2",
+    "fecha": "2024-07-10",
+    "contenido": "Reporta lesión en tobillo, estará ausente una semana.",
+    "tipo": "Lesión",
+    "visible_en_reporte": true
+  }
+] 

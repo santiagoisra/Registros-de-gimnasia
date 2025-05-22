@@ -1,0 +1,11 @@
+# Task ID: 7
+# Title: Implement Automatic Alerts System
+# Status: done
+# Dependencies: 1, 4
+# Priority: medium
+# Description: Create alerts for extended absences and overdue payments
+# Details:
+Develop an alerts system that automatically identifies students with extended absences or overdue payments. Create an alerts dashboard component showing all current alerts. Implement alert dismissal and note-taking functionality. Add alert configuration options (thresholds, etc.). Create necessary components in src/components/alertas/ and services in src/services/alertas.ts.
+
+# Test Strategy:
+Test alert generation logic with various scenarios, verify threshold configurations work correctly, test alert dismissal and persistence, and validate that all alert types are correctly identified.

@@ -1,0 +1,108 @@
+# Task ID: 26
+# Title: Task #26: Implement Configurable Appointment Management System with Student Integration
+# Status: pending
+# Dependencies: None
+# Priority: medium
+# Description: Develop a flexible appointment scheduling system that allows for predefined and custom time slots with specific time ranges, complete with an administration panel and full integration with the existing student management system.
+# Details:
+The appointment management system should include the following components and features:
+
+1. Appointment Configuration:
+   - Support for predefined appointment templates with configurable duration, capacity, and recurrence
+   - Custom appointment creation with specific date/time ranges
+   - Ability to set buffer times between appointments
+   - Options to limit the number of students per appointment slot
+   - Calendar-based visual interface for appointment scheduling
+
+2. Administration Panel:
+   - Dashboard showing upcoming appointments, utilization statistics, and conflicts
+   - Batch operations for creating, modifying, or canceling multiple appointments
+   - User role management (admin, staff, student) with appropriate permissions
+   - Configuration settings for notification preferences and system defaults
+   - Reporting tools for appointment analytics (usage patterns, no-shows, etc.)
+
+3. Student Integration:
+   - Seamless connection with the existing student management system
+   - Student profiles should display appointment history and upcoming appointments
+   - Self-service booking interface for students to schedule appointments
+   - Automated notifications for appointment confirmations, reminders, and changes
+   - Waitlist functionality for fully booked appointment slots
+
+4. Technical Implementation:
+   - RESTful API endpoints for all appointment operations
+   - Database schema extensions to support appointment data
+   - Caching strategy for frequently accessed appointment data
+   - Real-time updates using WebSockets for concurrent booking scenarios
+   - Responsive design for mobile and desktop interfaces
+
+5. Additional Considerations:
+   - Implement timezone handling for appointments
+   - Support for recurring appointments (daily, weekly, monthly)
+   - Conflict detection and resolution mechanisms
+   - Audit logging for all appointment-related actions
+   - Export functionality for appointment data (CSV, iCal, etc.)
+
+# Test Strategy:
+The testing strategy for the appointment management system should include:
+
+1. Unit Testing:
+   - Test all appointment creation, modification, and deletion functions
+   - Validate time slot calculations and conflict detection algorithms
+   - Verify permission checks for different user roles
+   - Test integration points with the student management system
+   - Ensure proper handling of edge cases (timezone changes, daylight saving time)
+
+2. Integration Testing:
+   - Verify data flow between the appointment system and student database
+   - Test notification delivery across the entire system
+   - Validate that changes in one component correctly propagate to others
+   - Test API endpoints with various request parameters and load conditions
+   - Ensure database transactions maintain data integrity
+
+3. User Acceptance Testing:
+   - Create test scenarios for administrators creating appointment templates
+   - Simulate students booking, modifying, and canceling appointments
+   - Test the waitlist functionality and automatic slot assignment
+   - Verify the reporting and analytics features with sample data
+   - Test the system under various browser and device configurations
+
+4. Performance Testing:
+   - Simulate concurrent booking requests to test system stability
+   - Measure response times for calendar views with large datasets
+   - Test system performance during peak usage periods
+   - Verify database query optimization for appointment lookups
+   - Assess notification system performance under load
+
+5. Automated Testing:
+   - Implement end-to-end tests for critical appointment workflows
+   - Create automated regression tests for the administration panel
+   - Set up continuous integration to run tests on each code change
+   - Develop API tests to verify all endpoints function correctly
+   - Implement visual regression tests for the calendar interface
+
+6. Acceptance Criteria:
+   - Administrators can create and manage appointment templates
+   - Students can book, view, and cancel appointments
+   - The system correctly handles concurrent booking attempts
+   - Notifications are sent reliably for all appointment events
+   - The system maintains performance with 1000+ appointments and 500+ concurrent users
+   - All appointment data is correctly synchronized with the student management system
+
+# Subtasks:
+## 1. Agregar botón en la barra lateral para acceder a un panel 'Usar con Agente IA' e instalar Google Agent SDK [done]
+### Dependencies: None
+### Description: Crear un botón en la barra lateral que lleve a un nuevo panel llamado 'Usar con Agente IA'. En ese panel, instalar y configurar el Google Agent SDK (ADK) siguiendo la documentación oficial. El objetivo es preparar la integración de un agente IA que permita SUDO de usuarios (por ahora, gestionado en un archivo JSON local en la carpeta del proyecto).
+### Details:
+- Leer toda la documentación interna del proyecto para entender el contexto y las funcionalidades existentes.
+- Agregar un botón en la barra lateral que redirija a un panel 'Usar con Agente IA'.
+- En ese panel, instalar y dejar listo el Google Agent SDK (ADK) según https://google.github.io/adk-docs/get-started/quickstart/.
+- Preparar la estructura para que el agente pueda hacer SUDO de usuarios, gestionando los permisos en un archivo JSON local (no en Supabase por ahora).
+- El agente debe estar preparado para responder a:
+  - CRUD de alumnos
+  - CRUD de pagos de cada alumno
+  - Notas para cada alumno
+  - Asistencias para cada alumno
+  - Resúmenes naturales (ej: 'dame un resumen de pagos de Juan Perez')
+  - Alertas urgentes al saludar (ej: alumnos que no vinieron o deben abonar)
+- Todo debe estar desacoplado de la lógica actual de Supabase, usando solo el JSON local para SUDO.
+

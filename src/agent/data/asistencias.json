@@ -1,0 +1,36 @@
+[
+  {
+    "id": "as1",
+    "alumno_id": "a1",
+    "fecha": "2024-07-23",
+    "sede": "Plaza Arenales"
+  },
+  {
+    "id": "as2",
+    "alumno_id": "a1",
+    "fecha": "2024-07-24",
+    "sede": "Plaza Arenales"
+  },
+  {
+    "id": "as3",
+    "alumno_id": "a1",
+    "fecha": "2024-07-25",
+    "sede": "Plaza Arenales"
+  },
+  {
+    "id": "as4",
+    "alumno_id": "a3",
+    "fecha": "2024-07-26",
+    "sede": "Plaza Arenales"
+  },
+  {
+    "alumno_id": "f53b839a-7008-4bf2-b5e5-9e1a3f5684cd",
+    "fecha": "2025-05-20",
+    "id": "f6eb692b-b6c8-43ff-978d-949c70fd63ca"
+  },
+  {
+    "fecha": "2025-05-20",
+    "alumno_id": "8b6c4bfc-399c-4414-b88e-dec0cd40aa95",
+    "id": "beb33a45-e17f-400a-8a81-1c06606da220"
+  }
+]

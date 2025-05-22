@@ -1,0 +1,33 @@
+# Task ID: 5
+# Title: Implement Price Increase Management
+# Status: done
+# Dependencies: 1
+# Priority: medium
+# Description: Create functionality to manage price changes and track price history
+# Details:
+Develop interface for recording price increases with effective dates. Update the HistorialPrecios model implementation. Create UI for viewing price history. Implement logic to apply the correct price based on payment date in reports and calculations. Add this to src/app/configuracion/ (create if not exists) and corresponding components in src/components/configuracion/.
+
+Implementation status:
+- The PriceHistorySection component successfully allows registering, editing, and deleting price increases with effective dates, service, type, currency, and notes.
+- The price history is correctly displayed, highlighting the current price and showing historical records.
+- The UI and form implementation are complete and user-friendly.
+- The basic price history management functionality is fully implemented and operational.
+
+# Test Strategy:
+Test price history recording, retrieval of correct prices for specific dates, and verification that reports use appropriate prices based on time periods.
+
+Note: Current reports (getDashboardMetrics, getResumenPagosPorPeriodo, etc.) correctly display actual payment amounts. If a special report comparing historical list prices vs. actual payments is needed, it would be a future enhancement.
+
+# Subtasks:
+## 5.1. Document price history management functionality [done]
+### Dependencies: None
+### Description: Add comprehensive documentation and usage examples to the README
+### Details:
+
+
+## 5.2. Consider future enhancement for price analysis [done]
+### Dependencies: None
+### Description: Evaluate the need for a specialized report that compares historical list prices vs. actual payment amounts to detect deviations, discounts, or unapplied increases
+### Details:
+
+

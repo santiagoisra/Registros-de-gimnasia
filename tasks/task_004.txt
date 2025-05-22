@@ -1,0 +1,57 @@
+# Task ID: 4
+# Title: Develop Monthly Dashboard with Key Metrics
+# Status: done
+# Dependencies: 1, 2, 3
+# Priority: medium
+# Description: Create visual dashboard showing monthly attendance, payments, and student status
+# Details:
+Implement a dashboard component displaying: monthly attendance trends, payment status overview, student activity levels, and financial summary. Build upon existing components:
+
+1. Extract and refactor chart components from `src/components/reportes/ReporteGeneral.tsx` into reusable components in a new `src/components/ui/charts/` directory (BarChart, LineChart, PieChart).
+
+2. Create a new `MonthlyDashboard` component in `src/app/dashboard/` or `src/components/dashboard/` that enhances the existing `src/components/Dashboard.tsx` with real data connections.
+
+3. Unify aggregation logic from existing services (`src/services/pagos.ts`, `asistencias.ts`, `notas.ts`, `historialPrecios.ts`) into a new `src/services/reports.ts` file.
+
+4. Implement month/year selection and filtering capabilities.
+
+5. Ensure the dashboard includes:
+   - Monthly attendance visualization (BarChart)
+   - Monthly income trends (LineChart)
+   - Student status and payment cards
+   - Financial summary
+
+# Test Strategy:
+Verify data accuracy against raw database queries, comparing dashboard metrics with existing reports in ReporteGeneral. Test performance with different data volumes, ensure responsive design works on all devices (mobile and desktop), and validate filter functionality. Verify that all charts render correctly and display accurate information from the aggregation services.
+
+# Subtasks:
+## 4.1. Create reusable chart components [done]
+### Dependencies: None
+### Description: Extract and refactor chart components from ReporteGeneral.tsx into separate reusable components
+### Details:
+
+
+## 4.2. Implement reports service [done]
+### Dependencies: None
+### Description: Create src/services/reports.ts that unifies aggregation logic from existing services
+### Details:
+
+
+## 4.3. Develop MonthlyDashboard component [done]
+### Dependencies: None
+### Description: Create new dashboard component that uses the chart components and reports service
+### Details:
+
+
+## 4.4. Add filtering capabilities [done]
+### Dependencies: None
+### Description: Implement month/year selection and filtering for the dashboard
+### Details:
+
+
+## 4.5. Test and optimize [done]
+### Dependencies: None
+### Description: Verify data accuracy, responsive design, and performance
+### Details:
+
+

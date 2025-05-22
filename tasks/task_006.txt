@@ -1,0 +1,58 @@
+# Task ID: 6
+# Title: Create Custom Report Generator
+# Status: done
+# Dependencies: 4, 5
+# Priority: medium
+# Description: Develop functionality to generate customizable reports with export options
+# Details:
+Implement a report builder interface allowing selection of time periods, metrics, and filtering options. Create exportable formats (PDF, CSV) for reports. Include student-specific reports for sharing payment/attendance summaries. Implement in src/app/reportes/ and src/components/reportes/. Create report templates and a report generation service in src/services/reportGenerator.ts.
+
+# Test Strategy:
+Test report generation with various parameters, validate export functionality and format correctness, verify calculations match dashboard data, and test with different time ranges and filter combinations.
+
+# Subtasks:
+## 1. Mejorar dashboard de reportes para usar datos reales [done]
+### Dependencies: None
+### Description: Refactorizar los componentes ReporteAlumnos y ReportePagos para que consuman datos reales desde los servicios y la base de datos, eliminando datos mokeados. Unificar lógica de obtención de métricas y visualizaciones con el generador de reportes y el servicio reportGenerator. Asegurar que los reportes reflejen información actualizada y real del sistema.
+### Details:
+- Reemplazar datos de ejemplo (mock) en ReporteAlumnos y ReportePagos por consultas reales a los servicios correspondientes.
+- Integrar la lógica de filtrado, métricas y visualización con el servicio reportGenerator para mantener consistencia.
+- Asegurar que los reportes reflejen datos actualizados de la base de datos.
+- Mejorar la UI para mostrar estados de carga, errores y datos vacíos de forma amigable.
+- Agregar tests de integración para validar que los reportes muestran datos reales.
+- Documentar el cambio en el README técnico.
+<info added on 2025-05-12T00:39:20.040Z>
+## Análisis de la situación actual
+
+- Los componentes ReporteAlumnos y ReportePagos actualmente utilizan datos mokeados (arrays locales) que no reflejan el estado real del sistema.
+- El generador de reportes (ReportBuilder) ya está implementado correctamente y utiliza el servicio reportGenerator para obtener datos reales.
+- Es necesario unificar la lógica de obtención de datos para mantener consistencia en todos los reportes.
+
+## Plan de implementación
+
+1. **Refactorización de componentes**:
+   - Identificar todas las fuentes de datos mokeados en ReporteAlumnos y ReportePagos.
+   - Modificar ambos componentes para que utilicen el servicio reportGenerator con los parámetros adecuados.
+   - Reutilizar la misma estructura de llamadas que usa ReportBuilder para mantener consistencia.
+
+2. **Mejora de experiencia de usuario**:
+   - Implementar estados de carga (loading) durante la obtención de datos.
+   - Agregar manejo de errores con mensajes informativos para el usuario.
+   - Crear visualizaciones para estados de datos vacíos que guíen al usuario.
+
+3. **Unificación de lógica**:
+   - Extraer lógica común de procesamiento de datos a funciones reutilizables.
+   - Asegurar que las métricas calculadas sean consistentes entre todos los reportes.
+   - Eliminar cualquier transformación de datos redundante.
+
+4. **Pruebas y validación**:
+   - Crear tests de integración que verifiquen la correcta obtención de datos reales.
+   - Validar que los filtros y parámetros funcionan correctamente con datos reales.
+   - Comprobar rendimiento con conjuntos grandes de datos.
+
+5. **Documentación**:
+   - Actualizar el README técnico con los cambios realizados.
+   - Documentar la estructura unificada de reportes para futuros desarrolladores.
+   - Incluir ejemplos de uso de los componentes refactorizados.
+</info added on 2025-05-12T00:39:20.040Z>
+

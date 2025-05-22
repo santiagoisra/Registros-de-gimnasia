@@ -1,0 +1,44 @@
+# Task ID: 1
+# Title: Refine Data Models for Advanced Features
+# Status: done
+# Dependencies: None
+# Priority: high
+# Description: Extend existing data models to support advanced reporting, alerts, and price history tracking
+# Details:
+Review and enhance the existing Alumno, Asistencia, Pago, Nota, and HistorialPrecios models. Add fields for tracking payment status, attendance streaks, alert preferences, and price change history. Ensure models support relationships needed for complex queries in reports and dashboards. Update TypeScript interfaces in src/types/ directory and corresponding Supabase schema.
+
+# Test Strategy:
+Validate model changes against reporting and alert requirements. Create test queries to ensure all necessary data can be retrieved efficiently. Verify backward compatibility with existing functionality.
+
+# Subtasks:
+## 1. Revisar y corregir la UX de selección de alumno en el historial de precios [done]
+### Dependencies: None
+### Description: Analizar la lógica de negocio y experiencia de usuario para el historial de precios: si siempre debe estar asociado a un alumno, el modal de 'Agregar precio' debe forzar la selección de un alumno válido. Si el modal se usa en un contexto global, debe incluir un selector de alumno obligatorio. Implementar la corrección adecuada según el flujo real de uso.
+### Details:
+Actualmente, el formulario de historial de precios permite abrir el modal 'Agregar precio' sin garantizar que haya un alumno seleccionado, lo que puede llevar a errores de UUID vacío. Se debe:
+- Analizar si el historial de precios siempre debe estar asociado a un alumno (por lógica de negocio y modelo de datos).
+- Si es así, el modal solo debe poder abrirse desde la ficha de un alumno, o debe incluir un selector de alumno obligatorio si se usa en contexto global.
+- Implementar la solución adecuada: o bien restringir el acceso al modal, o bien agregar el selector de alumno en el formulario.
+- Validar que nunca se intente crear un historial de precios sin un alumno válido.
+<info added on 2025-05-09T01:20:58.973Z>
+Se han implementado mejoras significativas en la UX de la página de pagos para resolver los problemas identificados:
+
+1. Reorganización de controles:
+   - Se eliminó el botón global "Detalles adicionales del pago" del layout principal
+   - El botón ahora aparece únicamente dentro de cada formulario específico (Pago individual y Pago en lote)
+   - Esta modificación reduce la duplicidad de elementos y elimina la confusión visual para los usuarios
+
+2. Corrección de feedback al usuario:
+   - Se ajustó el mensaje "¡Pagos registrados correctamente!" en el formulario de pago en lote
+   - El mensaje ahora solo aparece después de un registro exitoso de pagos
+   - Se implementó lógica para que el mensaje desaparezca cuando el usuario vuelve a seleccionar alumnos o reabre el formulario
+   - Esto previene mensajes engañosos que podrían confundir al usuario sobre el estado de sus operaciones
+
+3. Optimización de carga de datos:
+   - Se revisó y corrigió la lógica de carga del historial de pagos
+   - Se aseguró que el indicador de carga (loader) desaparezca correctamente al finalizar la carga
+   - Se garantiza que el historial siempre se muestre cuando corresponde
+
+Estas mejoras han resultado en una experiencia de usuario más clara, robusta y profesional en la gestión de pagos, resolviendo los problemas de UX identificados previamente relacionados con la selección de alumnos y la visualización del historial de precios.
+</info added on 2025-05-09T01:20:58.973Z>
+

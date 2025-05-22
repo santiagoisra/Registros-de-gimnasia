@@ -1,0 +1,14 @@
+[
+  {
+    "id": "1",
+    "nombre": "admin",
+    "rol": "admin",
+    "permisos": ["alumnos:crud", "pagos:crud", "notas:crud", "asistencias:crud", "resumen:read", "alertas:read"]
+  },
+  {
+    "id": "2",
+    "nombre": "profesor",
+    "rol": "profesor",
+    "permisos": ["alumnos:read", "pagos:read", "notas:read", "asistencias:read", "resumen:read", "alertas:read"]
+  }
+] 
