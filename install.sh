@@ -192,9 +192,6 @@ main() {
     get_latest_version
     detect_os
     install_cursor_free_vip
-
-    # Limpiar cache de Next.js antes de deploy (opcional, seguro)
-    rm -rf .next/cache
 }
 
 # Run main program

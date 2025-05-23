@@ -655,3 +655,16 @@ Can you analyze the complexity of our tasks to help me understand which ones nee
 ```
 Can you show me the complexity report in a more readable format?
 ```
+
+## Buenas prácticas para deploy en Vercel (Next.js)
+
+- No uses `excludeFiles` en `vercel.json` para Next.js, la gestión de archivos la maneja Next automáticamente.
+- Usá `.vercelignore` para excluir carpetas de tests, docs, cachés y archivos locales.
+- No importes assets grandes (imágenes, videos, PDFs, JSON) en el código del backend; ponelos en `/public` o un storage externo.
+- Auditá dependencias regularmente (`npm ls`, `npm dedupe`, `npm prune --production`).
+- Eliminá dependencias que no uses y preferí alternativas livianas.
+- Si una función crece mucho, dividila en varias funciones más chicas.
+- Verificá que cada función sólo importe lo que necesita.
+- Si el deploy falla por tamaño, revisá el bundle y node_modules.
+
+Más info: [Vercel Troubleshooting 250MB Limit](https://vercel.com/guides/troubleshooting-function-250mb-limit)
