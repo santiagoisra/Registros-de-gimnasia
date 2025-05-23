@@ -1,3 +1,27 @@
+<<<<<<< HEAD
+=======
+# Ignorar toda la carpeta .next (no solo cache)
+.next
+
+# Ignorar reportes de testing
+git
+playwright-report
+cypress
+cypress/
+cypress.config.ts
+
+# Ignorar carpetas de documentación y scripts locales
+docs
+scripts
+
+# Ignorar archivos de logs
+*.log
+
+# Ignorar archivos de sistema
+.DS_Store
+Thumbs.db
+
+>>>>>>> bca3edf4c49598923fba43e3671ae0efe1be456d
 # Ignorar cache de Next.js (reduce tamaño del deploy)
 .next/cache
 
@@ -9,7 +33,10 @@
 node_modules
 .venv
 coverage
+<<<<<<< HEAD
 .DS_Store
+=======
+>>>>>>> bca3edf4c49598923fba43e3671ae0efe1be456d
 
 # Ignorar archivos de test y configuración local
 *.test.*
