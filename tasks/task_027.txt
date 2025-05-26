@@ -1,89 +1,153 @@
 # Task ID: 27
-# Title: Task #27: Redesign Attendance Dashboard for Enhanced User Experience and Efficiency
+# Title: Task #27: Enhance Attendance Dashboard with Mobile-Optimized Interface and Efficient Marking Features
 # Status: pending
 # Dependencies: None
-# Priority: medium
+# Priority: high
 # Description: Redesign the attendance dashboard to provide a more efficient user experience with one-touch attendance marking, location/shift filtering, mobile optimization, visual indicators, and multi-student selection capabilities.
 # Details:
-The redesign of the attendance dashboard should focus on the following key aspects:
+The attendance dashboard enhancement should include the following key components:
 
 1. One-Touch Attendance Marking:
-   - Implement a simplified interface where instructors can mark attendance with a single tap/click
-   - Include options for present, absent, late, and excused statuses
-   - Add confirmation feedback (visual/haptic) after marking attendance
+   - Implement a simple tap/click mechanism to toggle student attendance status
+   - Ensure the action is confirmed visually with minimal latency
+   - Add undo functionality for accidental marks
 
-2. Filtering Capabilities:
-   - Develop robust filtering by location/campus
-   - Implement shift/time period filtering
-   - Allow for combination filters (e.g., morning shift at north campus)
-   - Include date range selection with calendar integration
+2. Location and Shift Filtering:
+   - Create dropdown selectors for location (sede) and shift (turno)
+   - Implement real-time filtering of student lists based on selections
+   - Add search functionality to quickly find specific students
+   - Ensure filters persist across sessions for user convenience
 
-3. Mobile Optimization:
-   - Create responsive design that works seamlessly across devices
-   - Optimize touch targets for mobile users
-   - Implement progressive loading for faster performance on mobile networks
-   - Ensure all dashboard features are accessible on smaller screens
+3. Mobile Interface Optimization:
+   - Implement responsive design principles for all screen sizes
+   - Optimize touch targets for mobile devices (minimum 44x44px)
+   - Reduce unnecessary UI elements on smaller screens
+   - Implement progressive loading for faster initial rendering
+   - Ensure text is readable without zooming on mobile devices
 
-4. Visual Indicators:
-   - Design clear visual status indicators (color coding for attendance status)
-   - Add progress bars or charts showing attendance trends
-   - Implement alerts for students with attendance issues
-   - Include visual confirmation of successful attendance marking
+4. Visual Attendance Status Indicators:
+   - Design clear, accessible color coding for attendance states (present, absent, excused, late)
+   - Add icons alongside colors for better accessibility
+   - Implement status counters/summaries at the top of the dashboard
+   - Consider adding tooltips for additional status information
 
-5. Multi-Student Selection:
-   - Allow batch selection of multiple students
-   - Implement group actions (mark all selected as present/absent)
-   - Add "select all" and "select by criteria" options
-   - Include drag selection for desktop users
+5. Touch Gestures Implementation:
+   - Add swipe gestures for marking/unmarking attendance on mobile
+   - Implement long-press for additional attendance options (late, excused)
+   - Ensure gestures have visual feedback and are discoverable
 
-6. Technical Implementation:
-   - Use modern frontend frameworks (React/Vue.js) for responsive UI
-   - Implement efficient API calls to minimize data transfer
-   - Ensure offline capability with local storage for temporary data
-   - Optimize database queries for performance
+6. Multi-Student Selection:
+   - Add checkbox or multi-select mode for batch operations
+   - Implement "select all" and "select by criteria" options
+   - Create batch actions menu for selected students
+   - Ensure clear visual indication of selected students
 
-7. Integration Requirements:
-   - Ensure compatibility with existing student management system
-   - Maintain data consistency with other modules
-   - Preserve historical attendance data during migration
+7. Date and Shift Navigation:
+   - Implement an intuitive date picker with quick navigation to today
+   - Add previous/next day navigation buttons
+   - Create a calendar view for seeing attendance patterns
+   - Allow quick switching between shifts without reloading the entire page
+
+Technical Considerations:
+- Use React hooks for state management
+- Implement optimistic UI updates for immediate feedback
+- Consider using virtualized lists for performance with large student counts
+- Ensure all new features work with the existing Supabase backend
+- Maintain accessibility standards throughout the implementation
+- Add appropriate loading states and error handling
 
 # Test Strategy:
-The testing strategy should include the following approaches:
+Testing for the enhanced attendance dashboard should follow a comprehensive approach:
 
-1. Functional Testing:
-   - Verify all attendance marking options work correctly (present, absent, late, excused)
-   - Test all filter combinations for accurate results
-   - Confirm multi-student selection and batch operations function as expected
-   - Validate that visual indicators correctly reflect attendance status
+1. Unit Testing:
+   - Test individual components (filters, buttons, attendance markers)
+   - Verify state management for attendance status changes
+   - Test filter logic for location and shift combinations
+   - Validate gesture recognition functions in isolation
 
-2. Usability Testing:
-   - Conduct user testing sessions with actual instructors/administrators
-   - Gather feedback on the intuitiveness of the new interface
-   - Measure time to complete common tasks compared to the old dashboard
-   - Evaluate the effectiveness of visual indicators and feedback mechanisms
+2. Integration Testing:
+   - Verify that filters correctly update the student list
+   - Test that attendance marking properly updates the database
+   - Ensure multi-select functionality works with batch operations
+   - Validate that navigation between dates preserves other settings
 
-3. Responsive Design Testing:
-   - Test on multiple devices (phones, tablets, desktops) with various screen sizes
-   - Verify all features are accessible and functional on mobile devices
-   - Measure load times and performance across different devices
-   - Test touch interactions on mobile devices
+3. Mobile Responsiveness Testing:
+   - Test on multiple device sizes (phone, tablet, desktop)
+   - Verify touch targets are appropriately sized on mobile
+   - Test all gesture interactions on actual mobile devices
+   - Validate that the interface remains usable at all breakpoints
 
 4. Performance Testing:
-   - Benchmark dashboard loading times with various data volumes
-   - Test system performance with concurrent users
-   - Measure response time for attendance marking operations
-   - Evaluate database query efficiency
+   - Measure load times with varying numbers of students
+   - Test response time for attendance marking actions
+   - Verify smooth scrolling with large student lists
+   - Measure and optimize network requests
 
-5. Integration Testing:
-   - Verify data consistency between the dashboard and other system modules
-   - Test integration with the student management system
-   - Confirm historical data is correctly displayed and maintained
-   - Validate that changes in one module are reflected in others
+5. User Acceptance Testing:
+   - Create specific scenarios for testers to complete:
+     * Mark attendance for a specific student
+     * Filter students by location and shift
+     * Mark multiple students as present simultaneously
+     * Navigate between different dates
+   - Collect feedback on intuitiveness and efficiency
 
-6. Acceptance Criteria:
-   - Dashboard loads within 2 seconds on standard connections
-   - Attendance marking takes no more than 1 click/tap per student
-   - All features are accessible on mobile devices with screens ≥ 4.7"
-   - Filtering operations return results in under 1 second
-   - Multi-student operations support at least 50 students simultaneously
-   - Visual indicators are distinguishable by users with color vision deficiencies
+6. Accessibility Testing:
+   - Verify color contrast meets WCAG standards
+   - Test keyboard navigation for all features
+   - Ensure screen readers can interpret attendance status changes
+   - Validate that all interactive elements have appropriate ARIA attributes
+
+7. Cross-Browser Testing:
+   - Verify functionality in Chrome, Firefox, Safari, and Edge
+   - Test on both iOS and Android mobile browsers
+
+8. Regression Testing:
+   - Ensure existing functionality continues to work
+   - Verify integration with the student management system
+   - Test compatibility with the shift management system from Task #24
+
+Documentation for testing should include screenshots of the interface at various stages and detailed steps to reproduce each test scenario.
+
+# Subtasks:
+## 1. Implement Responsive Layout and Mobile Optimization [pending]
+### Dependencies: None
+### Description: Create a responsive foundation for the attendance dashboard that adapts to different screen sizes with optimized touch targets and progressive loading.
+### Details:
+Use CSS Grid/Flexbox for responsive layouts. Implement media queries for breakpoints at 768px and 480px. Optimize touch targets to minimum 44x44px for mobile. Set up progressive loading with skeleton screens. Ensure text readability with minimum 16px font size on mobile. Hide non-essential UI elements on smaller screens using responsive utility classes.
+
+## 2. Develop Location and Shift Filtering System [pending]
+### Dependencies: 25.1
+### Description: Create dropdown selectors for location (sede) and shift (turno) with real-time filtering and search functionality.
+### Details:
+Implement dropdown components with search capability. Create filter state using React hooks (useState, useContext). Add debounced search input for student name filtering. Connect filters to Supabase queries with appropriate WHERE clauses. Store filter preferences in localStorage to persist across sessions. Add clear filters button and visual indication of active filters.
+
+## 3. Build One-Touch Attendance Marking System [pending]
+### Dependencies: 25.1
+### Description: Implement a simple tap/click mechanism to toggle student attendance status with visual confirmation and undo functionality.
+### Details:
+Create toggleable attendance status buttons with appropriate state management. Implement optimistic UI updates for immediate feedback. Add visual transitions for status changes. Develop an undo system using a temporary action stack. Connect UI actions to Supabase update operations. Add loading and error states for network operations.
+
+## 4. Design Visual Attendance Status Indicators [pending]
+### Dependencies: 25.3
+### Description: Create clear visual indicators for attendance states with color coding, icons, and status summaries.
+### Details:
+Design a color system for attendance states (present: green, absent: red, excused: blue, late: orange). Add SVG icons for each state that work alongside colors. Create a status summary component showing counts by status. Implement tooltips for additional information on hover/tap. Ensure color contrast meets WCAG AA standards for accessibility.
+
+## 5. Implement Touch Gestures for Mobile Interaction [pending]
+### Dependencies: 25.3, 25.4
+### Description: Add swipe and long-press gestures for efficient attendance marking on mobile devices with appropriate feedback.
+### Details:
+Integrate a touch gesture library (e.g., react-swipeable). Implement left/right swipe for marking attendance status. Add haptic feedback where supported. Create long-press interaction for accessing additional attendance options. Add visual cues to indicate available gestures. Ensure gestures don't interfere with native scrolling.
+
+## 6. Develop Multi-Student Selection and Batch Operations [pending]
+### Dependencies: 25.3, 25.4
+### Description: Create a system for selecting multiple students and performing batch attendance operations.
+### Details:
+Implement selection mode toggle in the UI. Add individual checkboxes and 'select all' functionality. Create a batch actions menu with options for marking all selected students. Develop a selection counter showing number of selected students. Implement 'select by criteria' options (e.g., all absent). Add clear visual indication of selected state with highlight styling.
+
+## 7. Create Date and Shift Navigation System [pending]
+### Dependencies: 25.2
+### Description: Implement intuitive date selection and navigation between shifts with a calendar view for attendance patterns.
+### Details:
+Integrate a date picker component with custom styling. Add previous/next day navigation buttons. Implement a calendar view showing attendance summary per day. Create shift tabs for quick switching without full page reload. Use React context to manage date/shift state across components. Add visual indicators for days with attendance issues in the calendar view.
+
