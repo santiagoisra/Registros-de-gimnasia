@@ -28,9 +28,10 @@ app = FastAPI()
 
 # Inicializar el agente de Google ADK si está disponible
 root_agent = None
+# En la sección de inicialización del agente, agregar más logging:
 if google_adk_available:
     try:
-        # Configurar el agente con las herramientas disponibles
+        print("Iniciando configuración del agente Google ADK...")
         tools = [
             crud_alumnos,
             crud_pagos,
@@ -42,18 +43,27 @@ if google_adk_available:
             saludo_alerta,
             get_sudo_users
         ]
+        print(f"Tools configuradas: {len(tools)}")
+        
         root_agent = Agent(
             name="GymManagementAgent",
             description="Agente para gestión de gimnasio con funciones CRUD para alumnos, pagos, notas y asistencias",
             tools=tools
         )
+        print("Agente inicializado exitosamente")
     except Exception as e:
-        print(f"Error inicializando Google ADK Agent: {e}")
+        print(f"Error detallado inicializando Google ADK Agent: {e}")
+        import traceback
+        traceback.print_exc()
         root_agent = None
+else:
+    print("Google ADK no está disponible")
 
-# Endpoint principal para el agente IA (usado por el frontend)
+# Y en el endpoint, mejorar el manejo de errores:
 @app.post("/agente_ia/")
 async def run_agent(request: Request):
+    print(f"Recibida solicitud en /agente_ia/. ADK disponible: {google_adk_available}, Agente: {root_agent is not None}")
+    
     if not google_adk_available:
         return {"status": "error", "message": "Google ADK no está instalado. Instálalo con 'pip install google-adk'"}
     
@@ -63,9 +73,11 @@ async def run_agent(request: Request):
     try:
         data = await request.json()
         message = data.get("message", "")
+        print(f"Procesando mensaje: {message}")
         
         # Ejecutar el agente con el mensaje
         response = root_agent.run({"message": message})
+        print(f"Respuesta del agente: {response}")
         
         return {
             "status": "success",
@@ -73,6 +85,9 @@ async def run_agent(request: Request):
             "message": "Procesado exitosamente"
         }
     except Exception as e:
+        print(f"Error detallado procesando solicitud: {e}")
+        import traceback
+        traceback.print_exc()
         return {
             "status": "error",
             "message": f"Error procesando solicitud: {str(e)}",
