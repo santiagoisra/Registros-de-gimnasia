@@ -8,15 +8,5 @@
       "source": "/api/agente-ia/(.*)",
       "destination": "/api/agente-ia/$1"
     }
-<<<<<<< HEAD
-  ],
-  "functions": {
-    "api/agente-ia/index.py": {
-      "memory": 1024,
-      "excludeFiles": ".git/**,.vscode/**,node_modules/**,.next/**,cypress/**,docs/**,test/**,__tests__/**,coverage/**"
-    }
-  }
-=======
   ]
->>>>>>> bca3edf4c49598923fba43e3671ae0efe1be456d
-} 
+}
