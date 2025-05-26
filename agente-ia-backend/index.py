@@ -5,6 +5,9 @@ import os
 # Importar Google ADK
 try:
     from google.adk.agents import Agent
+    from google.adk.runners import Runner
+    from google.adk.sessions import InMemorySessionService
+    from google.genai import types
     google_adk_available = True
 except ImportError:
     google_adk_available = False
@@ -28,7 +31,11 @@ app = FastAPI()
 
 # Inicializar el agente de Google ADK si está disponible
 root_agent = None
-# En la sección de inicialización del agente, agregar más logging:
+session_service = None
+runner = None
+APP_NAME = "gimnasia_app"
+USER_ID = "usuario1"
+SESSION_ID = "sesion1"
 if google_adk_available:
     try:
         print("Iniciando configuración del agente Google ADK...")
@@ -44,18 +51,22 @@ if google_adk_available:
             get_sudo_users
         ]
         print(f"Tools configuradas: {len(tools)}")
-        
         root_agent = Agent(
             name="GymManagementAgent",
             description="Agente para gestión de gimnasio con funciones CRUD para alumnos, pagos, notas y asistencias",
             tools=tools
         )
+        session_service = InMemorySessionService()
+        session_service.create_session(app_name=APP_NAME, user_id=USER_ID, session_id=SESSION_ID)
+        runner = Runner(agent=root_agent, app_name=APP_NAME, session_service=session_service)
         print("Agente inicializado exitosamente")
     except Exception as e:
         print(f"Error detallado inicializando Google ADK Agent: {e}")
         import traceback
         traceback.print_exc()
         root_agent = None
+        session_service = None
+        runner = None
 else:
     print("Google ADK no está disponible")
 
@@ -63,25 +74,25 @@ else:
 @app.post("/agente_ia/")
 async def run_agent(request: Request):
     print(f"Recibida solicitud en /agente_ia/. ADK disponible: {google_adk_available}, Agente: {root_agent is not None}")
-    
     if not google_adk_available:
         return {"status": "error", "message": "Google ADK no está instalado. Instálalo con 'pip install google-adk'"}
-    
-    if not root_agent:
+    if not root_agent or not runner or not session_service:
         return {"status": "error", "message": "El agente no pudo ser inicializado"}
-    
     try:
         data = await request.json()
         message = data.get("message", "")
         print(f"Procesando mensaje: {message}")
-        
-        # Ejecutar el agente con el mensaje
-        response = root_agent.run({"message": message})
-        print(f"Respuesta del agente: {response}")
-        
+        content = types.Content(role="user", parts=[types.Part(text=message)])
+        events = runner.run(user_id=USER_ID, session_id=SESSION_ID, new_message=content)
+        respuesta = None
+        for event in events:
+            if event.is_final_response():
+                respuesta = event.content.parts[0].text if event.content and event.content.parts else None
+                break
+        print(f"Respuesta del agente: {respuesta}")
         return {
             "status": "success",
-            "response": response.get("response", str(response)),
+            "response": respuesta or "No se recibió respuesta del agente.",
             "message": "Procesado exitosamente"
         }
     except Exception as e:
