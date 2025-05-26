@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { Cog6ToothIcon, ChatBubbleLeftRightIcon, BellIcon, ClockIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline'
+import { ChatBubbleLeftRightIcon, BellIcon, ClockIcon, CurrencyDollarIcon } from '@heroicons/react/24/outline'
 
 const configurationOptions = [
   {

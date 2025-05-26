@@ -37,4 +37,6 @@ node_modules
 
 # Ignorar archivos de test y configuración local
 *.test.*
-*.spec.* 
+*.spec.*
+
+package-lock.json 
