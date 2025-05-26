@@ -1,16 +1,16 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/api/shifts/[id]/route": "app/api/shifts/[id]/route.js",
   "/alumnos/page": "app/alumnos/page.js",
-  "/asistencias/page": "app/asistencias/page.js",
-  "/configuracion/alertas/page": "app/configuracion/alertas/page.js",
   "/api/agente-ia/route": "app/api/agente-ia/route.js",
-  "/configuracion/turnos/page": "app/configuracion/turnos/page.js",
+  "/api/shifts/route": "app/api/shifts/route.js",
+  "/asistencias/page": "app/asistencias/page.js",
+  "/configuracion/agente-ia/page": "app/configuracion/agente-ia/page.js",
+  "/configuracion/alertas/page": "app/configuracion/alertas/page.js",
   "/configuracion/historial-precios/page": "app/configuracion/historial-precios/page.js",
+  "/configuracion/turnos/page": "app/configuracion/turnos/page.js",
+  "/api/shifts/[id]/route": "app/api/shifts/[id]/route.js",
   "/dashboard/page": "app/dashboard/page.js",
   "/page": "app/page.js",
-  "/reportes/page": "app/reportes/page.js",
-  "/configuracion/agente-ia/page": "app/configuracion/agente-ia/page.js",
   "/pagos/page": "app/pagos/page.js",
-  "/api/shifts/route": "app/api/shifts/route.js"
+  "/reportes/page": "app/reportes/page.js"
 }

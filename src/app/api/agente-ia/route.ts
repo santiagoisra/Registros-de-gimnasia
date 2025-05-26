@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     console.log('Respuesta completa del agente:', agentData)
 
     // Procesar la respuesta del agente
-    let responseContent = agentData.response || agentData.message || JSON.stringify(agentData)
+    const responseContent = agentData.response || agentData.message || JSON.stringify(agentData)
 
     return NextResponse.json({ response: responseContent });
 
