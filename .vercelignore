@@ -1,5 +1,6 @@
-<<<<<<< HEAD
-=======
+agente-ia-backend/
+api/agente-ia/
+api/agente
 # Ignorar toda la carpeta .next (no solo cache)
 .next
 
@@ -32,11 +33,7 @@ Thumbs.db
 # Ignorar carpetas de desarrollo
 node_modules
 .venv
-coverage
-<<<<<<< HEAD
 .DS_Store
-=======
->>>>>>> bca3edf4c49598923fba43e3671ae0efe1be456d
 
 # Ignorar archivos de test y configuración local
 *.test.*
