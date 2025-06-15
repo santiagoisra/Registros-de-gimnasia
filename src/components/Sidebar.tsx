@@ -6,6 +6,7 @@ import {
   HomeIcon,
   UserGroupIcon,
   CalendarIcon,
+  ClockIcon,
   CurrencyDollarIcon,
   ChartBarIcon,
   Bars3Icon,
@@ -21,6 +22,7 @@ const navigation = [
   { name: 'Usar con Agente IA', href: '/configuracion/agente-ia', icon: ChatBubbleLeftRightIcon },
   { name: 'Alumnos', href: '/alumnos', icon: UserGroupIcon },
   { name: 'Asistencias', href: '/asistencias', icon: CalendarIcon },
+  { name: 'Citas', href: '/citas', icon: ClockIcon },
   { name: 'Pagos', href: '/pagos', icon: CurrencyDollarIcon },
   { name: 'Reportes', href: '/reportes', icon: ChartBarIcon },
 ]
@@ -207,4 +209,4 @@ export default function Sidebar() {
       </div>
     </>
   )
-} 
+}

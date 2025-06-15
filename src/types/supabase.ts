@@ -100,6 +100,30 @@ export interface Nota {
 }
 
 /**
+ * Modelo de Cita en la base de datos.
+ * Refleja exactamente la estructura de la tabla citas.
+ */
+export interface Cita {
+  id: string;
+  title: string;
+  date: string;
+  time: string;
+  duration: number;
+  student_id: string;
+  status: 'scheduled' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled' | 'no-show';
+  type: 'individual' | 'group' | 'evaluation' | 'consultation';
+  notes: string | null;
+  recurring: boolean;
+  recurringtype: 'daily' | 'weekly' | 'monthly' | null;
+  recurringend: string | null;
+  maxcapacity: number;
+  buffertime: number;
+  created_at: string;
+  updated_at: string;
+  [key: string]: unknown;
+}
+
+/**
  * Estadísticas de asistencia (usado en servicios)
  */
 export type EstadisticasAsistencia = {
@@ -169,6 +193,12 @@ export type Database = {
         Update: Partial<Omit<Shift, 'id' | 'created_at'>>
         Relationships: []
       }
+      citas: {
+        Row: Cita
+        Insert: Omit<Cita, 'id' | 'created_at' | 'updated_at'>
+        Update: Partial<Omit<Cita, 'id' | 'created_at' | 'updated_at'>>
+        Relationships: []
+      }
     }
   }
   Views: Record<string, never>
@@ -182,4 +212,4 @@ export type SupabaseSchema = {
   Tables: Database['public']['Tables']
   Views: Record<string, never>
   Functions: Record<string, never>
-} 
+}

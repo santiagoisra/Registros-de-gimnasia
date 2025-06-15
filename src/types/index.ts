@@ -174,4 +174,60 @@ export interface DateRangeParams {
   fechaHasta?: string;
 }
 
-export type { Shift } from './supabase' 
+export type { Shift } from './supabase'
+
+/**
+ * Modelo extendido de Cita para frontend.
+ * Incluye todos los campos de la base y campos adicionales para UI.
+ */
+export interface Cita {
+  id: string;
+  title: string;
+  date: Date;
+  time: string;
+  duration: number;
+  student_id: string;
+  status: 'scheduled' | 'confirmed' | 'in-progress' | 'completed' | 'cancelled' | 'no-show';
+  type: 'individual' | 'group' | 'evaluation' | 'consultation';
+  notes?: string;
+  recurring: boolean;
+  recurringtype?: 'daily' | 'weekly' | 'monthly';
+  recurringend?: Date;
+  maxcapacity: number;
+  buffertime: number;
+  created_at: Date;
+  updated_at: Date;
+  alumnos?: {
+    nombre: string;
+    apellido: string;
+  };
+}
+
+/**
+ * Filtros para la lista de citas
+ */
+export interface CitaFilters {
+  status?: string;
+  type?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  studentId?: string;
+  recurring?: boolean;
+}
+
+/**
+ * Props para componentes de citas
+ */
+export interface CitasListProps {
+  filters: CitaFilters;
+  onEditCita: (cita: Cita) => void;
+}
+
+export interface CitasFiltersProps {
+  filters: CitaFilters;
+  onFiltersChange: (filters: CitaFilters) => void;
+}
+
+export interface CitasCalendarProps {
+  filters: CitaFilters;
+}
